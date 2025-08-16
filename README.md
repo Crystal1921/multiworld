@@ -2,19 +2,19 @@
 
 # Multiworld ![](http://cf.way2muchnoise.eu/multiworld-mod.svg) ![](http://cf.way2muchnoise.eu/versions/multiworld-mod.svg)
 
-The Multiworld Mod - Adds support for creating & teleporting to multiple worlds. 
+The Multiworld Mod - Adds support for creating & teleporting to multiple worlds.
 
 <a href="https://modrinth.com/mod/multiworld/versions?l=fabric"><img src="https://cdn.modrinth.com/data/cached_images/1b54a3f3b03745c57beaa1ab11d9d86b9222a41a.png" width="160"></a>
 <a href="https://modrinth.com/mod/multiworld/versions?l=neoforge"><img src="https://cdn.modrinth.com/data/cached_images/a073c4dc33587010c5b7f0386d3df9e1b0eee3ed.png" width="160"></a>
- 
+
 ## Command Usage:
 | Command       | About                                      | Example |
 |---------------|--------------------------------------------|---------|
 | /mw           | View Help                                  |
-| /mw list      | List all Worlds                            | 
+| /mw list      | List all Worlds                            |
 | /mw tp        | Teleport to a World                        | /mw tp minecraft:overworld |
-| /mw spawn     | Teleport to the Spawn of the current World | 
-| /mw setspawn  | Sets the Spawn of the current World        |  
+| /mw spawn     | Teleport to the Spawn of the current World |
+| /mw setspawn  | Sets the Spawn of the current World        |
 | /mw create    | Creates a new World                        | /mw create myLovelyWorld NORMAL -g=FLAT -s=1234 |
 | /mw delete    | Delete a World (Console Only)              | /mw delete myWorld |
 
@@ -25,7 +25,7 @@ The Multiworld Mod - Adds support for creating & teleporting to multiple worlds.
 | /mw difficulty | Set the Difficulty for the current World   | /mw difficulty EASY                |
 
 ## Portals <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/03/Nether_portal_%28animated%29.png/revision/latest?cb=20191114182303" width="128" float="right" align="right">
-The latest version of Multiworld introduces Portals. 
+The latest version of Multiworld introduces Portals.
 Portals lead to a Destination, which can be either a World *(`myWorld`)*, another Portal *(`p:myOtherPortal`)*, or exact cords *(`w:myWorld:0,0,0`)*.
 
 To make a Portal use the Portal Wand, given by *`/mw portal wand`*. While holding the wand item, like in WorldEdit, Left & Right click the blocks to select the corners of the portal frame. The selected region will be used upon usage of the portal create command.
@@ -53,7 +53,7 @@ The permission `multiworld.admin` or being `/op`-ed grants access to every comma
 | /mw create <id> <dim> [-g=GENERATOR -s=SEED] | multiworld.create |
 | /mw gamerule | multiworld.gamerule |
 etc..
- 
+
 ## Coming Soon
 
 - World delete command

@@ -1,0 +1,13 @@
+{
+  "itemGroup.neomultiverse": "Example Mod Tab",
+  "block.neomultiverse.example_block": "Example Block",
+  "item.neomultiverse.example_item": "Example Item",
+
+  "neomultiverse.configuration.title": "NeoMultiverse Configs",
+  "neomultiverse.configuration.section.neomultiverse.common.toml": "NeoMultiverse Configs",
+  "neomultiverse.configuration.section.neomultiverse.common.toml.title": "NeoMultiverse Configs",
+  "neomultiverse.configuration.items": "Item List",
+  "neomultiverse.configuration.logDirtBlock": "Log Dirt Block",
+  "neomultiverse.configuration.magicNumberIntroduction": "Magic Number Text",
+  "neomultiverse.configuration.magicNumber": "Magic Number"
+}

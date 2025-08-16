@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "package": "xyz.nucleoid.fantasy.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DimensionOptionsMixin",
+    "MinecraftServerAccess",
+    "MixinMinecraftServer",
+    "MixinNetherPortalBlock",
+    "RegistryCodecsMixin",
+    "ServerChunkManagerMixin",
+    "ServerWorldMixin",
+    "SimpleRegistryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
