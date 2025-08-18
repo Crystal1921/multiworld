@@ -48,7 +48,7 @@ public class MixinNetherPortalBlock {
 					
 					BlockPos dest = p.getDestLocation();
 					
-					MultiworldMod.get_world_creator().teleleport(
+					MultiworldMod.get_world_creator().teleport(
 							(ServerPlayer) entity,
 							p.getDestWorld(),
 							dest.getX(),

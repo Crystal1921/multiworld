@@ -55,7 +55,7 @@ public class DeleteCommand implements Command {
 		}
         
         LOGGER.info("Deleting world folder \"" + id + "\"...");
-        MultiworldMod.get_world_creator().delete_world(id);
+        MultiworldMod.get_world_creator().deleteWorld(id);
 
         return 1;
     }

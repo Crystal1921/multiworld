@@ -1,10 +1,9 @@
 package me.isaiah.multiworld;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -12,11 +11,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPresets;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
@@ -36,7 +36,7 @@ public class NeoForgeWorldCreator implements ICreator {
         MultiworldMod.setICreator(new NeoForgeWorldCreator());
     }
 
-    public ServerLevel create_world(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
+    public ServerLevel createWorld(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
         RuntimeWorldConfig config = new RuntimeWorldConfig()
                 .setDimensionType(dim_of(dim))
                 .setGenerator(gen)
@@ -52,7 +52,7 @@ public class NeoForgeWorldCreator implements ICreator {
     }
     
     @Override
-    public void set_difficulty(String id, Difficulty dif) {
+    public void setDifficulty(String id, Difficulty dif) {
     	this.worldConfigs.get(id).setDifficulty(dif);
     }
     
@@ -60,29 +60,29 @@ public class NeoForgeWorldCreator implements ICreator {
         return ResourceKey.create(Registries.DIMENSION_TYPE, id);
     }
     
-    public void delete_world(String id) {
+    public void deleteWorld(String id) {
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(ResourceLocation.parse(id), null);
         worldHandle.delete();
     }
 
 	@Override
-	public boolean is_the_end(ServerLevel world) {
+	public boolean isTheEnd(ServerLevel world) {
 		return world.dimensionTypeRegistration() == BuiltinDimensionTypes.END;
 	}
 
 	@Override
-	public BlockPos get_pos(double x, double y, double z) {
+	public BlockPos getPos(double x, double y, double z) {
 		return BlockPos.containing(x, y, z);
 	}
 	
 	@Override
-	public BlockPos get_spawn(ServerLevel world) {
+	public BlockPos getSpawn(ServerLevel world) {
 		return world.getLevelData().getSpawnPos();
 	}
 
 	@Override
-	public void teleleport(ServerPlayer player, ServerLevel world, double x, double y, double z) {
+	public void teleport(ServerPlayer player, ServerLevel world, double x, double y, double z) {
 		DimensionTransition target = new DimensionTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0f, 0f, DimensionTransition.DO_NOTHING);
 		// FabricDimensionInternals.changeDimension(player, world, target);
 
@@ -91,10 +91,10 @@ public class NeoForgeWorldCreator implements ICreator {
 		player.changeDimension(target);}
 	
 	@Override
-	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc) {
-		var biome = mc.registryAccess().registryOrThrow(Registries.BIOME).wrapAsHolder(mc.registryAccess().registryOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS));
-        FlatLevelGeneratorSettings flat = new FlatLevelGeneratorSettings(Optional.empty(), biome, Collections.emptyList());
-        return new CustomFlatChunkGenerator(flat);
+	public ChunkGenerator getVoidGen(MinecraftServer mc) {
+		Registry<FlatLevelGeneratorPreset> flatLevelGeneratorPresets = mc.registryAccess().registryOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET);
+		FlatLevelGeneratorPreset preset = flatLevelGeneratorPresets.getOrThrow(FlatLevelGeneratorPresets.THE_VOID);
+        return new CustomFlatChunkGenerator(preset.settings());
 	}
 	
 	// Custom Flat Gen
@@ -115,8 +115,8 @@ public class NeoForgeWorldCreator implements ICreator {
 	}
 
 	@Override
-	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc) {
-		return this.get_flat_chunk_gen(mc);
+	public ChunkGenerator getVoidChunkGen(MinecraftServer mc) {
+		return this.getVoidGen(mc);
 	}
 
 }

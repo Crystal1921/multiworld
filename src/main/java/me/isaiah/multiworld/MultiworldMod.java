@@ -68,7 +68,7 @@ public class MultiworldMod {
     }
 
     public static ServerLevel create_world(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
-        return world_creator.create_world(id, dim, gen, dif, seed);
+        return world_creator.createWorld(id, dim, gen, dif, seed);
     }
 
     /**

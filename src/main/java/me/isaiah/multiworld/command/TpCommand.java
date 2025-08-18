@@ -42,7 +42,7 @@ public class TpCommand implements Command {
 			boolean isEnd = false;
 			
 			try {
-				boolean is_the_end = MultiworldMod.get_world_creator().is_the_end(w);
+				boolean is_the_end = MultiworldMod.get_world_creator().isTheEnd(w);
 				if (is_the_end) {
 					isEnd = true;
 				}
@@ -77,7 +77,7 @@ public class TpCommand implements Command {
             // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
             // FabricDimensionInternals.changeDimension(plr, w, target);
 
-            MultiworldMod.get_world_creator().teleleport(plr, w, sp.getX(), sp.getY(), sp.getZ());
+            MultiworldMod.get_world_creator().teleport(plr, w, sp.getX(), sp.getY(), sp.getZ());
             
             return 1;
         }

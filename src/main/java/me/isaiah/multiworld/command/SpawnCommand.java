@@ -64,11 +64,11 @@ public class SpawnCommand implements Command {
 	public static BlockPos multiworld_method_43126(ServerLevel world) {
 		LevelData prop = world.getLevelData();
 		
-		BlockPos pos = MultiworldMod.get_world_creator().get_spawn(world);
+		BlockPos pos = MultiworldMod.get_world_creator().getSpawn(world);
         // BlockPos pos = new BlockPos(prop.getSpawnX(), prop.getSpawnY(), prop.getSpawnZ());
 		
         if (!world.getWorldBorder().isWithinBounds(pos)) {
-        	BlockPos pp = MultiworldMod.get_world_creator().get_pos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ());
+        	BlockPos pp = MultiworldMod.get_world_creator().getPos(world.getWorldBorder().getCenterX(), 0.0, world.getWorldBorder().getCenterZ());
             pos = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(pp));
         }
         return pos;

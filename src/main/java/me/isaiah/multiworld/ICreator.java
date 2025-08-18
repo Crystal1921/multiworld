@@ -23,16 +23,16 @@ public interface ICreator {
 
 	/**
 	 */
-	public ServerLevel create_world(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed);
+	public ServerLevel createWorld(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed);
 
 	/**
 	 */
-	public BlockPos get_pos(double x, double y, double z);
+	public BlockPos getPos(double x, double y, double z);
 
 	/**
 	 */
 	@Deprecated
-	public default Component colored_literal_(String txt, ChatFormatting color) {
+	public default Component coloredLiteral(String txt, ChatFormatting color) {
 		try {
 			return Component.nullToEmpty(txt).copy().withStyle(color);
 		} catch (Exception | IncompatibleClassChangeError e) {
@@ -44,17 +44,17 @@ public interface ICreator {
 
 	/**
 	 */
-	void teleleport(ServerPlayer player, ServerLevel world, double x, double y, double z);
+	void teleport(ServerPlayer player, ServerLevel world, double x, double y, double z);
 
 	/**
 	 */
-	void set_difficulty(String id, Difficulty dif);
+	void setDifficulty(String id, Difficulty dif);
 
     /**
      * Return a {@link ChunkGenerator} for the given vanilla environment,
      * or NULL if the passed argument is not NORMAL / NETHER / END.
      */
-    default ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
+    default ChunkGenerator getChunkGen(MinecraftServer mc, String env) {
     	ChunkGenerator gen = null;
     	if (env.contains("NORMAL") || env.contains("DEFAULT")) {
 			gen = mc.getLevel(Level.OVERWORLD).getChunkSource().getGenerator(); // .withSeed(seed);
@@ -69,7 +69,7 @@ public interface ICreator {
 		}
 		
 		if (env.contains("FLAT")) {
-			FlatLevelSource genn = (FlatLevelSource) this.get_flat_chunk_gen(mc);
+			FlatLevelSource genn = (FlatLevelSource) this.getVoidGen(mc);
 
 			FlatLevelGeneratorSettings flat = genn.settings();
 			
@@ -89,18 +89,18 @@ public interface ICreator {
 		}
 		
 		if (env.contains("VOID")) {
-			return this.get_void_chunk_gen(mc);
+			return this.getVoidChunkGen(mc);
 		}
 
 		return gen;
     } 
 
 	// TODO: move to icommonlib ?:
-	public BlockPos get_spawn(ServerLevel world);
-	public boolean is_the_end(ServerLevel world);
-	public ChunkGenerator get_flat_chunk_gen(MinecraftServer mc);
-	public ChunkGenerator get_void_chunk_gen(MinecraftServer mc);
+	public BlockPos getSpawn(ServerLevel world);
+	public boolean isTheEnd(ServerLevel world);
+	public ChunkGenerator getVoidGen(MinecraftServer mc);
+	public ChunkGenerator getVoidChunkGen(MinecraftServer mc);
 
-	void delete_world(String id);
+	void deleteWorld(String id);
 	
 }

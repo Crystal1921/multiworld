@@ -87,7 +87,7 @@ public class PortalUtil {
 		double x1 = Double.parseDouble(from[0]);
 		double y1 = Double.parseDouble(from[1]);
 		double z1 = Double.parseDouble(from[2]);
-        return MultiworldMod.get_world_creator().get_pos(x1, y1, z1);
+        return MultiworldMod.get_world_creator().getPos(x1, y1, z1);
 	}
 	
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 import me.isaiah.multiworld.MultiworldMod;
@@ -110,8 +109,8 @@ public class Portal {
 		double y2 = Double.valueOf(to[1]);
 		double z2 = Double.valueOf(to[2]);
 		
-		BlockPos a = MultiworldMod.get_world_creator().get_pos(x1, y1, z1);
-		BlockPos b = MultiworldMod.get_world_creator().get_pos(x2, y2, z2);
+		BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
+		BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
 
 		this.minEdge = PortalUtil.getMinPos(a, b);
 		this.maxEdge = PortalUtil.getMaxPos(a, b);
