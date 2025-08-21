@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "DimensionOptionsMixin",
+    "FlatLevelGeneratorSettingsMixin",
     "MinecraftServerAccess",
     "MixinMinecraftServer",
     "MixinNetherPortalBlock",

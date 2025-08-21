@@ -29,7 +29,6 @@ public class ConsoleCommand {
 			return 1;
 		}
 
-		// Delete Command (Console Only)
 		if (args[0].equalsIgnoreCase("delete")) {
 			DeleteCommand.run(mc, source, args);
 			return 1;

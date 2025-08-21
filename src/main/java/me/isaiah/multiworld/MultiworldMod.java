@@ -73,8 +73,6 @@ public class MultiworldMod {
 
     /**
      * ModInitializer onInitialize
-     *
-     * @see {@link me.isaiah.multiworld.fabric.MultiworldModFabric}
      */
     public static void init() {
         System.out.println("Multiworld init");
@@ -222,6 +220,13 @@ public class MultiworldMod {
                 e.printStackTrace();
             }
         }*/
+
+
+        // Delete Command (Console Only)
+        if (args[0].equalsIgnoreCase("delete")) {
+            DeleteCommand.run(mc, source, args);
+            return 1;
+        }
 
         // Help Command
         if (args[0].equalsIgnoreCase("help")) {
