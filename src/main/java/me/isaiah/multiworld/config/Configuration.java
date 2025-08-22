@@ -1,7 +1,6 @@
 /**
  * Isaiah's Configuration File Format
  * Tiny two file YAML-like configuration parser
- * 
  * Unlicense
  */
 package me.isaiah.multiworld.config;
@@ -86,6 +85,10 @@ public class Configuration {
      */
     public void set(String key, Object value) {
         contentMap.put(key, value);
+    }
+
+    public void remove(String key) {
+        contentMap.remove(key);
     }
 
     public void save(File to) throws IOException {

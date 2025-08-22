@@ -1,4 +1,4 @@
-<img src="https://cdn.modrinth.com/data/cached_images/01d4b3f0a8d469b8d7b36030f2039007500b00f4.png" align="right" height="64">
+<img src="https://cdn.modrinth.com/data/cached_images/01d4b3f0a8d469b8d7b36030f2039007500b00f4.png" height="64" alt="Multiworld Logo">
 
 # Multiworld ![](http://cf.way2muchnoise.eu/multiworld-mod.svg) ![](http://cf.way2muchnoise.eu/versions/multiworld-mod.svg)
 
@@ -31,12 +31,13 @@ Portals lead to a Destination, which can be either a World *(`myWorld`)*, anothe
 To make a Portal use the Portal Wand, given by *`/mw portal wand`*. While holding the wand item, like in WorldEdit, Left & Right click the blocks to select the corners of the portal frame. The selected region will be used upon usage of the portal create command.
 
 ### Portal Commands
-TBD
-| Command           | About                                      | Example                                         |
-|-------------------|--------------------------------------------|-------------------------------------------------|
-| /mw portal        | View Help                                  |
-| /mw portal create | Create a new Portal from the Wand Area     | /mw create myPortal myWorld                     |
-| /mw portal wand   | Get a Portal Wand, to make a portal area   | Select the Obsidian Corners of the Portal Frame |
+| Command           | About                                    | Example                                         |
+|-------------------|------------------------------------------|-------------------------------------------------|
+| /mw portal        | View Help                                |                                                 |
+| /mw portal create | Create a new Portal from the Wand Area   | /mw create myPortal myWorld                     |
+| /mw portal wand   | Get a Portal Wand, to make a portal area | Select the Obsidian Corners of the Portal Frame |
+| /mw portal info   | List all Portals                         |                                                 |
+| /mw portal remove | Remove a Portal                          | /mw portal remove myPortal                      |
 
 
 ## Permissions
@@ -56,7 +57,6 @@ etc..
 
 ## Coming Soon
 
-- World delete command
 - Custom generator suppport
 - Custom Portal support
 

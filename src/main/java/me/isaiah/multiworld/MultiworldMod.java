@@ -43,7 +43,7 @@ public class MultiworldMod {
     public static final String VERSION = "1.10";
     private static final char COLOR_CHAR = '\u00A7';
     public static MinecraftServer mc;
-    public static String CMD = "mw";
+    public static String CMD = "mv";
     public static ICreator world_creator;
     public static String[] COMMAND_HELP = {
             "&4Multiworld Mod Commands:&r",

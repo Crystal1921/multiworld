@@ -1,5 +1,6 @@
 package me.isaiah.multiworld.command;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
@@ -8,6 +9,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.InfoSuggest;
+import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import me.isaiah.multiworld.portal.WandEventHandler;
@@ -24,6 +26,8 @@ import static me.isaiah.multiworld.MultiworldMod.message;
 public class PortalCommand implements Command {
 
 	public static HashMap<String, Portal> KNOWN_PORTALS = new HashMap<>();
+	private static final String DEST_POS_REGEX = "^e:[a-z0-9_]+:[a-z0-9_]+:-?\\d+,-?\\d+,-?\\d+$";
+	private static final String DEST_REGEX = "^e:[a-z0-9_]+:[a-z0-9_]+";
 	
 	public static void addKnownPortal(String key, Portal value) {
 		String lower = key.toLowerCase(Locale.ROOT);
@@ -46,14 +50,14 @@ public class PortalCommand implements Command {
 			"&a/mw portal select <name>&r - TODO",
 			"&a/mw portal wand&r - Gives a Portal Creation Wand",
 			"&a/mw portal info <name>&r - Displays information about a portal.",
-			"&a/mw portal remove <name>&r - TODO", // Remove the portal whose name is given.",
+			"&a/mw portal remove <name>&r", // Remove the portal whose name is given.",
 	};
 	
 	/**
 	 * Valid Subcommands
 	 */
 	public static String[] SUBCOMMANDS = {
-			"create", "wand", "info"
+			"create", "wand", "info", "remove"
 	};
 
 	/**
@@ -151,6 +155,10 @@ public class PortalCommand implements Command {
 
 			return createPortal(plr, args);
 		}
+
+		if (args[1].equalsIgnoreCase("remove")) {
+			return removePortal(plr, args);
+		}
 		
 		return 1;
 	}
@@ -188,7 +196,12 @@ public class PortalCommand implements Command {
 		String name = args[2];
 		String nameL = name.toLowerCase(Locale.ROOT);
 		String dest = args[3];
-		
+
+        if (!isValidDestination(dest)) {
+			message(plr, "&4Invalid destination format! Use: e:<world>:<x>,<y>,<z> or <world>:<x>,<y>,<z>");
+            return 0;
+        }
+
 		if (KNOWN_PORTALS.containsKey(nameL)) {
 			message(plr, "&4A Portal with the name \"" + name + "\" already exists!");
 			return 0;
@@ -212,6 +225,20 @@ public class PortalCommand implements Command {
 			e.printStackTrace();
 		}
 		message(plr, "&aPortal Created.");
+		return 1;
+	}
+
+	private static int removePortal(ServerPlayer plr, String[] args) {
+		String arg = args[2];
+		if (KNOWN_PORTALS.containsKey(arg)) {
+			KNOWN_PORTALS.remove(arg);
+			delete(arg);
+			message(plr, "&aPortal \"" + arg + "\" deleted.");
+		} else {
+			message(plr, "&4Portal \"" + arg + "\" not found.");
+			return 0;
+		}
+
 		return 1;
 	}
 
@@ -289,6 +316,41 @@ public class PortalCommand implements Command {
     private static double round(double d) {
     	return Math.round(d * 100.0) / 100.0;
     }
-    
 
+	public static void delete(String name){
+		File configDir = new File("config");
+		File cf = new File(configDir, "multiworld");
+		File wc = new File(cf, "portals.yml");
+
+		if (!wc.exists()) {
+			// 文件不存在就不用删除
+			return;
+		}
+		String prefix = "portals." + name;
+
+		try {
+			FileConfiguration config = new FileConfiguration(wc);
+
+			config.remove(prefix + ".entryfee.amount");
+			config.remove(prefix + ".entryfee");
+			config.remove(prefix + ".safeteleport");
+			config.remove(prefix + ".teleportnonplayers");
+			config.remove(prefix + ".handlerscript");
+
+			config.remove(prefix + ".owner"); // player
+			config.remove(prefix + ".location"); // x1,y1,z1:x2,y2,z2
+			config.remove(prefix + ".world");
+			config.remove(prefix + ".destination");
+			config.remove(prefix);
+
+			config.save();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private static boolean isValidDestination(String dest) {
+        return dest.matches(DEST_POS_REGEX) || dest.matches(DEST_REGEX);
+    }
 }
