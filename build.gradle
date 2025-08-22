@@ -13,7 +13,9 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-
+    flatDir {
+        dir 'libs'
+    }
 }
 
 base {
@@ -106,7 +108,7 @@ configurations {
 }
 
 dependencies {
-
+//    implementation "DistantHorizon:DistantHorizons-2.3.4-b-1.21.1-fabric-neoforge"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

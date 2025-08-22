@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPresets;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import xyz.nucleoid.fantasy.Fantasy;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
 import xyz.nucleoid.fantasy.RuntimeWorldHandle;
@@ -48,7 +51,9 @@ public class NeoForgeWorldCreator implements ICreator {
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(ResourceLocation.parse(id), config);
         this.worldConfigs.put(id, config);
-        return worldHandle.asWorld();
+		ServerLevel world = worldHandle.asWorld();
+		NeoForge.EVENT_BUS.post(new LevelEvent.Load(world));
+		return world;
     }
     
     @Override
@@ -84,11 +89,8 @@ public class NeoForgeWorldCreator implements ICreator {
 	@Override
 	public void teleport(ServerPlayer player, ServerLevel world, double x, double y, double z) {
 		DimensionTransition target = new DimensionTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0f, 0f, DimensionTransition.DO_NOTHING);
-		// FabricDimensionInternals.changeDimension(player, world, target);
-
-		// Per https://fabricmc.net/2024/05/31/121.html
-		// for 1.21, FabricDimension API is replaced by teleportTo
-		player.changeDimension(target);}
+		player.changeDimension(target);
+	}
 	
 	@Override
 	public ChunkGenerator getVoidGen(MinecraftServer mc) {
