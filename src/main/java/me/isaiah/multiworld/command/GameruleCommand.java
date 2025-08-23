@@ -140,7 +140,7 @@ public class GameruleCommand implements Command {
      * @param b - The value for the Gamerule (ex: "true", or "100")
      */
     public static void set_rule_cfg(Level w, String a, String b) throws IOException {
-        File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
+        File cf = new File(Util.get_platform_config_dir(), "multiworld");
         cf.mkdirs();
 
         File worlds = new File(cf, "worlds");

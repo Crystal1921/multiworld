@@ -39,7 +39,7 @@ public class DifficultyCommand implements Command {
             }
         }
 
-		Difficulty d = Difficulty.NORMAL;
+		Difficulty d;
 
 		// String to Difficulty
 		if (a1.equalsIgnoreCase("EASY"))         { d = Difficulty.EASY; }

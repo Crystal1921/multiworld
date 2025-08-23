@@ -146,7 +146,7 @@ public class CreateCommand implements Command {
         	
         }
         
-        ServerLevel world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.NORMAL, seed);
+        ServerLevel world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.PEACEFUL, seed);
 		make_config(world, args[2], seed, customGen);
 
 		message(plr, I18n.CREATED_WORLD + args[1]);
@@ -248,7 +248,7 @@ public class CreateCommand implements Command {
 		    	dim = Util.OVERWORLD_ID;
 		    }
 			
-			Difficulty d = Difficulty.NORMAL;
+			Difficulty d = Difficulty.PEACEFUL;
 
 			// Set saved Difficulty
 			if (config.is_set("difficulty")) {

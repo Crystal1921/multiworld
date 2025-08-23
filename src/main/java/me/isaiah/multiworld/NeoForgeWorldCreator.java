@@ -45,8 +45,7 @@ public class NeoForgeWorldCreator implements ICreator {
                 .setGenerator(gen)
                 .setDifficulty(dif)
 				.setSeed(seed)
-				.setShouldTickTime(true)
-                ;
+				.setShouldTickTime(true);
 
         Fantasy fantasy = Fantasy.get(MultiworldMod.mc);
         RuntimeWorldHandle worldHandle = fantasy.getOrOpenPersistentWorld(ResourceLocation.parse(id), config);

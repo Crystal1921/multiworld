@@ -26,7 +26,7 @@ public final class RuntimeWorldConfig {
     private ChunkGenerator generator = null;
     private boolean shouldTickTime = false;
     private long timeOfDay = 6000;
-    private Difficulty difficulty = Difficulty.NORMAL;
+    private Difficulty difficulty = Difficulty.PEACEFUL;
     private final GameRuleStore gameRules = new GameRuleStore();
 
     private int sunnyTime = Integer.MAX_VALUE;

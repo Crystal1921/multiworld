@@ -6,7 +6,7 @@ import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.WorldData;
 
 public final class RuntimeWorldProperties extends DerivedLevelData {
-    protected final RuntimeWorldConfig config;
+    final RuntimeWorldConfig config;
     private final GameRules rules;
 
     public RuntimeWorldProperties(WorldData saveProperties, RuntimeWorldConfig config) {
