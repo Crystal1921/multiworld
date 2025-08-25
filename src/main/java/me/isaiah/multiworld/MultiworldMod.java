@@ -8,6 +8,10 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.isaiah.multiworld.command.*;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
@@ -27,9 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
+import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -173,7 +180,7 @@ public class MultiworldMod {
                             }
                         })
                         .then(Commands.argument("world", StringArgumentType.string())
-                                .suggests(new BrigadierTpCommand.WorldSuggestionProvider())
+                                .suggests(new WorldSuggestionProvider())
                                 .executes(ctx -> {
                                     String worldName = StringArgumentType.getString(ctx, "world");
                                     ServerPlayer player = ctx.getSource().getPlayer();
@@ -181,7 +188,7 @@ public class MultiworldMod {
                                     return TpCommand.run(ctx.getSource().getServer(), player, args);
                                 })
                                 .then(Commands.argument("player", StringArgumentType.string())
-                                        .suggests(new BrigadierTpCommand.PlayerSuggestionProvider())
+                                        .suggests(new PlayerSuggestionProvider())
                                         .executes(ctx -> {
                                             String worldName = StringArgumentType.getString(ctx, "world");
                                             String playerName = StringArgumentType.getString(ctx, "player");
@@ -255,9 +262,9 @@ public class MultiworldMod {
                             }
                         })
                         .then(Commands.argument("id", StringArgumentType.string())
-                                .suggests(new BrigadierCreateCommand.IdSuggestionProvider())
+                                .suggests(new IdSuggestionProvider())
                                 .then(Commands.argument("environment", StringArgumentType.string())
-                                        .suggests(new BrigadierCreateCommand.EnvironmentSuggestionProvider())
+                                        .suggests(new EnvironmentSuggestionProvider())
                                         .executes(ctx -> {
                                             String id = StringArgumentType.getString(ctx, "id");
                                             String environment = StringArgumentType.getString(ctx, "environment");
@@ -265,8 +272,8 @@ public class MultiworldMod {
                                             String[] args = {"create", id, environment};
                                             return CreateCommand.run(ctx.getSource().getServer(), player, args);
                                         })
-                                        .then(Commands.argument("options", StringArgumentType.greedyString())
-                                                .suggests(new BrigadierCreateCommand.GeneratorSuggestionProvider())
+                                        .then(Commands.argument("options", greedyString())
+                                                .suggests(new GeneratorSuggestionProvider())
                                                 .executes(ctx -> {
                                                     String id = StringArgumentType.getString(ctx, "id");
                                                     String environment = StringArgumentType.getString(ctx, "environment");
@@ -293,6 +300,183 @@ public class MultiworldMod {
                             }
                             return 1;
                         }))
+                
+                // Spawn Command
+                .then(Commands.literal("spawn")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.spawn") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            String[] args = {"spawn"};
+                            return SpawnCommand.run(ctx.getSource().getServer(), player, args);
+                        }))
+                
+                // SetSpawn Command
+                .then(Commands.literal("setspawn")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.setspawn") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            String[] args = {"setspawn"};
+                            return SetspawnCommand.run(ctx.getSource().getServer(), player, args);
+                        }))
+                
+                // Gamerule Command
+                .then(Commands.literal("gamerule")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.gamerule") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .then(Commands.argument("rule", StringArgumentType.string())
+                                .suggests(new GameruleSuggestionProvider())
+                                .executes(ctx -> {
+                                    String rule = StringArgumentType.getString(ctx, "rule");
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    String[] args = {"gamerule", rule};
+                                    return GameruleCommand.run(ctx.getSource().getServer(), player, args);
+                                })
+                                .then(Commands.argument("value", StringArgumentType.string())
+                                        .suggests(new GameruleValueSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String rule = StringArgumentType.getString(ctx, "rule");
+                                            String value = StringArgumentType.getString(ctx, "value");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"gamerule", rule, value};
+                                            return GameruleCommand.run(ctx.getSource().getServer(), player, args);
+                                        }))))
+                
+                // Difficulty Command
+                .then(Commands.literal("difficulty")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.difficulty") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .then(Commands.argument("difficulty", StringArgumentType.string())
+                                .suggests(new DifficultySuggestionProvider())
+                                .executes(ctx -> {
+                                    String difficulty = StringArgumentType.getString(ctx, "difficulty");
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    String[] args = {"difficulty", difficulty};
+                                    return DifficultyCommand.run(ctx.getSource().getServer(), player, args);
+                                })
+                                .then(Commands.argument("world", StringArgumentType.string())
+                                        .suggests(new WorldSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String difficulty = StringArgumentType.getString(ctx, "difficulty");
+                                            String world = StringArgumentType.getString(ctx, "world");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"difficulty", difficulty, world};
+                                            return DifficultyCommand.run(ctx.getSource().getServer(), player, args);
+                                        }))))
+                
+                // Portal Command
+                .then(Commands.literal("portal")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.portal") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            String[] args = {"portal"};
+                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                        })
+                        .then(Commands.literal("create")
+                                .then(Commands.argument("name", StringArgumentType.string())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"portal", "create", name};
+                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                        })
+                                        .then(Commands.argument("destination", greedyString())
+                                                .suggests(new DestinationSuggestionProvider())
+                                                .executes(ctx -> {
+                                                    String name = StringArgumentType.getString(ctx, "name");
+                                                    String destination = StringArgumentType.getString(ctx, "destination");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    String[] args = {"portal", "create", name, destination};
+                                                    return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                                }))))
+                        .then(Commands.literal("wand")
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    String[] args = {"portal", "wand"};
+                                    return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                }))
+                        .then(Commands.literal("info")
+                                .then(Commands.argument("name", StringArgumentType.string())
+                                        .suggests(new PortalNameSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"portal", "info", name};
+                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                        })))
+                        .then(Commands.literal("remove")
+                                .then(Commands.argument("name", StringArgumentType.string())
+                                        .suggests(new PortalNameSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"portal", "remove", name};
+                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                        }))))
+                
+                // Delete Command
+                .then(Commands.literal("delete")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .then(Commands.argument("world", StringArgumentType.string())
+                                .suggests(new DeleteWorldSuggestionProvider())
+                                .executes(ctx -> {
+                                    String world = StringArgumentType.getString(ctx, "world");
+                                    String[] args = {"delete", world};
+                                    return DeleteCommand.run(ctx.getSource().getServer(), ctx.getSource(), args);
+                                })))
         );
     }
 
@@ -312,6 +496,8 @@ public class MultiworldMod {
         message(plr, "Currently in: " + id.toString());
 
         return 1;
+    }
+
     public static Component text(String message) {
         try {
             return Component.nullToEmpty(translate_alternate_color_codes('&', message));
@@ -342,6 +528,147 @@ public class MultiworldMod {
 
     public static Component text_plain(String txt) {
         return Component.nullToEmpty(txt);
+    }
+
+    // Suggestion Providers
+    public static class WorldSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            context.getSource().getServer().levelKeys().forEach(resourceKey -> {
+                ResourceLocation location = resourceKey.location();
+                String worldName = location.toString();
+                if (worldName.startsWith("multiworld:")) {
+                    worldName = worldName.replace("multiworld:", "");
+                }
+                builder.suggest(worldName);
+            });
+            return builder.buildFuture();
+        }
+    }
+
+    public static class PlayerSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            context.getSource().getServer().getPlayerNames().forEach(builder::suggest);
+            return builder.buildFuture();
+        }
+    }
+
+    public static class IdSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            builder.suggest("myid:myvalue");
+            return builder.buildFuture();
+        }
+    }
+
+    public static class EnvironmentSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            builder.suggest("NORMAL");
+            builder.suggest("NETHER");
+            builder.suggest("END");
+            return builder.buildFuture();
+        }
+    }
+
+    public static class GeneratorSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            builder.suggest("-g=NORMAL");
+            builder.suggest("-g=FLAT");
+            builder.suggest("-g=VOID");
+            builder.suggest("-s=1234");
+            builder.suggest("-s=RANDOM");
+            
+            for (String key : CreateCommand.customs.keySet()) {
+                builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
+            }
+            
+            return builder.buildFuture();
+        }
+    }
+
+    public static class GameruleSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            if (GameruleCommand.keys.isEmpty()) {
+                GameruleCommand.setupServer(context.getSource().getServer());
+            }
+
+            for (String name : GameruleCommand.keys.keySet()) {
+                builder.suggest(name);
+            }
+            
+            return builder.buildFuture();
+        }
+    }
+
+    public static class GameruleValueSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            builder.suggest("true");
+            builder.suggest("false");
+            builder.suggest("0");
+            builder.suggest("1");
+            builder.suggest("10");
+            return builder.buildFuture();
+        }
+    }
+
+    public static class DifficultySuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            String[] difficulties = {"PEACEFUL", "EASY", "NORMAL", "HARD"};
+            for (String difficulty : difficulties) {
+                builder.suggest(difficulty);
+            }
+            return builder.buildFuture();
+        }
+    }
+
+    public static class PortalNameSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            for (String portalName : PortalCommand.KNOWN_PORTALS.keySet()) {
+                builder.suggest(portalName);
+            }
+            return builder.buildFuture();
+        }
+    }
+
+    public static class DestinationSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            context.getSource().getServer().levelKeys().forEach(resourceKey -> {
+                String namespace = resourceKey.location().getNamespace();
+                String path = resourceKey.location().getPath();
+                builder.suggest("e:" + namespace + ":" + path);
+            });
+            
+            return builder.buildFuture();
+        }
+    }
+
+    public static class DeleteWorldSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+            context.getSource().getServer().levelKeys().forEach(resourceKey -> {
+                ResourceLocation location = resourceKey.location();
+                String worldName = location.toString();
+                if (worldName.startsWith("multiworld:")) {
+                    worldName = worldName.replace("multiworld:", "");
+                }
+                // Don't suggest built-in worlds for deletion
+                if (!worldName.equals("minecraft:overworld") && 
+                    !worldName.equals("minecraft:the_nether") && 
+                    !worldName.equals("minecraft:the_end")) {
+                    builder.suggest(worldName);
+                }
+            });
+            
+            return builder.buildFuture();
+        }
     }
 
 }
