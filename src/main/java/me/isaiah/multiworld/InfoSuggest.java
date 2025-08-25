@@ -21,8 +21,12 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * @deprecated This class is deprecated. Individual commands now use their own brigadier-based suggestion providers.
+ * This class is kept for backward compatibility but should not be used in new code.
+ * 
  * Our Implementation of a command SuggestionProvider.
  */
+@Deprecated
 public class InfoSuggest implements SuggestionProvider<CommandSourceStack> {
 
     /**
@@ -60,150 +64,21 @@ public class InfoSuggest implements SuggestionProvider<CommandSourceStack> {
     }
 
     /**
-     * Build our Suggestion list
+     * @deprecated Use individual brigadier command suggestion providers instead
      */
     @Override
+    @Deprecated
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
-        builder = builder.createOffset(builder.getInput().lastIndexOf(' ') + 1);
-
-        String input = builder.getInput();
-        String[] cmds = input.trim().split(" ");
-
-        CommandSourceStack plr = context.getSource();
-        boolean ALL = Perm.has(plr, "multiworld.admin");
-
-        if (cmds.length <= 1 || (cmds.length <= 2 && !input.endsWith(" "))) {
-            for (String s : subcommands) {
-                builder.suggest(s);
-            }
-            return builder.buildFuture();
-        }
-
-        if (cmds.length <= 2 || (cmds.length <= 3 && !input.endsWith(" "))) {
-            if ((cmds[1].equalsIgnoreCase("tp") || (cmds[1].equalsIgnoreCase("delete")) && (ALL || Perm.has(plr, "multiworld.tp")))) {
-                List<String> names = getWorldNames();
-                for (String s : names) builder.suggest(s);
-            }
-
-            if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
-                if (GameruleCommand.keys.isEmpty()) {
-                    GameruleCommand.setupServer(MultiworldMod.mc);
-                }
-
-                String last = input.substring(input.lastIndexOf(' ')).trim();
-
-                for (String name : GameruleCommand.keys.keySet()) {
-                    if (name.startsWith(last) || last.contains("gamerule") || name.toLowerCase().contains(last)) {
-                        builder.suggest(name);
-                    }
-                }
-                return builder.buildFuture();
-            }
-
-            if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
-                String last = input.substring(input.lastIndexOf(' ')).trim();
-                for (String name : diff_names) {
-                    if (name.startsWith(last) || last.contains("difficulty") || name.toLowerCase().contains(last)) {
-                        builder.suggest(name);
-                    }
-                }
-                return builder.buildFuture();
-            }
-
-            if (cmds[1].equalsIgnoreCase("portal")) {
-                for (String s : PortalCommand.SUBCOMMANDS) {
-                    builder.suggest(s);
-                }
-                return builder.buildFuture();
-            }
-        }
-
-        if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" "))) {
-            if (cmds[1].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
-                // TODO: IntRules
-                builder.suggest("true");
-                builder.suggest("false");
-            }
-
-            if (cmds[1].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
-                ArrayList<String> names = new ArrayList<>();
-                MultiworldMod.mc.levelKeys().forEach(r -> {
-                    String val = r.location().toString();
-                    if (val.startsWith("multiworld:")) {
-                        val = val.replace("multiworld:", "");
-                    }
-                    names.add(val);
-                });
-                for (String s : names) builder.suggest(s);
-            }
-        }
-
-        // Create Command
-        if (cmds[1].equalsIgnoreCase("create") && (ALL || Perm.has(plr, "multiworld.create"))) {
-            getSuggestions_CreateCommand(builder, input, cmds, plr, ALL);
-        }
-
-        // Portal Command
-        if (cmds[1].equalsIgnoreCase("portal")) {
-            PortalCommand.getSuggestions_PortalCommand(builder, input, cmds, plr, ALL);
-        }
-
+        // This method is deprecated and should not be used with the new brigadier command system
         return builder.buildFuture();
     }
 
     /**
-     * Create Command, "/mw Create"
-     * "/mw create <id> <env> [-g=<generator> -s=<seed>]"
+     * @deprecated Use BrigadierCreateCommand.GeneratorSuggestionProvider instead
      */
+    @Deprecated
     public void getSuggestions_CreateCommand(SuggestionsBuilder builder, String input, String[] cmds, CommandSourceStack plr, boolean ALL) {
-        if (!(ALL || Perm.has(plr, "multiworld.create"))) return; // No Permission
-
-        // Argument 1: <id>
-        if (cmds.length <= 2 || (cmds.length <= 3 && !input.endsWith(" "))) {
-            builder.suggest("myid:myvalue");
-            return;
-        }
-
-        // Argument 2: <env>
-        if (cmds.length <= 3 || (cmds.length <= 4 && !input.endsWith(" "))) {
-            builder.suggest("NORMAL");
-            builder.suggest("NETHER");
-            builder.suggest("END");
-            return;
-        }
-
-        // Optional Arguments
-        int maxDebug = 7;
-        if (cmds.length <= 4 || (cmds.length <= maxDebug && !input.endsWith(" "))) {
-            if (cmds.length <= 4) {
-                builder.suggest("-g=<GENERATOR>");
-                builder.suggest("-s=<SEED>");
-                return;
-            }
-
-            int n = 4 - 1;
-            String current = cmds[cmds.length - 1];
-            String[] beforeCurrent = Arrays.copyOfRange(cmds, n + 1, cmds.length - 1);
-            String beforeStr = String.join(" ", beforeCurrent);
-
-            if (current.startsWith("-s=")) {
-                builder.suggest("-s=1234");
-                builder.suggest("-s=RANDOM");
-            } else if (current.startsWith("-g=")) {
-                builder.suggest("-g=NORMAL");
-                builder.suggest("-g=FLAT");
-                builder.suggest("-g=VOID");
-
-                for (String key : CreateCommand.customs.keySet()) {
-                    builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));
-                }
-            } else {
-                if (current.startsWith("-")) {
-                    if (!beforeStr.contains("-g=")) builder.suggest("-g=<GENERATOR>");
-                    if (!beforeStr.contains("-s=")) builder.suggest("-s=<SEED>");
-                }
-            }
-        }
+        // This method is deprecated
     }
 
 }

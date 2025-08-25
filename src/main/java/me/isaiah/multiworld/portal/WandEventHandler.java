@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 
-import static me.isaiah.multiworld.MultiworldMod.message;
+import static me.isaiah.multiworld.command.MultiworldCommand.message;
 
 public class WandEventHandler {
 	

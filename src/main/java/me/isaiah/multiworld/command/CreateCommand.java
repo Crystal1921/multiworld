@@ -1,6 +1,6 @@
 package me.isaiah.multiworld.command;
 
-import static me.isaiah.multiworld.MultiworldMod.message;
+import static me.isaiah.multiworld.command.MultiworldCommand.message;
 
 import java.io.File;
 import java.util.HashMap;

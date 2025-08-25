@@ -3,7 +3,9 @@
  */
 package me.isaiah.multiworld;
 
+import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.portal.WandEventHandler;
+import me.isaiah.multiworld.registry.BlockRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -41,7 +43,7 @@ public class MultiworldModNeoForge {
 
 	@SubscribeEvent
 	public void onCommandsRegister(RegisterCommandsEvent event) {
-		MultiworldMod.register_commands(event.getDispatcher());
+		MultiworldCommand.register_commands(event.getDispatcher());
 	}
 	
 	@SubscribeEvent
