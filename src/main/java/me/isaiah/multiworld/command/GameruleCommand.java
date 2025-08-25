@@ -74,23 +74,6 @@ public class GameruleCommand implements Command {
     }
 
     /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-	public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        if (args.length < 2) {
-            return 0;
-        }
-        
-        String rule = args[1];
-        String value = (args.length >= 3) ? args[2] : null;
-        
-        return run(mc, plr, rule, value);
-    }
-
-    /**
      * Read the Gamerule names – fetches gamerules from server
      */
     public static void setupServer(MinecraftServer server) {

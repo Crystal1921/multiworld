@@ -154,35 +154,6 @@ public class CreateCommand implements Command {
         return 1;
     }
 
-	/**
-	 * Legacy Run Command - kept for backwards compatibility
-	 * @deprecated Use run(MinecraftServer, ServerPlayer, String, String, String) instead
-	 */
-	@Deprecated
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        if (args.length == 1 || args.length == 2) {
-            // Command Usage Message
-            I18n.message(plr, I18n.USAGE_CREATE);
-            return 0;
-        }
-        
-        String worldId = args[1];
-        String environment = args[2];
-        
-        // Reconstruct options string from remaining args
-        String options = null;
-        if (args.length > 3) {
-            StringBuilder optionsBuilder = new StringBuilder();
-            for (int i = 3; i < args.length; i++) {
-                if (i > 3) optionsBuilder.append(" ");
-                optionsBuilder.append(args[i]);
-            }
-            options = optionsBuilder.toString();
-        }
-        
-        return run(mc, plr, worldId, environment, options);
-    }
-
     /**
      * Return a {@link ResourceLocation} representing the given vanilla environment,
      * or NULL if the passed argument is not NORMAL / NETHER / END.

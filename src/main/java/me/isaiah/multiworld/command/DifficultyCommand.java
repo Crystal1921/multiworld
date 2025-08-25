@@ -66,21 +66,4 @@ public class DifficultyCommand implements Command {
         return 1;
     }
 
-    /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
-     */
-    @Deprecated
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        if (args.length < 2) {
-			MultiworldCommand.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
-			return 0;
-		}
-        
-        String difficulty = args[1];
-        String worldName = (args.length >= 3) ? args[2] : null;
-        
-        return run(mc, plr, difficulty, worldName);
-    }
-
 }

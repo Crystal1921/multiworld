@@ -96,22 +96,6 @@ public class TpCommand implements Command {
     }
 
     /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
-     */
-    @Deprecated
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        if (args.length < 2) {
-            return 0;
-        }
-        
-        String worldName = args[1];
-        String targetPlayerName = (args.length > 2) ? args[2] : null;
-        
-        return run(mc, plr, worldName, targetPlayerName);
-    }
-    
-    /**
      * net.minecraft.class_3218.method_29200
      * 
      * TODO: check why method_29200 removed in 1.20.1

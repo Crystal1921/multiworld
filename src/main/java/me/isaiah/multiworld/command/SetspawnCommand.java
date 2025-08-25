@@ -35,15 +35,6 @@ public class SetspawnCommand implements Command {
         return 1;
     }
 
-    /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, ServerPlayer) instead
-     */
-    @Deprecated
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        return run(mc, plr);
-    }
-
     public static void setSpawn(Level w, BlockPos spawn) throws IOException {
         File cf = new File(Util.get_platform_config_dir(), "multiworld"); 
         cf.mkdirs();

@@ -7,7 +7,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import me.isaiah.multiworld.ConsoleCommand;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.perm.Perm;
 import net.minecraft.commands.CommandSourceStack;
@@ -362,10 +361,6 @@ public class MultiworldCommand {
     }
 
     private static int showMainHelp(CommandSourceStack source) throws CommandSyntaxException {
-        if (!isPlayer(source)) {
-            ConsoleCommand.broadcast_console(MultiworldMod.mc, source, null);
-            return 1;
-        }
 
         final ServerPlayer plr = get_player(source);
 
@@ -401,7 +396,7 @@ public class MultiworldCommand {
     // Suggestion Providers
     public static class WorldSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             context.getSource().getServer().levelKeys().forEach(resourceKey -> {
                 ResourceLocation location = resourceKey.location();
                 String worldName = location.toString();
@@ -416,7 +411,7 @@ public class MultiworldCommand {
 
     public static class PlayerSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             Arrays.stream(context.getSource().getServer().getPlayerNames()).forEach(builder::suggest);
             return builder.buildFuture();
         }
@@ -424,7 +419,7 @@ public class MultiworldCommand {
 
     public static class IdSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             builder.suggest("myid:myvalue");
             return builder.buildFuture();
         }
@@ -432,7 +427,7 @@ public class MultiworldCommand {
 
     public static class EnvironmentSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             builder.suggest("NORMAL");
             builder.suggest("NETHER");
             builder.suggest("END");
@@ -442,7 +437,7 @@ public class MultiworldCommand {
 
     public static class GeneratorSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             builder.suggest("-g=NORMAL");
             builder.suggest("-g=FLAT");
             builder.suggest("-g=VOID");
@@ -459,7 +454,7 @@ public class MultiworldCommand {
 
     public static class GameruleSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             if (GameruleCommand.keys.isEmpty()) {
                 GameruleCommand.setupServer(context.getSource().getServer());
             }
@@ -474,7 +469,7 @@ public class MultiworldCommand {
 
     public static class GameruleValueSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             builder.suggest("true");
             builder.suggest("false");
             builder.suggest("0");
@@ -486,7 +481,7 @@ public class MultiworldCommand {
 
     public static class DifficultySuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             String[] difficulties = {"PEACEFUL", "EASY", "NORMAL", "HARD"};
             for (String difficulty : difficulties) {
                 builder.suggest(difficulty);
@@ -497,7 +492,7 @@ public class MultiworldCommand {
 
     public static class PortalNameSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             for (String portalName : PortalCommand.KNOWN_PORTALS.keySet()) {
                 builder.suggest(portalName);
             }
@@ -507,7 +502,7 @@ public class MultiworldCommand {
 
     public static class DestinationSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             context.getSource().getServer().levelKeys().forEach(resourceKey -> {
                 String namespace = resourceKey.location().getNamespace();
                 String path = resourceKey.location().getPath();
@@ -520,7 +515,7 @@ public class MultiworldCommand {
 
     public static class DeleteWorldSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) throws CommandSyntaxException {
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             context.getSource().getServer().levelKeys().forEach(resourceKey -> {
                 ResourceLocation location = resourceKey.location();
                 String worldName = location.toString();

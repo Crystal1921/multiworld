@@ -33,15 +33,6 @@ public class SpawnCommand implements Command {
         return 1;
     }
 
-    /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, ServerPlayer) instead
-     */
-    @Deprecated
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        return run(mc, plr);
-    }
-
     public static BlockPos getSpawn(ServerLevel w) {
         File config_dir = new File("config");
         config_dir.mkdirs();

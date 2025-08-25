@@ -5,16 +5,12 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import net.minecraft.network.chat.Component;
-import org.slf4j.Logger;
 
-import me.isaiah.multiworld.ConsoleCommand;
 import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 
 public class DeleteCommand implements Command {
-
-	public static Logger LOGGER = ConsoleCommand.LOGGER;
 
 	private static HashMap<String, Long> map = new HashMap<>();
 	
@@ -52,21 +48,6 @@ public class DeleteCommand implements Command {
         MultiworldMod.get_world_creator().deleteWorld(worldId);
 
         return 1;
-    }
-
-    /**
-     * Legacy Run Command - kept for backwards compatibility
-     * @deprecated Use run(MinecraftServer, CommandSourceStack, String) instead
-     */
-    @Deprecated
-    public static int run(MinecraftServer mc, CommandSourceStack source, String[] args) {
-        if (args.length == 1) {
-        	LOGGER.error("Usage: /mw delete <id>");
-            return 0;
-        }
-        
-        String worldId = args[1];
-        return run(mc, source, worldId);
     }
 
 }
