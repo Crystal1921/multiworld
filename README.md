@@ -10,34 +10,34 @@ The Multiworld Mod - Adds support for creating & teleporting to multiple worlds.
 ## Command Usage:
 | Command       | About                                      | Example |
 |---------------|--------------------------------------------|---------|
-| /mw           | View Help                                  |
-| /mw list      | List all Worlds                            |
-| /mw tp        | Teleport to a World                        | /mw tp minecraft:overworld |
-| /mw spawn     | Teleport to the Spawn of the current World |
-| /mw setspawn  | Sets the Spawn of the current World        |
-| /mw create    | Creates a new World                        | /mw create myLovelyWorld NORMAL -g=FLAT -s=1234 |
-| /mw delete    | Delete a World (Console Only)              | /mw delete myWorld |
+| /mv           | View Help                                  |
+| /mv list      | List all Worlds                            |
+| /mv tp        | Teleport to a World                        | /mv tp minecraft:overworld |
+| /mv spawn     | Teleport to the Spawn of the current World |
+| /mv setspawn  | Sets the Spawn of the current World        |
+| /mv create    | Creates a new World                        | /mv create myLovelyWorld NORMAL -g=FLAT -s=1234 |
+| /mv delete    | Delete a World (Console Only)              | /mv delete myWorld |
 
 #### Gamerules & Difficulty
 | Command        | About                                      | Example                            |
 |----------------|--------------------------------------------|------------------------------------|
-| /mw gamerule   | Gamerule Support for Custom Worlds         | /mw gamerule doDaylightCycle false |
-| /mw difficulty | Set the Difficulty for the current World   | /mw difficulty EASY                |
+| /mv gamerule   | Gamerule Support for Custom Worlds         | /mv gamerule doDaylightCycle false |
+| /mv difficulty | Set the Difficulty for the current World   | /mv difficulty EASY                |
 
 ## Portals <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/03/Nether_portal_%28animated%29.png/revision/latest?cb=20191114182303" width="128" float="right" align="right">
 The latest version of Multiworld introduces Portals.
 Portals lead to a Destination, which can be either a World *(`myWorld`)*, another Portal *(`p:myOtherPortal`)*, or exact cords *(`w:myWorld:0,0,0`)*.
 
-To make a Portal use the Portal Wand, given by *`/mw portal wand`*. While holding the wand item, like in WorldEdit, Left & Right click the blocks to select the corners of the portal frame. The selected region will be used upon usage of the portal create command.
+To make a Portal use the Portal Wand, given by *`/mv portal wand`*. While holding the wand item, like in WorldEdit, Left & Right click the blocks to select the corners of the portal frame. The selected region will be used upon usage of the portal create command.
 
 ### Portal Commands
 | Command           | About                                    | Example                                         |
 |-------------------|------------------------------------------|-------------------------------------------------|
-| /mw portal        | View Help                                |                                                 |
-| /mw portal create | Create a new Portal from the Wand Area   | /mw create myPortal myWorld                     |
-| /mw portal wand   | Get a Portal Wand, to make a portal area | Select the Obsidian Corners of the Portal Frame |
-| /mw portal info   | List all Portals                         |                                                 |
-| /mw portal remove | Remove a Portal                          | /mw portal remove myPortal                      |
+| /mv portal        | View Help                                |                                                 |
+| /mv portal create | Create a new Portal from the Wand Area   | /mv create myPortal myWorld [isTransparent]     |
+| /mv portal wand   | Get a Portal Wand, to make a portal area | Select the Obsidian Corners of the Portal Frame |
+| /mv portal info   | List all Portals                         |                                                 |
+| /mv portal remove | Remove a Portal                          | /mv portal remove myPortal                      |
 
 
 ## Permissions
@@ -47,12 +47,12 @@ The permission `multiworld.admin` or being `/op`-ed grants access to every comma
 
 | Command |     |
 |------|-----|
-| /mw  | multiworld.cmd |
-| /mw tp | multiworld.tp |
-| /mw spawn | multiworld.spawn |
-| /mw setspawn | multiworld.setspawn |
-| /mw create <id> <dim> [-g=GENERATOR -s=SEED] | multiworld.create |
-| /mw gamerule | multiworld.gamerule |
+| /mv  | multiworld.cmd |
+| /mv tp | multiworld.tp |
+| /mv spawn | multiworld.spawn |
+| /mv setspawn | multiworld.setspawn |
+| /mv create <id> <dim> [-g=GENERATOR -s=SEED] | multiworld.create |
+| /mv gamerule | multiworld.gamerule |
 etc..
 
 ## Coming Soon
