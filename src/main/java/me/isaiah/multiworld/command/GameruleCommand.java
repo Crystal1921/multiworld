@@ -38,7 +38,7 @@ public class GameruleCommand implements Command {
 
 		if (args.length < 3) {
 			Value<?> rule = getGameRules(w).getRule(keys.get(args[1]));
-			MultiworldMod.message(plr, "[&4Multiworld&r] Value of " + args[1] + " is: " + rule);
+			MultiworldCommand.message(plr, "[&4Multiworld&r] Value of " + args[1] + " is: " + rule);
 			return 1;
 		}
 		
@@ -97,7 +97,7 @@ public class GameruleCommand implements Command {
 			e.printStackTrace();
 		}
 
-        MultiworldMod.message(plr, "[&cMultiworld&r]: Gamerule " + a1 + " is now set to: " + a2);
+        MultiworldCommand.message(plr, "[&cMultiworld&r]: Gamerule " + a1 + " is now set to: " + a2);
         
         return 1;
     }

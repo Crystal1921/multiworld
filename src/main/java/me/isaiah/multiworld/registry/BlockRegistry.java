@@ -1,5 +1,6 @@
-package me.isaiah.multiworld;
+package me.isaiah.multiworld.registry;
 
+import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.block.PortalBlock;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredRegister;

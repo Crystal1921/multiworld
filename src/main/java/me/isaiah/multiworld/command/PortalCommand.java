@@ -21,7 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 
-import static me.isaiah.multiworld.MultiworldMod.message;
+import static me.isaiah.multiworld.command.MultiworldCommand.message;
 
 public class PortalCommand implements Command {
 

@@ -2,6 +2,7 @@ package me.isaiah.multiworld;
 
 import java.util.Locale;
 
+import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.command.Util;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -13,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class I18n {
 
 	public static void message(ServerPlayer plr, String text) {
-		MultiworldMod.message(plr, text);
+		MultiworldCommand.message(plr, text);
 	}
 	
 	// Default Language

@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import me.isaiah.multiworld.BlockRegistry;
+import me.isaiah.multiworld.registry.BlockRegistry;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SpawnCommand;

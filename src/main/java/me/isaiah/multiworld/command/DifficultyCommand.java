@@ -16,7 +16,7 @@ public class DifficultyCommand implements Command {
         ServerLevel w = (ServerLevel) plr.level();
 
 		if (args.length < 2) {
-			MultiworldMod.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
+			MultiworldCommand.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
 			return 1;
 		}
 		
@@ -47,7 +47,7 @@ public class DifficultyCommand implements Command {
 		else if (a1.equalsIgnoreCase("NORMAL"))  { d = Difficulty.NORMAL; }
 		else if (a1.equalsIgnoreCase("PEACEFUL")){ d = Difficulty.PEACEFUL; }
 		else {
-			MultiworldMod.message(plr, "Invalid difficulty: " + a1);
+			MultiworldCommand.message(plr, "Invalid difficulty: " + a1);
 			return 1;
 		}
 
@@ -61,7 +61,7 @@ public class DifficultyCommand implements Command {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        MultiworldMod.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.dimension().location().toString() + "' is now set to: " + a1);
+        MultiworldCommand.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.dimension().location().toString() + "' is now set to: " + a1);
         return 1;
     }
 
