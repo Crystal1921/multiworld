@@ -5,12 +5,14 @@
 package me.isaiah.multiworld;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.isaiah.multiworld.command.*;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
+import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -146,6 +148,7 @@ public class MultiworldMod {
 
     // On command register
     public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
+        // Main command with all subcommands
         dispatcher.register(literal(CMD)
                 .requires(source -> {
                     try {
@@ -155,190 +158,160 @@ public class MultiworldMod {
                         return source.hasPermission(1);
                     }
                 })
-                .executes(ctx -> broadcast(ctx.getSource(), ChatFormatting.AQUA, null))
-                .then(argument("message", greedyString()).suggests(new InfoSuggest())
-                        .executes(ctx -> {
+                .executes(ctx -> showMainHelp(ctx.getSource()))
+                
+                // TP Command
+                .then(Commands.literal("tp")
+                        .requires(source -> {
                             try {
-                                return broadcast(ctx.getSource(), ChatFormatting.AQUA, getString(ctx, "message"));
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.tp") || 
+                                       Perm.has(player, "multiworld.admin");
                             } catch (Exception e) {
-                                e.printStackTrace();
-                                return 1;
+                                return source.hasPermission(1);
                             }
-                        })));
+                        })
+                        .then(Commands.argument("world", StringArgumentType.string())
+                                .suggests(new BrigadierTpCommand.WorldSuggestionProvider())
+                                .executes(ctx -> {
+                                    String worldName = StringArgumentType.getString(ctx, "world");
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    String[] args = {"tp", worldName};
+                                    return TpCommand.run(ctx.getSource().getServer(), player, args);
+                                })
+                                .then(Commands.argument("player", StringArgumentType.string())
+                                        .suggests(new BrigadierTpCommand.PlayerSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String worldName = StringArgumentType.getString(ctx, "world");
+                                            String playerName = StringArgumentType.getString(ctx, "player");
+                                            String[] args = {"tp", worldName, playerName};
+                                            return TpCommand.run(ctx.getSource().getServer(), null, args);
+                                        }))))
+                
+                // List Command
+                .then(Commands.literal("list")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.cmd") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            
+                            message(player, "&bAll Worlds:");
+                            Level pworld = player.level();
+                            ResourceLocation pwid = pworld.dimension().location();
+
+                            ctx.getSource().getServer().getAllLevels().forEach(world -> {
+                                ResourceLocation id = world.dimension().location();
+                                String name = id.toString();
+                                if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
+
+                                if (id.equals(pwid)) {
+                                    message(player, "- " + name + " &a(Currently in)");
+                                } else {
+                                    message(player, "- " + name);
+                                }
+                            });
+                            return 1;
+                        }))
+                
+                // Version Command
+                .then(Commands.literal("version")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.cmd") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            message(player, "Multiworld Mod version " + VERSION);
+                            return 1;
+                        }))
+                
+                // Create Command
+                .then(Commands.literal("create")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) || 
+                                       Perm.has(player, "multiworld.create") || 
+                                       Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .then(Commands.argument("id", StringArgumentType.string())
+                                .suggests(new BrigadierCreateCommand.IdSuggestionProvider())
+                                .then(Commands.argument("environment", StringArgumentType.string())
+                                        .suggests(new BrigadierCreateCommand.EnvironmentSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String id = StringArgumentType.getString(ctx, "id");
+                                            String environment = StringArgumentType.getString(ctx, "environment");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            String[] args = {"create", id, environment};
+                                            return CreateCommand.run(ctx.getSource().getServer(), player, args);
+                                        })
+                                        .then(Commands.argument("options", StringArgumentType.greedyString())
+                                                .suggests(new BrigadierCreateCommand.GeneratorSuggestionProvider())
+                                                .executes(ctx -> {
+                                                    String id = StringArgumentType.getString(ctx, "id");
+                                                    String environment = StringArgumentType.getString(ctx, "environment");
+                                                    String options = StringArgumentType.getString(ctx, "options");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    
+                                                    String[] optionArgs = options.split(" ");
+                                                    String[] args = new String[3 + optionArgs.length];
+                                                    args[0] = "create";
+                                                    args[1] = id;
+                                                    args[2] = environment;
+                                                    System.arraycopy(optionArgs, 0, args, 3, optionArgs.length);
+                                                    
+                                                    return CreateCommand.run(ctx.getSource().getServer(), player, args);
+                                                })))))
+                
+                // Help Command
+                .then(Commands.literal("help")
+                        .executes(ctx -> {
+                            ServerPlayer player = ctx.getSource().getPlayer();
+                            if (player == null) return 1;
+                            for (String s : COMMAND_HELP) {
+                                message(player, s);
+                            }
+                            return 1;
+                        }))
+        );
     }
 
-    public static int broadcast(CommandSourceStack source, ChatFormatting formatting, String message) throws CommandSyntaxException {
-    	/*
-    	if (!source.isExecutedByPlayer()) {
-    		if (!source.getName().equalsIgnoreCase("Server")) return 1;
-    		return broadcast_console(source, message);
-    	}
-    	*/
-
+    private static int showMainHelp(CommandSourceStack source) throws CommandSyntaxException {
         if (!isPlayer(source)) {
-            ConsoleCommand.broadcast_console(mc, source, message);
+            ConsoleCommand.broadcast_console(mc, source, null);
             return 1;
         }
 
-        final ServerPlayer plr = get_player(source); // source.getPlayerOrThrow();
+        final ServerPlayer plr = get_player(source);
+        
+        message(plr, "&bMultiworld Mod for Minecraft " + mc.getServerVersion());
 
-        if (null == message) {
-            message(plr, "&bMultiworld Mod for Minecraft " + mc.getServerVersion());
+        Level world = plr.level();
+        ResourceLocation id = world.dimension().location();
 
-            Level world = plr.level();
-            ResourceLocation id = world.dimension().location();
+        message(plr, "Currently in: " + id.toString());
 
-            message(plr, "Currently in: " + id.toString());
-
-            return 1;
-        }
-
-        boolean ALL = Perm.has(plr, "multiworld.admin");
-        String[] args = message.split(" ");
-
-        /*if (args[0].equalsIgnoreCase("portaltest")) {
-            BlockPos pos = plr.getBlockPos();
-            pos = pos.add(2, 0, 2);
-            ServerWorld w = plr.getWorld();
-
-            Portal p = new Portal();
-            for (int x = 0; x < 4; x++) {
-                for (int y = 0; y < 5; y++) {
-                    BlockPos pos2 = pos.add(x, y, 0);
-                    if ((x > 0 && x < 3) && (y > 0 && y < 4)) {
-                        p.blocks.add(pos2);
-                        w.setBlockState(pos2, Blocks.NETHER_PORTAL.getDefaultState());
-                    } else
-                    w.setBlockState(pos2, Blocks.STONE.getDefaultState());
-                }
-            }
-            p.addToMap();
-            try {
-                p.save();
-            } catch (IOException e) {
-                plr.sendMessage(text("Failed saving portal data. Check console for details.", Formatting.RED), false);
-                e.printStackTrace();
-            }
-        }*/
-
-
-        // Delete Command (Console Only)
-        if (args[0].equalsIgnoreCase("delete")) {
-            DeleteCommand.run(mc, source, args);
-            return 1;
-        }
-
-        // Help Command
-        if (args[0].equalsIgnoreCase("help")) {
-            for (String s : COMMAND_HELP) {
-                message(plr, s);
-            }
-        }
-
-        // Debug
-        if (args[0].equalsIgnoreCase("debugtick")) {
-            ServerLevel w = (ServerLevel) plr.level();
-            ResourceLocation id = w.dimension().location();
-            message(plr, "World ID: " + id.toString());
-            message(plr, "Players : " + w.players().size());
-            w.tick(() -> true);
-        }
-
-        // SetSpawn Command
-        if (args[0].equalsIgnoreCase("setspawn") && (ALL || Perm.has(plr, "multiworld.setspawn"))) {
-            return SetspawnCommand.run(mc, plr, args);
-        }
-
-        // Spawn Command
-        if (args[0].equalsIgnoreCase("spawn") && (ALL || Perm.has(plr, "multiworld.spawn"))) {
-            return SpawnCommand.run(mc, plr, args);
-        }
-
-        // Gamerule Command
-        if (args[0].equalsIgnoreCase("gamerule") && (ALL || Perm.has(plr, "multiworld.gamerule"))) {
-            return GameruleCommand.run(mc, plr, args);
-        }
-
-        // Difficulty Command
-        if (args[0].equalsIgnoreCase("difficulty") && (ALL || Perm.has(plr, "multiworld.difficulty"))) {
-            return DifficultyCommand.run(mc, plr, args);
-        }
-
-        // TP Command
-        if (args[0].equalsIgnoreCase("tp")) {
-            if (!(ALL || Perm.has(plr, "multiworld.tp"))) {
-                plr.displayClientMessage(Component.nullToEmpty("No permission! Missing permission: multiworld.tp"), false);
-                return 1;
-            }
-            if (args.length == 1) {
-                plr.displayClientMessage(text_plain("Usage: /" + CMD + " tp <world>"), false);
-                return 0;
-            }
-            return TpCommand.run(mc, plr, args);
-        }
-
-        // List Command
-        if (args[0].equalsIgnoreCase("list")) {
-            if (!(ALL || Perm.has(plr, "multiworld.cmd"))) {
-                plr.displayClientMessage(Component.nullToEmpty("No permission! Missing permission: multiworld.cmd"), false);
-                return 1;
-            }
-
-            message(plr, "&bAll Worlds:");
-
-            Level pworld = plr.level();
-            ResourceLocation pwid = pworld.dimension().location();
-
-            mc.getAllLevels().forEach(world -> {
-                ResourceLocation id = world.dimension().location();
-                String name = id.toString();
-                if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
-
-                if (id.equals(pwid)) {
-                    message(plr, "- " + name + " &a(Currently in)");
-                } else {
-                    message(plr, "- " + name);
-                }
-            });
-        }
-
-        // Version Command
-        if (args[0].equalsIgnoreCase("version") && (ALL || Perm.has(plr, "multiworld.cmd"))) {
-            message(plr, "Multiworld Mod version " + VERSION);
-            return 1;
-        }
-
-        // Create Command
-        if (args[0].equalsIgnoreCase("create")) {
-            if (!(ALL || Perm.has(plr, "multiworld.create"))) {
-                message(plr, "No permission! Missing permission: multiworld.create");
-                return 1;
-            }
-            return CreateCommand.run(mc, plr, args);
-        }
-
-        // Delete Command
-        if (args[0].equalsIgnoreCase("delete")) {
-            if (!ALL) {
-                message(plr, "No permission! Missing permission: multiworld.admin");
-                return 1;
-            }
-            message(plr, "Delete Command is Console-only for security.");
-        }
-
-        // Help Command
-        if (args[0].equalsIgnoreCase("portal")) {
-            if (!(ALL || Perm.has(plr, "multiworld.portal"))) {
-                message(plr, "No permission! Missing permission: multiworld.portal");
-                return 1;
-            }
-
-            PortalCommand.run(mc, plr, args);
-        }
-
-        return Command.SINGLE_SUCCESS; // Success
-    }
-
+        return 1;
     public static Component text(String message) {
         try {
             return Component.nullToEmpty(translate_alternate_color_codes('&', message));
