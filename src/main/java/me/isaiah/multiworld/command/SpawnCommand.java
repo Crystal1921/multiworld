@@ -15,7 +15,12 @@ import net.minecraft.world.level.storage.LevelData;
 
 public class SpawnCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+    /**
+     * Run spawn command with native command logic
+     * @param mc MinecraftServer instance
+     * @param plr ServerPlayer to teleport to spawn
+     */
+    public static int run(MinecraftServer mc, ServerPlayer plr) {
         ServerLevel w = (ServerLevel) plr.level();
         BlockPos sp = getSpawn(w);
 
@@ -26,6 +31,15 @@ public class SpawnCommand implements Command {
         // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
         // ServerPlayerEntity teleported = FabricDimensionInternals.changeDimension(plr, w, target);
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, ServerPlayer) instead
+     */
+    @Deprecated
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        return run(mc, plr);
     }
 
     public static BlockPos getSpawn(ServerLevel w) {

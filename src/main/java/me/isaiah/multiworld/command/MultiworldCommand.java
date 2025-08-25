@@ -84,16 +84,14 @@ public class MultiworldCommand {
                                 .executes(ctx -> {
                                     String worldName = ResourceLocationArgument.getId(ctx, "world").toString();
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    String[] args = {"tp", worldName};
-                                    return TpCommand.run(ctx.getSource().getServer(), player, args);
+                                    return TpCommand.run(ctx.getSource().getServer(), player, worldName, null);
                                 })
                                 .then(Commands.argument("player", StringArgumentType.string())
                                         .suggests(new PlayerSuggestionProvider())
                                         .executes(ctx -> {
                                             String worldName = ResourceLocationArgument.getId(ctx, "world").toString();
                                             String playerName = StringArgumentType.getString(ctx, "player");
-                                            String[] args = {"tp", worldName, playerName};
-                                            return TpCommand.run(ctx.getSource().getServer(), null, args);
+                                            return TpCommand.run(ctx.getSource().getServer(), null, worldName, playerName);
                                         }))))
 
                 // List Command
@@ -169,8 +167,7 @@ public class MultiworldCommand {
                                             String id = ResourceLocationArgument.getId(ctx, "id").toString();
                                             String environment = StringArgumentType.getString(ctx, "environment");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"create", id, environment};
-                                            return CreateCommand.run(ctx.getSource().getServer(), player, args);
+                                            return CreateCommand.run(ctx.getSource().getServer(), player, id, environment, null);
                                         })
                                         .then(Commands.argument("options", greedyString())
                                                 .suggests(new GeneratorSuggestionProvider())
@@ -180,14 +177,7 @@ public class MultiworldCommand {
                                                     String options = StringArgumentType.getString(ctx, "options");
                                                     ServerPlayer player = ctx.getSource().getPlayer();
 
-                                                    String[] optionArgs = options.split(" ");
-                                                    String[] args = new String[3 + optionArgs.length];
-                                                    args[0] = "create";
-                                                    args[1] = id;
-                                                    args[2] = environment;
-                                                    System.arraycopy(optionArgs, 0, args, 3, optionArgs.length);
-
-                                                    return CreateCommand.run(ctx.getSource().getServer(), player, args);
+                                                    return CreateCommand.run(ctx.getSource().getServer(), player, id, environment, options);
                                                 })))))
 
                 // Help Command
@@ -216,8 +206,7 @@ public class MultiworldCommand {
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
-                            String[] args = {"spawn"};
-                            return SpawnCommand.run(ctx.getSource().getServer(), player, args);
+                            return SpawnCommand.run(ctx.getSource().getServer(), player);
                         }))
 
                 // SetSpawn Command
@@ -235,8 +224,7 @@ public class MultiworldCommand {
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
-                            String[] args = {"setspawn"};
-                            return SetspawnCommand.run(ctx.getSource().getServer(), player, args);
+                            return SetspawnCommand.run(ctx.getSource().getServer(), player);
                         }))
 
                 // Gamerule Command
@@ -256,8 +244,7 @@ public class MultiworldCommand {
                                 .executes(ctx -> {
                                     String rule = StringArgumentType.getString(ctx, "rule");
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    String[] args = {"gamerule", rule};
-                                    return GameruleCommand.run(ctx.getSource().getServer(), player, args);
+                                    return GameruleCommand.run(ctx.getSource().getServer(), player, rule, null);
                                 })
                                 .then(Commands.argument("value", StringArgumentType.string())
                                         .suggests(new GameruleValueSuggestionProvider())
@@ -265,8 +252,7 @@ public class MultiworldCommand {
                                             String rule = StringArgumentType.getString(ctx, "rule");
                                             String value = StringArgumentType.getString(ctx, "value");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"gamerule", rule, value};
-                                            return GameruleCommand.run(ctx.getSource().getServer(), player, args);
+                                            return GameruleCommand.run(ctx.getSource().getServer(), player, rule, value);
                                         }))))
 
                 // Difficulty Command
@@ -286,8 +272,7 @@ public class MultiworldCommand {
                                 .executes(ctx -> {
                                     String difficulty = StringArgumentType.getString(ctx, "difficulty");
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    String[] args = {"difficulty", difficulty};
-                                    return DifficultyCommand.run(ctx.getSource().getServer(), player, args);
+                                    return DifficultyCommand.run(ctx.getSource().getServer(), player, difficulty, null);
                                 })
                                 .then(Commands.argument("world", StringArgumentType.string())
                                         .suggests(new WorldSuggestionProvider())
@@ -295,8 +280,7 @@ public class MultiworldCommand {
                                             String difficulty = StringArgumentType.getString(ctx, "difficulty");
                                             String world = StringArgumentType.getString(ctx, "world");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"difficulty", difficulty, world};
-                                            return DifficultyCommand.run(ctx.getSource().getServer(), player, args);
+                                            return DifficultyCommand.run(ctx.getSource().getServer(), player, difficulty, world);
                                         }))))
 
                 // Portal Command
@@ -314,16 +298,14 @@ public class MultiworldCommand {
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
-                            String[] args = {"portal"};
-                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                            return PortalCommand.runHelp(ctx.getSource().getServer(), player);
                         })
                         .then(Commands.literal("create")
                                 .then(Commands.argument("name", StringArgumentType.string())
                                         .executes(ctx -> {
                                             String name = StringArgumentType.getString(ctx, "name");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"portal", "create", name};
-                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                            return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, null);
                                         })
                                         .then(Commands.argument("destination", greedyString())
                                                 .suggests(new DestinationSuggestionProvider())
@@ -331,28 +313,24 @@ public class MultiworldCommand {
                                                     String name = StringArgumentType.getString(ctx, "name");
                                                     String destination = StringArgumentType.getString(ctx, "destination");
                                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                                    String[] args = {"portal", "create", name, destination};
-                                                    return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                                    return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination);
                                                 }))))
                         .then(Commands.literal("wand")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    String[] args = {"portal", "wand"};
-                                    return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                    return PortalCommand.runWand(ctx.getSource().getServer(), player);
                                 }))
                         .then(Commands.literal("info")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    String[] args = {"portal", "info"};
-                                    return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                    return PortalCommand.runInfo(ctx.getSource().getServer(), player, null);
                                 })
                                 .then(Commands.argument("name", StringArgumentType.string())
                                         .suggests(new PortalNameSuggestionProvider())
                                         .executes(ctx -> {
                                             String name = StringArgumentType.getString(ctx, "name");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"portal", "info", name};
-                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                            return PortalCommand.runInfo(ctx.getSource().getServer(), player, name);
                                         })))
                         .then(Commands.literal("remove")
                                 .then(Commands.argument("name", StringArgumentType.string())
@@ -360,8 +338,7 @@ public class MultiworldCommand {
                                         .executes(ctx -> {
                                             String name = StringArgumentType.getString(ctx, "name");
                                             ServerPlayer player = ctx.getSource().getPlayer();
-                                            String[] args = {"portal", "remove", name};
-                                            return PortalCommand.run(ctx.getSource().getServer(), player, args);
+                                            return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
                                         }))))
 
                 // Delete Command
@@ -379,8 +356,7 @@ public class MultiworldCommand {
                                 .suggests(new DeleteWorldSuggestionProvider())
                                 .executes(ctx -> {
                                     String world = ResourceLocationArgument.getId(ctx, "world").toString();
-                                    String[] args = {"delete", world};
-                                    return DeleteCommand.run(ctx.getSource().getServer(), ctx.getSource(), args);
+                                    return DeleteCommand.run(ctx.getSource().getServer(), ctx.getSource(), world);
                                 })))
         );
     }

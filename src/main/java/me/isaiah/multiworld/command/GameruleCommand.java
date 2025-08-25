@@ -26,80 +26,68 @@ public class GameruleCommand implements Command {
 	@SuppressWarnings("rawtypes")
 	public static HashMap<String, GameRules.Key> keys = new HashMap<>();
 	
+    /**
+     * Run gamerule command with native command logic
+     * @param mc MinecraftServer instance
+     * @param plr ServerPlayer executing the command
+     * @param rule Gamerule name
+     * @param value Gamerule value (can be null to query current value)
+     */
     @SuppressWarnings("unchecked")
-	public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+	public static int run(MinecraftServer mc, ServerPlayer plr, String rule, String value) {
         ServerLevel w = (ServerLevel) plr.level();
 
 		if (keys.isEmpty()) {
 			setup(w);
 		}
 
-        // GameRules rules = new GameRules();
-
-		if (args.length < 3) {
-			Value<?> rule = getGameRules(w).getRule(keys.get(args[1]));
-			MultiworldCommand.message(plr, "[&4Multiworld&r] Value of " + args[1] + " is: " + rule);
+        // Query current value if no value provided
+		if (value == null || value.isEmpty()) {
+			Value<?> currentRule = getGameRules(w).getRule(keys.get(rule));
+			MultiworldCommand.message(plr, "[&4Multiworld&r] Value of " + rule + " is: " + currentRule);
 			return 1;
 		}
 		
-        String a1 = args[1];
-        String a2 = args[2];
-        
-        /*if (a1.equalsIgnoreCase("difficulty")) {
-        	// Test
-        	
-			Difficulty d = Difficulty.NORMAL;
+        // Set new value
+        boolean isBool = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
 
-			// String to Difficulty
-			if (a2.equalsIgnoreCase("EASY"))     { d = Difficulty.EASY; }
-			else if (a2.equalsIgnoreCase("HARD"))     { d = Difficulty.HARD; }
-			else if (a2.equalsIgnoreCase("NORMAL"))   { d = Difficulty.NORMAL; }
-			else if (a2.equalsIgnoreCase("PEACEFUL")) { d = Difficulty.PEACEFUL; }
-			else {
-				MultiworldMod.message(plr, "Invalid difficulty: " + a2);
-				return 1;
-			}
-        	
-        	MultiworldMod.get_world_creator().set_difficulty(w.getRegistryKey().getValue().toString(), d);
-        	
-        	try {
-				FileConfiguration config = CreateCommand.get_config(w);
-				config.set("difficulty", a2);
-				config.save();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-        	return 1;
-        }*/
-        
-        boolean is_bol = false;
-        
-        if (a2.equalsIgnoreCase("true") || a2.equalsIgnoreCase("false")) {
-        	is_bol = true;
-        }
-
-        if (is_bol) {
+        if (isBool) {
         	// Boolean Rule
-        	BooleanValue rule = (BooleanValue) getGameRules(w).getRule(keys.get(a1));
-        	rule.set(Boolean.valueOf(a2), mc);
+        	BooleanValue boolRule = (BooleanValue) getGameRules(w).getRule(keys.get(rule));
+        	boolRule.set(Boolean.valueOf(value), mc);
         } else {
         	// Int Rule
-        	IntegerValue rule = (IntegerValue) getGameRules(w).getRule(keys.get(a1));
-        	rule.set(Integer.valueOf(a2), mc);
+        	IntegerValue intRule = (IntegerValue) getGameRules(w).getRule(keys.get(rule));
+        	intRule.set(Integer.valueOf(value), mc);
         }
 
         // Save to world config
     	try {
-			set_rule_cfg(w, a1, a2);
+			set_rule_cfg(w, rule, value);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-        MultiworldCommand.message(plr, "[&cMultiworld&r]: Gamerule " + a1 + " is now set to: " + a2);
+        MultiworldCommand.message(plr, "[&cMultiworld&r]: Gamerule " + rule + " is now set to: " + value);
         
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+	public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        if (args.length < 2) {
+            return 0;
+        }
+        
+        String rule = args[1];
+        String value = (args.length >= 3) ? args[2] : null;
+        
+        return run(mc, plr, rule, value);
     }
 
     /**
