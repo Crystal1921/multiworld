@@ -1,6 +1,5 @@
 package me.isaiah.multiworld.block;
 
-import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
@@ -11,10 +10,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -28,10 +25,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 public class PortalBlock extends Block {
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
     protected static final int AABB_OFFSET = 2;
     protected static final VoxelShape X_AXIS_AABB = Block.box(0.0, 0.0, 6.0, 16.0, 16.0, 10.0);
     protected static final VoxelShape Z_AXIS_AABB = Block.box(6.0, 0.0, 0.0, 10.0, 16.0, 16.0);
-    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
+
     public PortalBlock() {
         super(BlockBehaviour.Properties.of()
                 .noCollission()
@@ -63,7 +61,6 @@ public class PortalBlock extends Block {
 
 
             if (isInside) {
-                I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
 
                 BlockPos dest = p.getDestLocation();
 

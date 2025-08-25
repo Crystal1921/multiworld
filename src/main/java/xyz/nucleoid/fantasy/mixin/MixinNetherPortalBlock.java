@@ -1,11 +1,5 @@
 package xyz.nucleoid.fantasy.mixin;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
@@ -15,19 +9,23 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetherPortalBlock.class)
 public class MixinNetherPortalBlock {
-	/**
-	 * TODO: check: 1.21.5 Changes this.
-	 */
-	@Inject(at = @At("HEAD"), method = "entityInside", cancellable = true)
-	private void onEntityCollision( BlockState state, Level world, BlockPos pos, Entity entity, CallbackInfo ci) {
-		if (!(entity instanceof ServerPlayer)) {
-			return;
-		}
-		
-		// Check if portal
+    /**
+     * TODO: check: 1.21.5 Changes this.
+     */
+    @Inject(at = @At("HEAD"), method = "entityInside", cancellable = true)
+    private void onEntityCollision(BlockState state, Level world, BlockPos pos, Entity entity, CallbackInfo ci) {
+        if (!(entity instanceof ServerPlayer)) {
+            return;
+        }
+
+        // Check if portal
 
         for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
 // boolean canPos = p.blocks.contains(pos);
@@ -41,7 +39,6 @@ public class MixinNetherPortalBlock {
 
 
             if (isInside) {
-                I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
 
                 BlockPos dest = p.getDestLocation();
 

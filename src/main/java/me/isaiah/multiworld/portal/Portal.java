@@ -26,8 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Representation of a Multiworld Portal
- * 
- * @see {@link https://mvplugins.org/portals/fundamentals/basic-usage/}
+ *
  */
 public class Portal {
 
@@ -122,10 +121,6 @@ public class Portal {
 		this.toPos = MultiworldMod.get_world_creator().get_pos(x2, y2, z2);
 		*/
 	}
-
-	public void addToMap() {
-		// TODO Auto-generated method stub
-	}
 	
 	/**
      * Load an existing saved portals from config (YAML) 
@@ -169,7 +164,9 @@ public class Portal {
         		Portal p = new Portal(name, owner, worldIn, dest, location);
         		
         		// Refresh Portal Frame
-        		p.buildPortalArea(p.getMinPos(), p.getMaxPos(), p.getOriginWorld());
+				//TODO : 是否需要重新生成门
+
+//        		p.buildPortalArea(p.getMinPos(), p.getMaxPos(), p.getOriginWorld());
         		
             	PortalCommand.addKnownPortal(name, p);
             	loaded += 1;
@@ -389,29 +386,6 @@ public class Portal {
         });
         ServerLevel w = worlds.get(name);
 		return w;
-	}
-	
-	@Deprecated
-	public void fillBlocks(BlockPos pos, ServerLevel w) {
-		// fill outside frame
-		for (int x = 0; x < 4; x++) {
-			for (int y = 0; y < 5; y++) {
-				if (x == 0 || x == 3 || y == 0 || y == 4) {
-					BlockPos pos2 = pos.offset(x, y, 0);
-					w.setBlockAndUpdate(pos2, Blocks.STONE.defaultBlockState());
-				}
-			}
-		}
-
-		// Fill the inner section with portal
-		for (int x = 1; x < 3; x++) {
-			for (int y = 1; y < 4; y++) {
-				BlockPos pos2 = pos.offset(x, y, 0);
-				//this.blocks.add(pos2);
-				w.setBlockAndUpdate(pos2, Blocks.NETHER_PORTAL.defaultBlockState());
-			}
-		}
-
 	}
 	
 	public void refreshPortalArea() {

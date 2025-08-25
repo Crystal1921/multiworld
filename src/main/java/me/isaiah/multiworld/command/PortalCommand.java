@@ -133,7 +133,7 @@ public class PortalCommand implements Command {
      * @param portalName  Portal name
      * @param destination Portal destination (can be null for default)
      */
-    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination) {
+    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination, boolean isTransparent) {
         if (!Util.isForgeOrHasICommon()) {
             message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
         }
@@ -148,9 +148,7 @@ public class PortalCommand implements Command {
             return 0;
         }
 
-        // Create args array for the existing createPortal method
-        String[] args = {"portal", "create", portalName, destination};
-        return createPortal(plr, args);
+        return createPortal(plr, portalName, destination, isTransparent);
     }
 
     /**
@@ -179,7 +177,7 @@ public class PortalCommand implements Command {
         return null;
     }
 
-    private static int createPortal(ServerPlayer plr, String[] args) {
+    private static int createPortal(ServerPlayer plr, String name, String dest, boolean isTransparent) {
         Object[] poss = WandEventHandler.getWandPositionsOrNull(plr.getUUID());
 
         if (null == poss) {
@@ -200,9 +198,7 @@ public class PortalCommand implements Command {
             return 0;
         }
 
-        String name = args[2];
         String nameL = name.toLowerCase(Locale.ROOT);
-        String dest = args[3];
 
         if (!isValidDestination(dest)) {
             message(plr, "&4Invalid destination format! Use: e:<world>:<x>,<y>,<z> or <world>:<x>,<y>,<z>");
@@ -223,12 +219,7 @@ public class PortalCommand implements Command {
                 pos2
         );
 
-        if (args.length == 5) {
-            String isTransport = args[4];
-            p.buildPortalArea(pos1, pos2, world, Boolean.parseBoolean(isTransport));
-        } else {
-            p.buildPortalArea(pos1, pos2, world);
-        }
+        p.buildPortalArea(pos1, pos2, world, isTransparent);
 
         KNOWN_PORTALS.put(nameL, p);
         try {
