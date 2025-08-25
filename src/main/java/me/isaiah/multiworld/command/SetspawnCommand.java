@@ -15,7 +15,12 @@ import net.minecraft.world.level.Level;
 
 public class SetspawnCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+    /**
+     * Run setspawn command with native command logic
+     * @param mc MinecraftServer instance
+     * @param plr ServerPlayer executing the command
+     */
+    public static int run(MinecraftServer mc, ServerPlayer plr) {
         Level w = plr.level();
         BlockPos pos = plr.blockPosition();
         try {
@@ -28,6 +33,15 @@ public class SetspawnCommand implements Command {
             e.printStackTrace();
         }
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, ServerPlayer) instead
+     */
+    @Deprecated
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        return run(mc, plr);
     }
 
     public static void setSpawn(Level w, BlockPos spawn) throws IOException {

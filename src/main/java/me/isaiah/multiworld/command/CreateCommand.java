@@ -92,38 +92,39 @@ public class CreateCommand implements Command {
 	}
 
 	/**
-	 * Run Command
+	 * Run Command with native command logic
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
+	 * @param worldId World identifier (will be prefixed with "multiworld:" if no namespace)
+	 * @param environment World environment (NORMAL, NETHER, END, or custom)
+	 * @param options Optional parameters string (can be null or empty)
 	 */
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
-        if (args.length == 1 || args.length == 2) {
-            // Command Usage Message
-            I18n.message(plr, I18n.USAGE_CREATE);
-            return 0;
-        }
-
+    public static int run(MinecraftServer mc, ServerPlayer plr, String worldId, String environment, String options) {
+        // Set default values
         Random r = new Random();
-        long seed = r.nextInt();
+        long seed = r.nextInt(); // Default: random seed
+        
+        ChunkGenerator gen = get_chunk_gen(mc, environment);
+        ResourceLocation dim = get_dim_id(environment);
 
-        String env = args[2];
-        ChunkGenerator gen = get_chunk_gen(mc, env);
-        ResourceLocation dim = get_dim_id(env);
-
+        // Default dimension fallback
         if (null == dim) {
-        	System.out.println("Null dimenstion ");
+        	System.out.println("Null dimension, using default OVERWORLD");
         	dim = Util.OVERWORLD_ID;
         }
 
-        String arg1 = args[1];
-        if (arg1.indexOf(':') == -1) {
-        	arg1 = "multiworld:" + arg1;
+        // Default namespace handling
+        String processedWorldId = worldId;
+        if (worldId.indexOf(':') == -1) {
+        	processedWorldId = "multiworld:" + worldId;
         }
 
         String customGen = "";
         
-        if (args.length > 3) {
-        	for (int i = 3; i < args.length; i++) {
-        		String arg = args[i];
-	        	
+        // Process optional parameters
+        if (options != null && !options.trim().isEmpty()) {
+        	String[] optionArgs = options.trim().split(" ");
+        	for (String arg : optionArgs) {
 	        	// Check if arg is "-g=GENERATOR"
 	        	Tuple<ChunkGenerator, String> resultA = checkArgForGen(mc, arg);
 	        	if (null != resultA) {
@@ -143,15 +144,43 @@ public class CreateCommand implements Command {
 	        		seed = resultB.get();
 	        	}
         	}
-        	
         }
         
-        ServerLevel world = MultiworldMod.create_world(arg1, dim, gen, Difficulty.PEACEFUL, seed);
-		make_config(world, args[2], seed, customGen);
+        ServerLevel world = MultiworldMod.create_world(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
+		make_config(world, environment, seed, customGen);
 
-		message(plr, I18n.CREATED_WORLD + args[1]);
+		message(plr, I18n.CREATED_WORLD + worldId);
         
         return 1;
+    }
+
+	/**
+	 * Legacy Run Command - kept for backwards compatibility
+	 * @deprecated Use run(MinecraftServer, ServerPlayer, String, String, String) instead
+	 */
+	@Deprecated
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        if (args.length == 1 || args.length == 2) {
+            // Command Usage Message
+            I18n.message(plr, I18n.USAGE_CREATE);
+            return 0;
+        }
+        
+        String worldId = args[1];
+        String environment = args[2];
+        
+        // Reconstruct options string from remaining args
+        String options = null;
+        if (args.length > 3) {
+            StringBuilder optionsBuilder = new StringBuilder();
+            for (int i = 3; i < args.length; i++) {
+                if (i > 3) optionsBuilder.append(" ");
+                optionsBuilder.append(args[i]);
+            }
+            options = optionsBuilder.toString();
+        }
+        
+        return run(mc, plr, worldId, environment, options);
     }
 
     /**

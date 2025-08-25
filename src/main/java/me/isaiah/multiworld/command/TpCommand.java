@@ -14,28 +14,39 @@ import me.isaiah.multiworld.config.*;
 
 public class TpCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+    /**
+     * Run teleport command with native command logic
+     * @param mc MinecraftServer instance
+     * @param plr ServerPlayer to teleport (can be null for console commands)
+     * @param worldName Target world name (will be prefixed with "multiworld:" if no namespace)
+     * @param targetPlayerName Target player name (for console teleporting another player, can be null)
+     */
+    public static int run(MinecraftServer mc, ServerPlayer plr, String worldName, String targetPlayerName) {
         HashMap<String,ServerLevel> worlds = new HashMap<>();
         mc.levelKeys().forEach(r -> {
             ServerLevel world = mc.getLevel(r);
             worlds.put(r.location().toString(), world);
         });
         
-        String arg1 = args[1];
-        if (arg1.indexOf(':') == -1) arg1 = "multiworld:" + arg1;
+        // Default namespace handling
+        String processedWorldName = worldName;
+        if (worldName.indexOf(':') == -1) {
+            processedWorldName = "multiworld:" + worldName;
+        }
         
+        // Handle console commands
         if (null == plr) {
-        	// Console
-        	if (args.length <= 2) {
+        	if (targetPlayerName == null || targetPlayerName.isEmpty()) {
         		return 0;
         	}
-
-        	String target = args[2];
-        	plr = mc.getPlayerList().getPlayerByName(target);
+        	plr = mc.getPlayerList().getPlayerByName(targetPlayerName);
+        	if (plr == null) {
+        		return 0;
+        	}
         }
 
-        if (worlds.containsKey(arg1)) {
-            ServerLevel w = worlds.get(arg1);
+        if (worlds.containsKey(processedWorldName)) {
+            ServerLevel w = worlds.get(processedWorldName);
             // BlockPos sp = multiworld_method_43126(w);
             BlockPos sp = SpawnCommand.getSpawn(w);
 			
@@ -49,7 +60,7 @@ public class TpCommand implements Command {
 			} catch (NoSuchMethodError | Exception e) {
 			}
 			
-			String env = read_env_from_config(arg1);
+			String env = read_env_from_config(processedWorldName);
 			if (null != env) {
 				if (env.equalsIgnoreCase("END")) {
 					isEnd = true;
@@ -82,6 +93,22 @@ public class TpCommand implements Command {
             return 1;
         }
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
+     */
+    @Deprecated
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        if (args.length < 2) {
+            return 0;
+        }
+        
+        String worldName = args[1];
+        String targetPlayerName = (args.length > 2) ? args[2] : null;
+        
+        return run(mc, plr, worldName, targetPlayerName);
     }
     
     /**

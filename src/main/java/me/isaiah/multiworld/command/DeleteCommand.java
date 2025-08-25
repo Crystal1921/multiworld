@@ -19,43 +19,54 @@ public class DeleteCommand implements Command {
 	private static HashMap<String, Long> map = new HashMap<>();
 	
 	/**
-	 * Run Command
+	 * Run delete command with native command logic
+	 * @param mc MinecraftServer instance
+	 * @param source CommandSourceStack executing the command
+	 * @param worldId World identifier to delete
 	 */
-    public static int run(MinecraftServer mc, CommandSourceStack source, String[] args) {
-        if (args.length == 1) {
-        	LOGGER.error("Usage: /mw delete <id>");
-            return 0;
-        }
-
-        String id = args[1];
-        
-        if (!map.containsKey(id)) {
-        	map.put(id, System.currentTimeMillis() );
-            source.sendSuccess(() -> Component.literal("Delete request for world \"" + id + "\" received. Type the command again to confirm."), false);
+    public static int run(MinecraftServer mc, CommandSourceStack source, String worldId) {
+        if (!map.containsKey(worldId)) {
+        	map.put(worldId, System.currentTimeMillis() );
+            source.sendSuccess(() -> Component.literal("Delete request for world \"" + worldId + "\" received. Type the command again to confirm."), false);
         	return 1;
         }
         
-        long start = map.get(id);
+        long start = map.get(worldId);
         long now = System.currentTimeMillis();
         long TIMEOUT = 20_000;
         
         if (now - start > TIMEOUT) {
             source.sendSuccess(() -> Component.literal("Delete request timed-out (>20s). Please try again."), false);
-        	map.remove(id);
+        	map.remove(worldId);
         	return 0;
         }
 
-        source.sendSuccess(() -> Component.literal("Deleting multiworld config for \"" + id + "\"..."), false);
+        source.sendSuccess(() -> Component.literal("Deleting multiworld config for \"" + worldId + "\"..."), false);
         try {
-			File config = Util.get_config_file(MultiworldMod.new_id(id));
+			File config = Util.get_config_file(MultiworldMod.new_id(worldId));
 			config.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        source.sendSuccess(() -> Component.literal("Deleting world folder \"" + id + "\"..."), false);
-        MultiworldMod.get_world_creator().deleteWorld(id);
+        source.sendSuccess(() -> Component.literal("Deleting world folder \"" + worldId + "\"..."), false);
+        MultiworldMod.get_world_creator().deleteWorld(worldId);
 
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, CommandSourceStack, String) instead
+     */
+    @Deprecated
+    public static int run(MinecraftServer mc, CommandSourceStack source, String[] args) {
+        if (args.length == 1) {
+        	LOGGER.error("Usage: /mw delete <id>");
+            return 0;
+        }
+        
+        String worldId = args[1];
+        return run(mc, source, worldId);
     }
 
 }

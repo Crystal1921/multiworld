@@ -61,16 +61,128 @@ public class PortalCommand implements Command {
 	};
 
 	/**
-	 * Execute the Command
+	 * Run portal help command
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
 	 */
+	public static int runHelp(MinecraftServer mc, ServerPlayer plr) {
+		for (String s : COMMAND_HELP) {
+			message(plr, s);
+		}
+		return 1;
+	}
+
+	/**
+	 * Run portal wand command
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
+	 */
+	public static int runWand(MinecraftServer mc, ServerPlayer plr) {
+		if (!Util.isForgeOrHasICommon()) {
+			message(plr,  "&4WARN: iCommonLib is required for Portals to function properly");
+		}
+		
+		if (!Perm.has(plr, "multiworld.portal.wand")) {
+			message(plr, "Invalid permission! Missing: multiworld.portal.wand");
+			return 0;
+		}
+		
+		message(plr, "&aGiving wand!");
+		plr.addItem(WandEventHandler.getItemStack().copy());
+		return 1;
+	}
+
+	/**
+	 * Run portal info command
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
+	 * @param portalName Portal name (can be null to list all portals)
+	 */
+	public static int runInfo(MinecraftServer mc, ServerPlayer plr, String portalName) {
+		if (!Util.isForgeOrHasICommon()) {
+			message(plr,  "&4WARN: iCommonLib is required for Portals to function properly");
+		}
+		
+		if (portalName == null || portalName.isEmpty()) {
+			// List all portals
+			message(plr, "&6Multiworld Portals (" + KNOWN_PORTALS.size() + "):");
+			for (Portal p : KNOWN_PORTALS.values()) {
+				message(plr, " Portal: \"" + p.getName() + "\": ");
+				String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
+				String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
+				message(plr, " - " + from + ") -> " + to + ")");
+			}
+			return 1;
+		}
+		
+		// Show specific portal info
+		Portal p = KNOWN_PORTALS.getOrDefault(portalName, getPortalIgnoreCase(portalName));
+		if (null == p) {
+			message(plr, "&4Portal with the name " + portalName + " not found!");
+			return 0;
+		}
+		message(plr, "&6Multiworld Portals:");
+		message(plr, " Portal: \"" + p.getName() + "\": ");
+		message(plr, "  &6- From:&r " + p.getOriginWorldId() + " @ (" + p.getMinPos().toShortString() + ")");
+		message(plr, "  &6- To:&r " + p.getDestWorldName() + " @ (" + p.getDestLocation().toShortString() + ")");
+		message(plr, "  &6- Destination:&r " + p.getDestination());
+		message(plr, "  &6- Portal Frame:&r " + p.getLocationConfigString());
+		return 1;
+	}
+
+	/**
+	 * Run portal create command
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
+	 * @param portalName Portal name
+	 * @param destination Portal destination (can be null for default)
+	 */
+	public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination) {
+		if (!Util.isForgeOrHasICommon()) {
+			message(plr,  "&4WARN: iCommonLib is required for Portals to function properly");
+		}
+		
+		if (!Perm.has(plr, "multiworld.portal.create")) {
+			message(plr, "Invalid permission! Missing: multiworld.portal.create");
+			return 0;
+		}
+
+		if (destination == null || destination.isEmpty()) {
+			message(plr, I18n.CMD_PORTAL_USAGE_CREATE);
+			return 0;
+		}
+
+		// Create args array for the existing createPortal method
+		String[] args = {"portal", "create", portalName, destination};
+		return createPortal(plr, args);
+	}
+
+	/**
+	 * Run portal remove command
+	 * @param mc MinecraftServer instance
+	 * @param plr ServerPlayer executing the command
+	 * @param portalName Portal name to remove
+	 */
+	public static int runRemove(MinecraftServer mc, ServerPlayer plr, String portalName) {
+		if (!Util.isForgeOrHasICommon()) {
+			message(plr,  "&4WARN: iCommonLib is required for Portals to function properly");
+		}
+		
+		// Create args array for the existing removePortal method
+		String[] args = {"portal", "remove", portalName};
+		return removePortal(plr, args);
+	}
+
+	/**
+	 * Legacy Execute the Command - kept for backwards compatibility
+	 * @deprecated Use specific run methods instead
+	 */
+	@Deprecated
 	public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
 
 		// Portal Command Help
 		if (args.length == 1) {
-			for (String s : COMMAND_HELP) {
-				message(plr, s);
-            }
-			return 0;
+			return runHelp(mc, plr);
 		}
 		
 		if (!Util.isForgeOrHasICommon()) {
@@ -97,41 +209,13 @@ public class PortalCommand implements Command {
 		
 		// Portal Info Command
 		if (args[1].equalsIgnoreCase("info")) {
-			if (args.length < 3) {
-				message(plr, "&6Multiworld Portals (" + KNOWN_PORTALS.size() + "):");
-				for (Portal p : KNOWN_PORTALS.values()) {
-					message(plr, " Portal: \"" + p.getName() + "\": ");
-					String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
-					String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
-					message(plr, " - " + from + ") -> " + to + ")");
-				}
-				return 1;
-			}
-			
-			String name = args[2];
-			Portal p = KNOWN_PORTALS.getOrDefault(name, getPortalIgnoreCase(name));
-			if (null == p) {
-				message(plr, "&4Portal with the name " + name + " not found!");
-			}
-			message(plr, "&6Multiworld Portals:");
-			message(plr, " Portal: \"" + p.getName() + "\": ");
-			message(plr, "  &6- From:&r " + p.getOriginWorldId() + " @ (" + p.getMinPos().toShortString() + ")");
-			message(plr, "  &6- To:&r " + p.getDestWorldName() + " @ (" + p.getDestLocation().toShortString() + ")");
-			message(plr, "  &6- Destination:&r " + p.getDestination());
-			message(plr, "  &6- Portal Frame:&r " + p.getLocationConfigString());
+			String portalName = (args.length >= 3) ? args[2] : null;
+			return runInfo(mc, plr, portalName);
 		}
 		
 		// Portal Wand Command
 		if (args[1].equalsIgnoreCase("wand")) {
-			if (!Perm.has(plr, "multiworld.portal.wand")) {
-				message(plr, "Invalid permission! Missing: multiworld.portal.wand");
-				return 0;
-			}
-			
-			message(plr, "&aGiving wand!");
-			plr.addItem(WandEventHandler.getItemStack().copy());
-
-			return 1;
+			return runWand(mc, plr);
 		}
 		
 		// Portal Subcommand Help
@@ -142,22 +226,14 @@ public class PortalCommand implements Command {
 		
 		// Portal Create Command
 		if (args[1].equalsIgnoreCase("create")) {
-			if (args.length < 4) {
-				// arguments
-				message(plr, I18n.CMD_PORTAL_USAGE_CREATE);
-				return 0;
-			}
-			
-			if (!Perm.has(plr, "multiworld.portal.create")) {
-				message(plr, "Invalid permission! Missing: multiworld.portal.create");
-				return 0;
-			}
-
-			return createPortal(plr, args);
+			String portalName = (args.length >= 3) ? args[2] : null;
+			String destination = (args.length >= 4) ? args[3] : null;
+			return runCreate(mc, plr, portalName, destination);
 		}
 
 		if (args[1].equalsIgnoreCase("remove")) {
-			return removePortal(plr, args);
+			String portalName = (args.length >= 3) ? args[2] : null;
+			return runRemove(mc, plr, portalName);
 		}
 		
 		return 1;

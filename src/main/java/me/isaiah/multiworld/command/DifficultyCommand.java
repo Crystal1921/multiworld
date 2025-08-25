@@ -12,57 +12,75 @@ import net.minecraft.world.Difficulty;
 
 public class DifficultyCommand implements Command {
 
-    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+    /**
+     * Run difficulty command with native command logic
+     * @param mc MinecraftServer instance
+     * @param plr ServerPlayer executing the command
+     * @param difficulty Difficulty level
+     * @param worldName Target world name (can be null for current world)
+     */
+    public static int run(MinecraftServer mc, ServerPlayer plr, String difficulty, String worldName) {
         ServerLevel w = (ServerLevel) plr.level();
 
-		if (args.length < 2) {
-			MultiworldCommand.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
-			return 1;
-		}
-		
-        String a1 = args[1];
-        // String a2 = args[2];
-        
-        if (args.length >= 3) {
-        	String a2 = args[2];
-        	
+        // Handle world selection
+        if (worldName != null && !worldName.isEmpty()) {
         	HashMap<String,ServerLevel> worlds = new HashMap<>();
             mc.levelKeys().forEach(r -> {
                 ServerLevel world = mc.getLevel(r);
                 worlds.put(r.location().toString(), world);
             });
 
-            if (a2.indexOf(':') == -1) a2 = "multiworld:" + a2;
+            // Default namespace handling
+            String processedWorldName = worldName;
+            if (worldName.indexOf(':') == -1) {
+                processedWorldName = "multiworld:" + worldName;
+            }
 
-            if (worlds.containsKey(a2)) {
-                w = worlds.get(a2);
+            if (worlds.containsKey(processedWorldName)) {
+                w = worlds.get(processedWorldName);
             }
         }
 
 		Difficulty d;
 
-		// String to Difficulty
-		if (a1.equalsIgnoreCase("EASY"))         { d = Difficulty.EASY; }
-		else if (a1.equalsIgnoreCase("HARD"))    { d = Difficulty.HARD; }
-		else if (a1.equalsIgnoreCase("NORMAL"))  { d = Difficulty.NORMAL; }
-		else if (a1.equalsIgnoreCase("PEACEFUL")){ d = Difficulty.PEACEFUL; }
+		// String to Difficulty with default fallback
+		if (difficulty.equalsIgnoreCase("EASY"))         { d = Difficulty.EASY; }
+		else if (difficulty.equalsIgnoreCase("HARD"))    { d = Difficulty.HARD; }
+		else if (difficulty.equalsIgnoreCase("NORMAL"))  { d = Difficulty.NORMAL; }
+		else if (difficulty.equalsIgnoreCase("PEACEFUL")){ d = Difficulty.PEACEFUL; }
 		else {
-			MultiworldCommand.message(plr, "Invalid difficulty: " + a1);
-			return 1;
+			MultiworldCommand.message(plr, "Invalid difficulty: " + difficulty + ". Valid values: PEACEFUL, EASY, NORMAL, HARD");
+			return 0;
 		}
 
         MultiworldMod.get_world_creator().setDifficulty(w.dimension().location().toString(), d);
 
         try {
 			FileConfiguration config = Util.get_config(w);
-			config.set("difficulty", a1);
+			config.set("difficulty", difficulty);
 			config.save();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        MultiworldCommand.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.dimension().location().toString() + "' is now set to: " + a1);
+        MultiworldCommand.message(plr, "[&cMultiworld&r]: Difficulty of world '" + w.dimension().location().toString() + "' is now set to: " + difficulty);
         return 1;
+    }
+
+    /**
+     * Legacy Run Command - kept for backwards compatibility
+     * @deprecated Use run(MinecraftServer, ServerPlayer, String, String) instead
+     */
+    @Deprecated
+    public static int run(MinecraftServer mc, ServerPlayer plr, String[] args) {
+        if (args.length < 2) {
+			MultiworldCommand.message(plr, "[&4Multiworld&r] Usage: /mw difficulty <value> [world id]");
+			return 0;
+		}
+        
+        String difficulty = args[1];
+        String worldName = (args.length >= 3) ? args[2] : null;
+        
+        return run(mc, plr, difficulty, worldName);
     }
 
 }
