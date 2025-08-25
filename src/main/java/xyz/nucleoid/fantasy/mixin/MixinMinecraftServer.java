@@ -25,12 +25,6 @@ public class MixinMinecraftServer implements IMC {
     @Shadow
     private Map<ResourceKey<Level>, ServerLevel> levels;
 
-    // 原版已经使用安全的数组操作
-//	@Redirect(method = "tickChildren", at = @At(value = "INVOKE", target = "Ljava/lang/Iterable;iterator()Ljava/util/Iterator;", ordinal = 0), require = 0)
-//	private Iterator<ServerLevel> fantasy$copyBeforeTicking(Iterable<ServerLevel> instance) {
-//		return new SafeIterator<>((Collection<ServerLevel>) instance);
-//	}
-
     // The locals you have to manage for an inject are insane. And do it twice. A redirect is much cleaner.
     // Here is what it looks like with an inject: https://gist.github.com/i509VCB/f80077cc536eb4dba62b794eba5611c1
     @Redirect(method = "createLevels", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))

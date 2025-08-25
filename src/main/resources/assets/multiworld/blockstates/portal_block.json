@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "multiworld:block/portal_block"
+    }
+  }
+}

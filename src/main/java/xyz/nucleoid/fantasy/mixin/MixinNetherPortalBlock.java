@@ -28,40 +28,36 @@ public class MixinNetherPortalBlock {
 		}
 		
 		// Check if portal
-		
-		boolean is_our_portal = true;
-		
-		if (is_our_portal) {
-			for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
-				// boolean canPos = p.blocks.contains(pos);
-				
-				BlockPos min = p.getMinPos();
-				BlockPos max = p.getMaxPos();
 
-				boolean isInside = pos.getX() >= min.getX() && pos.getX() <= max.getX() &&
-								pos.getY() >= min.getY() && pos.getY() <= max.getY() &&
-								pos.getZ() >= min.getZ() && pos.getZ() <= max.getZ();
+        for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
+// boolean canPos = p.blocks.contains(pos);
 
-				
-				if (isInside) {
-					I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
-					
-					BlockPos dest = p.getDestLocation();
-					
-					MultiworldMod.get_world_creator().teleport(
-							(ServerPlayer) entity,
-							p.getDestWorld(),
-							dest.getX(),
-							dest.getY(),
-							dest.getZ()
-					);
-					
-					ci.cancel();
-					return;
-				}
-			}
-		}
-		
-	}
+            BlockPos min = p.getMinPos();
+            BlockPos max = p.getMaxPos();
+
+            boolean isInside = pos.getX() >= min.getX() && pos.getX() <= max.getX() &&
+                    pos.getY() >= min.getY() && pos.getY() <= max.getY() &&
+                    pos.getZ() >= min.getZ() && pos.getZ() <= max.getZ();
+
+
+            if (isInside) {
+                I18n.message((ServerPlayer) entity, I18n.TELEPORTING);
+
+                BlockPos dest = p.getDestLocation();
+
+                MultiworldMod.get_world_creator().teleport(
+                        (ServerPlayer) entity,
+                        p.getDestWorld(),
+                        dest.getX(),
+                        dest.getY(),
+                        dest.getZ()
+                );
+
+                ci.cancel();
+                return;
+            }
+        }
+
+    }
 
 }

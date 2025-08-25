@@ -8,7 +8,6 @@
     "MinecraftServerAccess",
     "MixinMinecraftServer",
     "MixinNetherPortalBlock",
-    "RegistryCodecsMixin",
     "ServerChunkManagerMixin",
     "ServerWorldMixin",
     "SimpleRegistryMixin"

@@ -27,6 +27,8 @@ public class MultiworldModNeoForge {
 		NeoForgeWorldCreator.init();
 		PermForge.init();
 		MultiworldMod.init();
+
+		BlockRegistry.BLOCKS.register(modEventBus);
 	}
 
 	public void commonSetup(final FMLCommonSetupEvent event) {

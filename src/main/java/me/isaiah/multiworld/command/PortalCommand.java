@@ -216,7 +216,12 @@ public class PortalCommand implements Command {
 				pos2 
 				);
 
-		p.buildPortalArea(pos1, pos2, world);
+		if (args.length == 5) {
+			String isTransport = args[4];
+			p.buildPortalArea(pos1, pos2, world, Boolean.parseBoolean(isTransport));
+		} else {
+			p.buildPortalArea(pos1, pos2, world);
+		}
 
 		KNOWN_PORTALS.put(nameL, p);
 		try {

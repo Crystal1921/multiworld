@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import me.isaiah.multiworld.BlockRegistry;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
@@ -18,6 +19,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -263,8 +265,7 @@ public class Portal {
 	
 	/**
 	 * The destination of the Portal, in Multiverse format.
-	 * 
-	 * @see {@link https://mvplugins.org/core/reference/destinations/}
+	 *
 	 */
 	public String getDestination() {
 		return destination;
@@ -416,8 +417,12 @@ public class Portal {
 	public void refreshPortalArea() {
 		this.buildPortalArea(this.getMinPos(), this.getMaxPos(), this.getOriginWorld());
 	}
-	
+
 	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world) {
+		buildPortalArea(pos1, pos2, world, false);
+	}
+	
+	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world, boolean isTransparent) {
 	    int minX = Math.min(pos1.getX(), pos2.getX());
 	    int minY = Math.min(pos1.getY(), pos2.getY());
 	    int minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -459,10 +464,9 @@ public class Portal {
 	    
 	    // Set the portal blocks after we have a complete frame
 	    for (BlockPos currentPos : innerBlocks) {
-	    	BlockState portalState = Blocks.NETHER_PORTAL.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
+			Block block = isTransparent ? BlockRegistry.PORTAL_BLOCK.get() : Blocks.NETHER_PORTAL;
+	    	BlockState portalState = block.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
             world.setBlockAndUpdate(currentPos, portalState);
 	    }
 	}
-
-
 }
