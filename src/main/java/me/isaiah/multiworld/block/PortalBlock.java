@@ -51,6 +51,9 @@ public class PortalBlock extends Block {
 
         for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
 // boolean canPos = p.blocks.contains(pos);
+            if (p.getOriginWorld() != entity.level()) {
+                continue;
+            }
 
             BlockPos min = p.getMinPos();
             BlockPos max = p.getMaxPos();

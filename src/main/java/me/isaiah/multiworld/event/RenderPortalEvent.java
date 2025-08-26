@@ -1,6 +1,5 @@
 package me.isaiah.multiworld.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import me.isaiah.multiworld.MultiworldMod;
@@ -13,7 +12,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
