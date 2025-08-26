@@ -8,8 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Messages for Internationalization (I18N)
- * 
- * @see {@link https://minecraft.wiki/w/Formatting_codes}
+ *
  */
 public class I18n {
 
