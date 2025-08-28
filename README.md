@@ -39,6 +39,9 @@ To make a Portal use the Portal Wand, given by *`/mv portal wand`*. While holdin
 | /mv portal info   | List all Portals                         |                                                 |
 | /mv portal remove | Remove a Portal                          | /mv portal remove myPortal                      |
 
+### Import Worlds
+You can import existing worlds into Multiworld using the command `/mv import <path>` e.g. `/mv import mcg:void1`.
+The world must be located in the dimensions folder of your server, e.g. `world\dimensions\mcg\void1`
 
 ## Permissions
 
@@ -58,7 +61,6 @@ etc..
 ## Coming Soon
 
 - Custom generator suppport
-- Custom Portal support
 
 ## License & Credits
 
