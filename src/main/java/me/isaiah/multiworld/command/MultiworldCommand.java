@@ -363,7 +363,19 @@ public class MultiworldCommand {
                                     String world = ResourceLocationArgument.getId(ctx, "world").toString();
                                     return DeleteCommand.run(ctx.getSource().getServer(), ctx.getSource(), world);
                                 })))
-        );
+                .then(Commands.literal("import")
+                        .requires(source -> {
+                            try {
+                                ServerPlayer player = source.getPlayer();
+                                return source.hasPermission(1) ||
+                                        Perm.has(player, "multiworld.admin");
+                            } catch (Exception e) {
+                                return source.hasPermission(1);
+                            }
+                        })
+                        .then(Commands.argument("world", ResourceLocationArgument.id())
+                                .executes(ctx -> ImportCommand.run(ctx.getSource().getServer(), ctx.getSource(), ResourceLocationArgument.getId(ctx, "world"))))
+                ));
     }
 
     private static int showMainHelp(CommandSourceStack source) throws CommandSyntaxException {

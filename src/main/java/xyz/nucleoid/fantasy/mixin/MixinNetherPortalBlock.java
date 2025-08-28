@@ -28,7 +28,6 @@ public class MixinNetherPortalBlock {
         // Check if portal
 
         for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {
-// boolean canPos = p.blocks.contains(pos);
             if (p.getOriginWorld() != entity.level()) {
                 continue;
             }
@@ -42,7 +41,9 @@ public class MixinNetherPortalBlock {
 
 
             if (isInside) {
-
+                if (p.getDestWorld() == null) {
+                    return;
+                }
                 BlockPos dest = p.getDestLocation();
 
                 MultiworldMod.get_world_creator().teleport(

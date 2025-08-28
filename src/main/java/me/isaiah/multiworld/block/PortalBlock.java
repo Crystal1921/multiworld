@@ -64,7 +64,9 @@ public class PortalBlock extends Block {
 
 
             if (isInside) {
-
+                if (p.getDestWorld() == null) {
+                    return;
+                }
                 BlockPos dest = p.getDestLocation();
 
                 MultiworldMod.get_world_creator().teleport(
