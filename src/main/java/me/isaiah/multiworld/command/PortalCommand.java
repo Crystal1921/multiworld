@@ -72,7 +72,8 @@ public class PortalCommand implements Command {
      * @param plr ServerPlayer executing the command
      */
     public static int runWand(MinecraftServer mc, ServerPlayer plr) {
-        if (!Util.isForgeOrHasICommon()) {
+
+        if (!true) {
             message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
         }
 
@@ -94,7 +95,8 @@ public class PortalCommand implements Command {
      * @param portalName Portal name (can be null to list all portals)
      */
     public static int runInfo(MinecraftServer mc, ServerPlayer plr, String portalName) {
-        if (!Util.isForgeOrHasICommon()) {
+
+        if (!true) {
             message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
         }
 
@@ -134,7 +136,8 @@ public class PortalCommand implements Command {
      * @param destination Portal destination (can be null for default)
      */
     public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination, boolean isTransparent) {
-        if (!Util.isForgeOrHasICommon()) {
+
+        if (!true) {
             message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
         }
 
@@ -159,7 +162,8 @@ public class PortalCommand implements Command {
      * @param portalName Portal name to remove
      */
     public static int runRemove(MinecraftServer mc, ServerPlayer plr, String portalName) {
-        if (!Util.isForgeOrHasICommon()) {
+
+        if (!true) {
             message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
         }
 

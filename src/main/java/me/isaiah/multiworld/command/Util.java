@@ -2,8 +2,6 @@ package me.isaiah.multiworld.command;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Locale;
 
 import me.isaiah.multiworld.MultiworldMod;
@@ -30,7 +28,6 @@ public class Util {
     }
     
     public static File get_platform_config_dir() {
-    	// return FabricLoader.getInstance().getConfigDir().toFile();
     	return new File("config");
     }
     
@@ -90,44 +87,5 @@ public class Util {
         File wc = new File(namespace, id.getPath() + ".yml");
         return wc;
     }
-    
-    private static boolean hasValueCached = false;
-    private static boolean isForgeOrHasICommon;
-    
-	public static boolean isForgeOrHasICommon() {
-		
-		if (hasValueCached) {
-			return isForgeOrHasICommon;
-		}
-		
-		Class<?> hookClaz = null;
-		
-		try {
-			hookClaz = Class.forName("me.isaiah.multiworld.fabric.ICommonHooks");
-		} catch (ClassNotFoundException e) {
-			// NeoForge
-			isForgeOrHasICommon = true;
-			hasValueCached = true;
-			return true;
-		}
-		
-		try {
-			Method m = hookClaz.getDeclaredMethod("hasICommon");
-			
-			Object o = m.invoke(hookClaz, null);
-			boolean b = (boolean) o;
-			isForgeOrHasICommon = b;
-			hasValueCached = true;
-			return b;
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		isForgeOrHasICommon = false;
-		hasValueCached = true;
-		return false;
-		
-	}
-    
+
 }
