@@ -294,7 +294,7 @@ public class CreateCommand implements Command {
                         o = String.valueOf((Integer) o);
                     }
 
-                    GameruleCommand.set_gamerule_from_cfg(world, key, (String) o);
+                    GameruleCommand.setGameruleFromConfig(world, key, (String) o);
                 }
             }
 

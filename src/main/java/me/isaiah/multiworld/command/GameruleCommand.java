@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +23,7 @@ public class GameruleCommand implements Command {
 	public static GameRules getGameRules(ServerLevel world) {
 		return world.getGameRules();
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public static HashMap<String, GameRules.Key> keys = new HashMap<>();
 	
@@ -33,21 +34,25 @@ public class GameruleCommand implements Command {
      * @param rule Gamerule name
      * @param value Gamerule value (can be null to query current value)
      */
-    @SuppressWarnings("unchecked")
 	public static int run(MinecraftServer mc, ServerPlayer plr, String rule, String value) {
         ServerLevel w = (ServerLevel) plr.level();
 
-		if (keys.isEmpty()) {
-			setup(w);
-		}
+        return setGamerule(mc, plr, rule, value, w, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static int setGamerule(MinecraftServer mc, ServerPlayer plr, String rule, String value, ServerLevel w, boolean showMessage) {
+        if (keys.isEmpty()) {
+            setup(w);
+        }
 
         // Query current value if no value provided
-		if (value == null || value.isEmpty()) {
-			Value<?> currentRule = getGameRules(w).getRule(keys.get(rule));
-			MultiworldCommand.message(plr, "[&4Multiworld&r] Value of " + rule + " is: " + currentRule);
-			return 1;
-		}
-		
+        if (value == null || value.isEmpty()) {
+            Value<?> currentRule = getGameRules(w).getRule(keys.get(rule));
+            MultiworldCommand.message(plr, "[&4Multiworld&r] Value of " + rule + " is: " + currentRule);
+            return 1;
+        }
+
         // Set new value
         boolean isBool = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
 
@@ -62,14 +67,16 @@ public class GameruleCommand implements Command {
         }
 
         // Save to world config
-    	try {
-			set_rule_cfg(w, rule, value);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+            setRuleConfig(w, rule, value);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        MultiworldCommand.message(plr, "[&cMultiworld&r]: Gamerule " + rule + " is now set to: " + value);
-        
+        if (showMessage) {
+            MultiworldCommand.message(plr, "[&cMultiworld&r]: Gamerule " + rule + " is now set to: " + value);
+        }
+
         return 1;
     }
 
@@ -110,7 +117,7 @@ public class GameruleCommand implements Command {
      * @param a - The Gamerule name (ex: "doDaylightCycle")
      * @param b - The value for the Gamerule (ex: "true", or "100")
      */
-    public static void set_rule_cfg(Level w, String a, String b) throws IOException {
+    public static void setRuleConfig(Level w, String a, String b) throws IOException {
         File cf = new File(Util.get_platform_config_dir(), "multiworld");
         cf.mkdirs();
 
@@ -143,7 +150,7 @@ public class GameruleCommand implements Command {
      * @see {@link CreateCommand#reinit_world_from_config(MinecraftServer, String)}
      */
 	@SuppressWarnings("unchecked")
-	public static void set_gamerule_from_cfg(ServerLevel world, String key, String val) {
+	public static void setGameruleFromConfig(ServerLevel world, String key, String val) {
 		if (keys.isEmpty()) {
 			setup(world);
 		}
@@ -168,5 +175,6 @@ public class GameruleCommand implements Command {
         }
 		
 	}
+
 
 }
