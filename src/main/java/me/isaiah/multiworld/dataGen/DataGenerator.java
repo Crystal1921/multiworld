@@ -22,5 +22,11 @@ public class DataGenerator {
         event.getGenerator().addProvider(
                 event.includeClient(),
                 (DataProvider.Factory<ModItem>) pOutput -> new ModItem(pOutput, MultiworldMod.MOD_ID, efh));
+
+        //Language
+        generator.addProvider(
+                event.includeClient(), new ModLanguage(pack, "zh_cn"));
+        generator.addProvider(
+                event.includeClient(), new ModLanguage(pack, "en_us"));
     }
 }

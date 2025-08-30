@@ -15,7 +15,7 @@ public class GroupRegistry {
     @SuppressWarnings("all")
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MCGPROJECT_SPEC_MAIN = TABS.register("blocks", () -> CreativeModeTab.builder()
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
-            .title(Component.translatable("itemGroup.mcgproject_spec"))
+            .title(Component.translatable("itemGroup.multiworld"))
             .icon(() -> new ItemStack(ItemRegistry.PortalFinder.get()))
             .displayItems((parameters, output) -> {
                 output.accept(ItemRegistry.PortalFinder.get());
