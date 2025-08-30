@@ -1,18 +1,13 @@
 package me.isaiah.multiworld.portal;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import me.isaiah.multiworld.registry.BlockRegistry;
+import lombok.Getter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.PortalCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.config.FileConfiguration;
+import me.isaiah.multiworld.registry.BlockRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,152 +19,139 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static net.minecraft.world.inventory.InventoryMenu.BLOCK_ATLAS;
+
 /**
  * Representation of a Multiworld Portal
- *
  */
+@Getter
 public class Portal {
 
-	// public ArrayList<BlockPos> blocks;
-	// public ArrayList<Long> po
+    // public ArrayList<BlockPos> blocks;
+    // public ArrayList<Long> po
 
-	private String name;
-	private String owner;
-	private ResourceLocation worldIn;
-	
-	// private BlockPos fromPos;
-	// private BlockPos toPos;
-	
-	private BlockPos minEdge;
-	private BlockPos maxEdge;
-	
-	private String destination;
-	
-	private BlockPos destPos;
-	
-	private Portal(String name, String owner, ResourceLocation worldId, String destination) {
-		// this.blocks = new ArrayList<>();
-		this.name = name;
-		this.owner = owner;
-		this.worldIn = worldId;
-		this.destination = destination;
-	}
-	
-	public Portal(String name, String owner, ResourceLocation worldId, String destination, BlockPos a, BlockPos b) {
-		this(name, owner, worldId, destination);
-		
-		this.minEdge = PortalUtil.getMinPos(a, b);
-		this.maxEdge = PortalUtil.getMaxPos(a, b);
-		
-		//this.fromPos = from;
-		//this.toPos = to;
-	}
-	
-	public Portal(String name, String owner, ResourceLocation worldId, String destination, String location) {
-		this(name, owner, worldId, destination);
+    private String name;
+    private String owner;
+    private ResourceLocation worldIn;
 
-		try {
-			this.locationFromString(location);
-		} catch (ArrayIndexOutOfBoundsException e) {
-			MultiworldMod.LOGGER.info("Oops!");
-			e.printStackTrace();
-		}
-		
-	}
+    // private BlockPos fromPos;
+    // private BlockPos toPos;
 
-	public BlockPos getMinPos() {
-		return minEdge;
-	}
-	
-	public BlockPos getMaxPos() {
-		return maxEdge;
-	}
-	
-	public int getMaxY(int offset) {
-		if (minEdge.getY() > maxEdge.getY()) {
-			return minEdge.getY();
-		}
-		return maxEdge.getY() + offset;
-	}
-	
-	public BlockPos getCenterExit() {
-		return PortalUtil.getCenterWithLowestY(minEdge, maxEdge, 0);
-	}
-	
-	
-	private void locationFromString(String s) {
-		String[] spl = s.split(Pattern.quote(":"));
-		String[] from = spl[0].split(Pattern.quote(","));
-		String[] to = spl[1].split(Pattern.quote(","));
-		
-		double x1 = Double.valueOf(from[0]);
-		double y1 = Double.valueOf(from[1]);
-		double z1 = Double.valueOf(from[2]);
-		
-		double x2 = Double.valueOf(to[0]);
-		double y2 = Double.valueOf(to[1]);
-		double z2 = Double.valueOf(to[2]);
-		
-		BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
-		BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
+    private BlockPos minEdge;
+    private BlockPos maxEdge;
 
-		this.minEdge = PortalUtil.getMinPos(a, b);
-		this.maxEdge = PortalUtil.getMaxPos(a, b);
-		
-		/*
-		this.fromPos = MultiworldMod.get_world_creator().get_pos(x1, y1, z1);
-		this.toPos = MultiworldMod.get_world_creator().get_pos(x2, y2, z2);
-		*/
-	}
-	
-	/**
-     * Load an existing saved portals from config (YAML) 
+    private String destination;
+
+    private BlockPos destPos;
+
+    private SimpleGeneratedModel model;
+
+    private Portal(String name, String owner, ResourceLocation worldId, String destination) {
+        // this.blocks = new ArrayList<>();
+        this.name = name;
+        this.owner = owner;
+        this.worldIn = worldId;
+        this.destination = destination;
+    }
+
+    public Portal(String name, String owner, ResourceLocation worldId, String destination, BlockPos a, BlockPos b) {
+        this(name, owner, worldId, destination);
+
+        this.minEdge = PortalUtil.getMinPos(a, b);
+        this.maxEdge = PortalUtil.getMaxPos(a, b);
+
+        if (this.minEdge != null) {
+            BlockPos offset = this.minEdge.offset(this.maxEdge.multiply(-1));
+            this.model = new SimpleGeneratedModel(
+                    getTexture(ResourceLocation.withDefaultNamespace("block/stone")),
+                    offset.getX() == 0 ? 1 : offset.getX(),
+                    offset.getY() == 0 ? 1 : offset.getY(),
+                    offset.getZ() == 0 ? 1 : offset.getZ()
+            );
+        }
+    }
+
+    public Portal(String name, String owner, ResourceLocation worldId, String destination, String location) {
+        this(name, owner, worldId, destination);
+
+        try {
+            this.locationFromString(location);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            MultiworldMod.LOGGER.info("Oops!");
+            e.printStackTrace();
+        }
+
+        if (this.minEdge != null && this.maxEdge != null) {
+            BlockPos offset = this.minEdge.offset(this.maxEdge.multiply(-1));
+            this.model = new SimpleGeneratedModel(
+                    getTexture(ResourceLocation.withDefaultNamespace("block/stone")),
+                    offset.getX() == 0 ? 1 : offset.getX(),
+                    offset.getY() == 0 ? 1 : offset.getY(),
+                    offset.getZ() == 0 ? 1 : offset.getZ()
+            );
+        }
+    }
+
+    public static TextureAtlasSprite getTexture(ResourceLocation resource) {
+        return Minecraft.getInstance().getTextureAtlas(BLOCK_ATLAS).apply(resource);
+    }
+
+    /**
+     * Load an existing saved portals from config (YAML)
      */
-	public static int reinit_portals_from_config(MinecraftServer mc) {
-		File config_dir = new File("config");
+    public static int reinit_portals_from_config(MinecraftServer mc) {
+        File config_dir = new File("config");
         config_dir.mkdirs();
-        
-        File cf = new File(config_dir, "multiworld"); 
+
+        File cf = new File(config_dir, "multiworld");
         cf.mkdirs();
 
         File wc = new File(cf, "portals.yml");
         FileConfiguration config;
         try {
-			if (!wc.exists()) {
-				wc.createNewFile();
-				return 0;
-			}
+            if (!wc.exists()) {
+                wc.createNewFile();
+                return 0;
+            }
             config = new FileConfiguration(wc);
-            
+
             if (!config.hasSection("portals")) {
-            	MultiworldMod.LOGGER.info("No save portals to load");
-            	return 0;
+                MultiworldMod.LOGGER.info("No save portals to load");
+                return 0;
             }
 
-            LinkedHashMap <String, Object> sect = config.getSection("portals");
+            LinkedHashMap<String, Object> sect = config.getSection("portals");
             Set<String> keys = sect.keySet();
-            
+
             int loaded = 0;
             for (String name : keys) {
-            	
-        		String prefix = "portals." + name;
-            	
-        		String owner = config.getString(prefix + ".owner");
-        		String location = config.getString(prefix + ".location");
-        		String world = config.getString(prefix + ".world");
-        		String dest = config.getString(prefix + ".destination");
-        		
-        		ResourceLocation worldIn = MultiworldMod.new_id(world);
-        		
-        		Portal p = new Portal(name, owner, worldIn, dest, location);
-        		
-        		// Refresh Portal Frame
-				//TODO : 是否需要重新生成门
+
+                String prefix = "portals." + name;
+
+                String owner = config.getString(prefix + ".owner");
+                String location = config.getString(prefix + ".location");
+                String world = config.getString(prefix + ".world");
+                String dest = config.getString(prefix + ".destination");
+
+                ResourceLocation worldIn = MultiworldMod.new_id(world);
+
+                Portal p = new Portal(name, owner, worldIn, dest, location);
+
+                // Refresh Portal Frame
+                //TODO : 是否需要重新生成门
 
 //        		p.buildPortalArea(p.getMinPos(), p.getMaxPos(), p.getOriginWorld());
-        		
-            	PortalCommand.addKnownPortal(name, p);
-            	loaded += 1;
+
+                PortalCommand.addKnownPortal(name, p);
+                loaded += 1;
             }
             return loaded;
         } catch (Exception e) {
@@ -177,270 +159,319 @@ public class Portal {
             // throw e;
         }
         return 0;
-	}
+    }
 
-	public void save() throws IOException {
-		File config_dir = new File("config");
+    public BlockPos getMinPos() {
+        return minEdge;
+    }
+
+    public BlockPos getMaxPos() {
+        return maxEdge;
+    }
+
+    public int getMaxY(int offset) {
+        if (minEdge.getY() > maxEdge.getY()) {
+            return minEdge.getY();
+        }
+        return maxEdge.getY() + offset;
+    }
+
+    public BlockPos getCenterExit() {
+        return PortalUtil.getCenterWithLowestY(minEdge, maxEdge, 0);
+    }
+
+    private void locationFromString(String s) {
+        String[] spl = s.split(Pattern.quote(":"));
+        String[] from = spl[0].split(Pattern.quote(","));
+        String[] to = spl[1].split(Pattern.quote(","));
+
+        double x1 = Double.valueOf(from[0]);
+        double y1 = Double.valueOf(from[1]);
+        double z1 = Double.valueOf(from[2]);
+
+        double x2 = Double.valueOf(to[0]);
+        double y2 = Double.valueOf(to[1]);
+        double z2 = Double.valueOf(to[2]);
+
+        BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
+        BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
+
+        this.minEdge = PortalUtil.getMinPos(a, b);
+        this.maxEdge = PortalUtil.getMaxPos(a, b);
+
+		/*
+		this.fromPos = MultiworldMod.get_world_creator().get_pos(x1, y1, z1);
+		this.toPos = MultiworldMod.get_world_creator().get_pos(x2, y2, z2);
+		*/
+    }
+
+    public void save() throws IOException {
+        File config_dir = new File("config");
         config_dir.mkdirs();
-        
-        File cf = new File(config_dir, "multiworld"); 
+
+        File cf = new File(config_dir, "multiworld");
         cf.mkdirs();
 
         String name = this.getName();
-		String prefix = "portals." + name;
+        String prefix = "portals." + name;
 
         File wc = new File(cf, "portals.yml");
         FileConfiguration config;
         try {
-			if (!wc.exists()) {
-				wc.createNewFile();
-			}
+            if (!wc.exists()) {
+                wc.createNewFile();
+            }
             config = new FileConfiguration(wc);
 
             // Copied from Multiverse-Portals 5.0.3
-			config.set(prefix + ".entryfee.amount", 0.0);
-			config.set(prefix + ".safeteleport", true);
-			config.set(prefix + ".teleportnonplayers", false);
-			config.set(prefix + ".handlerscript", "''");
+            config.set(prefix + ".entryfee.amount", 0.0);
+            config.set(prefix + ".safeteleport", true);
+            config.set(prefix + ".teleportnonplayers", false);
+            config.set(prefix + ".handlerscript", "''");
 
-			config.set(prefix + ".owner", this.getOwner()); // player
-			config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
-			config.set(prefix + ".world", this.getOriginWorldId());
-			config.set(prefix + ".destination", this.getDestination());
+            config.set(prefix + ".owner", this.getOwner()); // player
+            config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
+            config.set(prefix + ".world", this.getOriginWorldId());
+            config.set(prefix + ".destination", this.getDestination());
 
-			config.save();
+            config.save();
         } catch (Exception e) {
             // e.printStackTrace();
             throw e;
         }
-	}
-	
-	/**
-	 */
-	public String getName() {
-		return this.name;
-	}
-	
-	/**
-	 */
-	public ResourceLocation getOriginWorldId() {
-		return this.worldIn;
-	}
+    }
 
-	/**
-	 */
+    /**
+     *
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     *
+     */
+    public ResourceLocation getOriginWorldId() {
+        return this.worldIn;
+    }
+
+    /**
+     */
 	/*
 	public BlockPos getFromLocation() {
 		return this.fromPos;
 	} 
 	*/
-	
-	/**
-	 */
-	public BlockPos getDestLocation() {
-		if (null == this.destPos) {
-			// this.destPos = SpawnCommand.getSpawn(this.getDestWorld());
-			return this.findDestPos();
-		}
-		
-		return this.destPos;
-	}
-	
-	/**
-	 * Retrieve the Portal's Bounds location in the Multiverse config form
-	 */
-	public String getLocationConfigString() {
-		return this.minEdge.getX() + "," + this.minEdge.getY() + "," + this.minEdge.getZ() + ":" +
-				this.maxEdge.getX() + "," + this.maxEdge.getY() + "," + this.maxEdge.getZ();
-	}
-	
-	/**
-	 */
-	public String getOwner() {
-		return this.owner;
-	}
-	
-	/**
-	 * The destination of the Portal, in Multiverse format.
-	 *
-	 */
-	public String getDestination() {
-		return destination;
-	}
 
-	/**
-	 * @return 
-	 */
-	public BlockPos findDestPos() {
-		String name = this.getDestination();
+    /**
+     *
+     */
+    public BlockPos getDestLocation() {
+        if (null == this.destPos) {
+            // this.destPos = SpawnCommand.getSpawn(this.getDestWorld());
+            return this.findDestPos();
+        }
 
-		String[] spl = name.split(Pattern.quote(":"));
-		
-		String start = spl[0];
-		if (start.length() > 1) {
-			return SpawnCommand.getSpawn(this.getDestWorld());
-		}
-		
-		if (start.equalsIgnoreCase("w")) {
-			return SpawnCommand.getSpawn(this.getDestWorld());
-		}
-		
-		if (start.equalsIgnoreCase("p")) {
-			Portal pp = PortalCommand.getKnownPortal( name.split(Pattern.quote("p:"))[1] );
-			if (null != pp) {
-				
-				Direction.Axis axis = (Math.abs(pp.getMinPos().getX() - getMaxPos().getX()) > Math.abs(getMinPos().getZ() - getMaxPos().getZ()))
-		        	    ? Direction.Axis.X
-		        	    : Direction.Axis.Z;
-			
-				BlockPos cen = PortalUtil.findSafeExit(pp.getDestWorld(), pp.getCenterExit(), 2, getMaxY(4));
-				if (axis == Axis.X) {
-					cen = cen.offset(0, 0, 2);
-				} else {
-					cen = cen.offset(3, 0, 0);
-				}
-				
-				return cen;
-			}
-		}
-		
-		if (start.equalsIgnoreCase("e")) {
-			// World+Location
-			for (int i = 0; i < spl.length; i++) {
-				String vall = spl[i];
-				if (vall.indexOf(',') != -1) {
-					// Location details
-					if (vall.split(Pattern.quote(",")).length != 3) {
-						// Don't Have x,y,z
-						return SpawnCommand.getSpawn(this.getDestWorld());
-					}
-					BlockPos pos = PortalUtil.blockPosFrom(vall);
-					return pos;
-				}
-				
-			}
-			
-		}
-		if (start.equalsIgnoreCase("a")) {
-			// Anchor
-			// note: multiverse-portals docs don't mention this.
-		}
-		return SpawnCommand.getSpawn(this.getDestWorld());
-	}
+        return this.destPos;
+    }
 
-	public String getDestWorldName() {
-		String name = this.getDestination();
-		if (name.startsWith("p:")) {
-			// Portal Dest
-			Portal pp = PortalCommand.getKnownPortal( name.split(Pattern.quote("p:"))[1] );
-			if (null != pp) return pp.getOriginWorldId().toString();
-		}
-		
-		if (name.startsWith("e:")) {
-			name = PortalUtil.extractIdentifier(name);
-		}
+    /**
+     * Retrieve the Portal's Bounds location in the Multiverse config form
+     */
+    public String getLocationConfigString() {
+        return this.minEdge.getX() + "," + this.minEdge.getY() + "," + this.minEdge.getZ() + ":" +
+                this.maxEdge.getX() + "," + this.maxEdge.getY() + "," + this.maxEdge.getZ();
+    }
 
-		if (name.indexOf(':') == -1) name = "multiworld:" + name;
-		return name;
-	}
-	
-	/**
-	 */
-	public ServerLevel getDestWorld() {
-		
-		String name = this.getDestination();
-		
-		if (name.startsWith("p:")) {
-			// Portal Dest
-			Portal pp = PortalCommand.getKnownPortal( name.split(Pattern.quote("p:"))[1] );
-			if (null != pp) {
-				return pp.getOriginWorld();
-			}
-		}
-		
-		if (name.startsWith("e:")) {
-			name = PortalUtil.extractIdentifier(name);
-		}
-		
-		if (name.indexOf(':') == -1) name = "multiworld:" + name;
-		
-		HashMap<String,ServerLevel> worlds = new HashMap<>();
+    /**
+     *
+     */
+    public String getOwner() {
+        return this.owner;
+    }
+
+    /**
+     * The destination of the Portal, in Multiverse format.
+     */
+    public String getDestination() {
+        return destination;
+    }
+
+    /**
+     * @return
+     */
+    public BlockPos findDestPos() {
+        String name = this.getDestination();
+
+        String[] spl = name.split(Pattern.quote(":"));
+
+        String start = spl[0];
+        if (start.length() > 1) {
+            return SpawnCommand.getSpawn(this.getDestWorld());
+        }
+
+        if (start.equalsIgnoreCase("w")) {
+            return SpawnCommand.getSpawn(this.getDestWorld());
+        }
+
+        if (start.equalsIgnoreCase("p")) {
+            Portal pp = PortalCommand.getKnownPortal(name.split(Pattern.quote("p:"))[1]);
+            if (null != pp) {
+
+                Direction.Axis axis = (Math.abs(pp.getMinPos().getX() - getMaxPos().getX()) > Math.abs(getMinPos().getZ() - getMaxPos().getZ()))
+                        ? Direction.Axis.X
+                        : Direction.Axis.Z;
+
+                BlockPos cen = PortalUtil.findSafeExit(pp.getDestWorld(), pp.getCenterExit(), 2, getMaxY(4));
+                if (axis == Axis.X) {
+                    cen = cen.offset(0, 0, 2);
+                } else {
+                    cen = cen.offset(3, 0, 0);
+                }
+
+                return cen;
+            }
+        }
+
+        if (start.equalsIgnoreCase("e")) {
+            // World+Location
+            for (int i = 0; i < spl.length; i++) {
+                String vall = spl[i];
+                if (vall.indexOf(',') != -1) {
+                    // Location details
+                    if (vall.split(Pattern.quote(",")).length != 3) {
+                        // Don't Have x,y,z
+                        return SpawnCommand.getSpawn(this.getDestWorld());
+                    }
+                    BlockPos pos = PortalUtil.blockPosFrom(vall);
+                    return pos;
+                }
+
+            }
+
+        }
+        if (start.equalsIgnoreCase("a")) {
+            // Anchor
+            // note: multiverse-portals docs don't mention this.
+        }
+        return SpawnCommand.getSpawn(this.getDestWorld());
+    }
+
+    public String getDestWorldName() {
+        String name = this.getDestination();
+        if (name.startsWith("p:")) {
+            // Portal Dest
+            Portal pp = PortalCommand.getKnownPortal(name.split(Pattern.quote("p:"))[1]);
+            if (null != pp) return pp.getOriginWorldId().toString();
+        }
+
+        if (name.startsWith("e:")) {
+            name = PortalUtil.extractIdentifier(name);
+        }
+
+        if (name.indexOf(':') == -1) name = "multiworld:" + name;
+        return name;
+    }
+
+    /**
+     *
+     */
+    public ServerLevel getDestWorld() {
+
+        String name = this.getDestination();
+
+        if (name.startsWith("p:")) {
+            // Portal Dest
+            Portal pp = PortalCommand.getKnownPortal(name.split(Pattern.quote("p:"))[1]);
+            if (null != pp) {
+                return pp.getOriginWorld();
+            }
+        }
+
+        if (name.startsWith("e:")) {
+            name = PortalUtil.extractIdentifier(name);
+        }
+
+        if (name.indexOf(':') == -1) name = "multiworld:" + name;
+
+        HashMap<String, ServerLevel> worlds = new HashMap<>();
         MultiworldMod.mc.levelKeys().forEach(r -> {
             ServerLevel world = MultiworldMod.mc.getLevel(r);
             worlds.put(r.location().toString(), world);
         });
-        
+
         ServerLevel w = worlds.get(name);
         // BlockPos sp = SpawnCommand.getSpawn(w);
-		return w;
-	}
-	
-	/**
-	 */
-	public ServerLevel getOriginWorld() {
-		String name = this.getOriginWorldId().toString();
-		HashMap<String,ServerLevel> worlds = new HashMap<>();
+        return w;
+    }
+
+    /**
+     *
+     */
+    public ServerLevel getOriginWorld() {
+        String name = this.getOriginWorldId().toString();
+        HashMap<String, ServerLevel> worlds = new HashMap<>();
         MultiworldMod.mc.levelKeys().forEach(r -> {
             ServerLevel world = MultiworldMod.mc.getLevel(r);
             worlds.put(r.location().toString(), world);
         });
         ServerLevel w = worlds.get(name);
-		return w;
-	}
-	
-	public void refreshPortalArea() {
-		this.buildPortalArea(this.getMinPos(), this.getMaxPos(), this.getOriginWorld());
-	}
+        return w;
+    }
 
-	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world) {
-		buildPortalArea(pos1, pos2, world, false);
-	}
-	
-	public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world, boolean isTransparent) {
-	    int minX = Math.min(pos1.getX(), pos2.getX());
-	    int minY = Math.min(pos1.getY(), pos2.getY());
-	    int minZ = Math.min(pos1.getZ(), pos2.getZ());
+    public void refreshPortalArea() {
+        this.buildPortalArea(this.getMinPos(), this.getMaxPos(), this.getOriginWorld());
+    }
 
-	    int maxX = Math.max(pos1.getX(), pos2.getX());
-	    int maxY = Math.max(pos1.getY(), pos2.getY());
-	    int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+    public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world) {
+        buildPortalArea(pos1, pos2, world, false);
+    }
 
-	    ArrayList<BlockPos> innerBlocks = new ArrayList<>();
-	    
-	    for (int x = minX; x <= maxX; x++) {
-	        for (int y = minY; y <= maxY; y++) {
-	            for (int z = minZ; z <= maxZ; z++) {
-	                BlockPos currentPos = new BlockPos(x, y, z);
+    public void buildPortalArea(BlockPos pos1, BlockPos pos2, ServerLevel world, boolean isTransparent) {
+        int minX = Math.min(pos1.getX(), pos2.getX());
+        int minY = Math.min(pos1.getY(), pos2.getY());
+        int minZ = Math.min(pos1.getZ(), pos2.getZ());
 
-	                int edgeCount = 0;
-	                if (x == minX || x == maxX) edgeCount++;
-	                if (y == minY || y == maxY) edgeCount++;
-	                if (z == minZ || z == maxZ) edgeCount++;
+        int maxX = Math.max(pos1.getX(), pos2.getX());
+        int maxY = Math.max(pos1.getY(), pos2.getY());
+        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
-	                boolean isOnEdge = edgeCount >= 2;
+        ArrayList<BlockPos> innerBlocks = new ArrayList<>();
 
-	                if (isOnEdge) {
-	                    // Frame block
-	                	if (world.isEmptyBlock(currentPos)) {
-	                		world.setBlockAndUpdate(currentPos, Blocks.OBSIDIAN.defaultBlockState());
-	                	}
-	                } else {
-	                    // Inner portal
-	                	innerBlocks.add(currentPos);
-	                }
-	            }
-	        }
-	    }
-	    
-	    Direction.Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
-        	    ? Direction.Axis.X
-        	    : Direction.Axis.Z;
-	    
-	    // Set the portal blocks after we have a complete frame
-	    for (BlockPos currentPos : innerBlocks) {
-			Block block = isTransparent ? BlockRegistry.PORTAL_BLOCK.get() : Blocks.NETHER_PORTAL;
-	    	BlockState portalState = block.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    BlockPos currentPos = new BlockPos(x, y, z);
+
+                    int edgeCount = 0;
+                    if (x == minX || x == maxX) edgeCount++;
+                    if (y == minY || y == maxY) edgeCount++;
+                    if (z == minZ || z == maxZ) edgeCount++;
+
+                    boolean isOnEdge = edgeCount >= 2;
+
+                    if (isOnEdge) {
+                        // Frame block
+                        if (world.isEmptyBlock(currentPos)) {
+                            world.setBlockAndUpdate(currentPos, Blocks.OBSIDIAN.defaultBlockState());
+                        }
+                    } else {
+                        // Inner portal
+                        innerBlocks.add(currentPos);
+                    }
+                }
+            }
+        }
+
+        Direction.Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
+                ? Direction.Axis.X
+                : Direction.Axis.Z;
+
+        // Set the portal blocks after we have a complete frame
+        for (BlockPos currentPos : innerBlocks) {
+            Block block = isTransparent ? BlockRegistry.PORTAL_BLOCK.get() : Blocks.NETHER_PORTAL;
+            BlockState portalState = block.defaultBlockState().setValue(NetherPortalBlock.AXIS, axis);
             world.setBlockAndUpdate(currentPos, portalState);
-	    }
-	}
+        }
+    }
 }

@@ -104,6 +104,8 @@ configurations {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
 //    implementation "DistantHorizon:DistantHorizons-2.3.4-b-1.21.1-fabric-neoforge"
 }
 
