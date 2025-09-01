@@ -38,9 +38,9 @@ public class Portal {
     // public ArrayList<BlockPos> blocks;
     // public ArrayList<Long> po
 
-    private String name;
-    private String owner;
-    private ResourceLocation worldIn;
+    private final String name;
+    private final String owner;
+    private final ResourceLocation worldIn;
 
     // private BlockPos fromPos;
     // private BlockPos toPos;
@@ -48,9 +48,11 @@ public class Portal {
     private BlockPos minEdge;
     private BlockPos maxEdge;
 
-    private String destination;
-
+    private final String destination;
     private BlockPos destPos;
+
+    private boolean enabled = true;
+    private Direction direction;
 
     private SimpleGeneratedModel model;
 
@@ -68,15 +70,7 @@ public class Portal {
         this.minEdge = PortalUtil.getMinPos(a, b);
         this.maxEdge = PortalUtil.getMaxPos(a, b);
 
-        if (this.minEdge != null) {
-            BlockPos offset = this.minEdge.offset(this.maxEdge.multiply(-1));
-            this.model = new SimpleGeneratedModel(
-                    getTexture(ResourceLocation.withDefaultNamespace("block/stone")),
-                    offset.getX() == 0 ? 1 : offset.getX(),
-                    offset.getY() == 0 ? 1 : offset.getY(),
-                    offset.getZ() == 0 ? 1 : offset.getZ()
-            );
-        }
+        initAreaModel(this.minEdge != null);
     }
 
     public Portal(String name, String owner, ResourceLocation worldId, String destination, String location) {
@@ -89,7 +83,11 @@ public class Portal {
             e.printStackTrace();
         }
 
-        if (this.minEdge != null && this.maxEdge != null) {
+        initAreaModel(this.minEdge != null && this.maxEdge != null);
+    }
+
+    private void initAreaModel(boolean bool) {
+        if (bool) {
             BlockPos offset = this.minEdge.offset(this.maxEdge.multiply(-1));
             this.model = new SimpleGeneratedModel(
                     getTexture(ResourceLocation.withDefaultNamespace("block/stone")),
@@ -107,7 +105,7 @@ public class Portal {
     /**
      * Load an existing saved portals from config (YAML)
      */
-    public static int reinit_portals_from_config(MinecraftServer mc) {
+    public static int reinitPortalsFromConfig(MinecraftServer mc) {
         File config_dir = new File("config");
         config_dir.mkdirs();
 
@@ -185,13 +183,13 @@ public class Portal {
         String[] from = spl[0].split(Pattern.quote(","));
         String[] to = spl[1].split(Pattern.quote(","));
 
-        double x1 = Double.valueOf(from[0]);
-        double y1 = Double.valueOf(from[1]);
-        double z1 = Double.valueOf(from[2]);
+        double x1 = Double.parseDouble(from[0]);
+        double y1 = Double.parseDouble(from[1]);
+        double z1 = Double.parseDouble(from[2]);
 
-        double x2 = Double.valueOf(to[0]);
-        double y2 = Double.valueOf(to[1]);
-        double z2 = Double.valueOf(to[2]);
+        double x2 = Double.parseDouble(to[0]);
+        double y2 = Double.parseDouble(to[1]);
+        double z2 = Double.parseDouble(to[2]);
 
         BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
         BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
@@ -244,24 +242,9 @@ public class Portal {
     /**
      *
      */
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     *
-     */
     public ResourceLocation getOriginWorldId() {
         return this.worldIn;
     }
-
-    /**
-     */
-	/*
-	public BlockPos getFromLocation() {
-		return this.fromPos;
-	} 
-	*/
 
     /**
      *
@@ -284,22 +267,18 @@ public class Portal {
     }
 
     /**
-     *
-     */
-    public String getOwner() {
-        return this.owner;
-    }
-
-    /**
      * The destination of the Portal, in Multiverse format.
      */
     public String getDestination() {
+        if (this.destination == null) {
+            System.out.println("Portal Destination is null!");
+            System.out.println(this.getName());
+            System.out.println(this.destination);
+            return "e:minecraft:overworld";
+        }
         return destination;
     }
 
-    /**
-     * @return
-     */
     public BlockPos findDestPos() {
         String name = this.getDestination();
 
@@ -343,17 +322,14 @@ public class Portal {
                         // Don't Have x,y,z
                         return SpawnCommand.getSpawn(this.getDestWorld());
                     }
-                    BlockPos pos = PortalUtil.blockPosFrom(vall);
-                    return pos;
+                    return PortalUtil.blockPosFrom(vall);
                 }
 
             }
 
         }
-        if (start.equalsIgnoreCase("a")) {
-            // Anchor
-            // note: multiverse-portals docs don't mention this.
-        }
+        // Anchor
+        // note: multiverse-portals docs don't mention this.
         return SpawnCommand.getSpawn(this.getDestWorld());
     }
 
@@ -400,9 +376,8 @@ public class Portal {
             worlds.put(r.location().toString(), world);
         });
 
-        ServerLevel w = worlds.get(name);
         // BlockPos sp = SpawnCommand.getSpawn(w);
-        return w;
+        return worlds.get(name);
     }
 
     /**
@@ -415,8 +390,7 @@ public class Portal {
             ServerLevel world = MultiworldMod.mc.getLevel(r);
             worlds.put(r.location().toString(), world);
         });
-        ServerLevel w = worlds.get(name);
-        return w;
+        return worlds.get(name);
     }
 
     public void refreshPortalArea() {
@@ -463,9 +437,9 @@ public class Portal {
             }
         }
 
-        Direction.Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
-                ? Direction.Axis.X
-                : Direction.Axis.Z;
+        Axis axis = (Math.abs(pos1.getX() - pos2.getX()) > Math.abs(pos1.getZ() - pos2.getZ()))
+                ? Axis.X
+                : Axis.Z;
 
         // Set the portal blocks after we have a complete frame
         for (BlockPos currentPos : innerBlocks) {

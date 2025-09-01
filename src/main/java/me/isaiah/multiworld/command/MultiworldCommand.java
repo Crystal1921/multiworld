@@ -10,7 +10,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.argument.SpaceBreakStringArgumentType;
-import me.isaiah.multiworld.perm.Perm;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -59,28 +58,11 @@ public class MultiworldCommand {
     public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
         // Main command with all subcommands
         dispatcher.register(literal(MultiworldMod.CMD)
-                .requires(source -> {
-                    try {
-                        return source.hasPermission(1) || Perm.has(get_player(source), "multiworld.cmd") ||
-                                Perm.has(get_player(source), "multiworld.admin");
-                    } catch (Exception e) {
-                        return source.hasPermission(1);
-                    }
-                })
+                .requires(source -> source.hasPermission(2))
                 .executes(ctx -> showMainHelp(ctx.getSource()))
 
                 // TP Command
                 .then(Commands.literal("tp")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.tp") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("world", ResourceLocationArgument.id())
                                 .suggests(new WorldSuggestionProvider())
                                 .executes(ctx -> {
@@ -98,16 +80,6 @@ public class MultiworldCommand {
 
                 // List Command
                 .then(Commands.literal("list")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.cmd") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
@@ -132,16 +104,6 @@ public class MultiworldCommand {
 
                 // Version Command
                 .then(Commands.literal("version")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.cmd") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
@@ -151,16 +113,6 @@ public class MultiworldCommand {
 
                 // Create Command
                 .then(Commands.literal("create")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.create") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("id", ResourceLocationArgument.id())
                                 .suggests(new IdSuggestionProvider())
                                 .then(Commands.argument("environment", StringArgumentType.string())
@@ -195,16 +147,6 @@ public class MultiworldCommand {
 
                 // Spawn Command
                 .then(Commands.literal("spawn")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.spawn") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
@@ -213,16 +155,6 @@ public class MultiworldCommand {
 
                 // SetSpawn Command
                 .then(Commands.literal("setspawn")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.setspawn") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
@@ -231,16 +163,6 @@ public class MultiworldCommand {
 
                 // Gamerule Command
                 .then(Commands.literal("gamerule")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.gamerule") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("rule", StringArgumentType.string())
                                 .suggests(new GameruleSuggestionProvider())
                                 .executes(ctx -> {
@@ -259,16 +181,6 @@ public class MultiworldCommand {
 
                 // Difficulty Command
                 .then(Commands.literal("difficulty")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.difficulty") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("difficulty", StringArgumentType.string())
                                 .suggests(new DifficultySuggestionProvider())
                                 .executes(ctx -> {
@@ -287,16 +199,6 @@ public class MultiworldCommand {
 
                 // Portal Command
                 .then(Commands.literal("portal")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.portal") ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
@@ -348,15 +250,6 @@ public class MultiworldCommand {
 
                 // Delete Command
                 .then(Commands.literal("delete")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("world", ResourceLocationArgument.id())
                                 .suggests(new DeleteWorldSuggestionProvider())
                                 .executes(ctx -> {
@@ -364,17 +257,10 @@ public class MultiworldCommand {
                                     return DeleteCommand.run(ctx.getSource().getServer(), ctx.getSource(), world);
                                 })))
                 .then(Commands.literal("import")
-                        .requires(source -> {
-                            try {
-                                ServerPlayer player = source.getPlayer();
-                                return source.hasPermission(1) ||
-                                        Perm.has(player, "multiworld.admin");
-                            } catch (Exception e) {
-                                return source.hasPermission(1);
-                            }
-                        })
                         .then(Commands.argument("world", ResourceLocationArgument.id())
                                 .executes(ctx -> ImportCommand.run(ctx.getSource().getServer(), ctx.getSource(), ResourceLocationArgument.getId(ctx, "world"))))
+                )
+                .then(Commands.literal("name")
                 ));
     }
 

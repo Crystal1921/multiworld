@@ -92,7 +92,7 @@ public class MultiworldMod {
                 }
             }
 
-            int loaded = Portal.reinit_portals_from_config(mc);
+            int loaded = Portal.reinitPortalsFromConfig(mc);
             if (loaded > 0) {
                 LOGGER.info("Found " + loaded + " saved world portals.");
             }
