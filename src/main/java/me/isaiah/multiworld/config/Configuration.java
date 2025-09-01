@@ -27,7 +27,8 @@ public class Configuration {
     /**
      */
     public <T> T getOrDefault(String key, T defaul) {
-        return (T) (Object)contentMap.get(key);
+        Object value = contentMap.get(key);
+        return value != null ? (T) value : defaul;
     }
 
     /**

@@ -2,6 +2,21 @@
  * Isaiah's Configuration File Format
  * Now using SnakeYAML for robust YAML parsing
  * 
+ * This version replaces the custom YAML parser with the mature SnakeYAML library
+ * while maintaining full API compatibility with the original implementation.
+ * 
+ * Key improvements:
+ * - More robust YAML parsing with better error handling
+ * - Proper type handling for all YAML data types
+ * - Better support for complex nested structures
+ * - Standards-compliant YAML output
+ * 
+ * API Compatibility:
+ * - All existing getter methods work unchanged
+ * - Dot notation for nested keys (e.g., "section.key") still supported
+ * - Section handling (hasSection, getSection) preserved
+ * - File loading and saving behavior maintained
+ * 
  * Unlicense
  */
 package me.isaiah.multiworld.config;
