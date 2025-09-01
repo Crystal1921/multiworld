@@ -17,6 +17,7 @@ public class Configuration {
     protected LinkedHashMap<String, Object> contentMap;
 
     public Configuration() {
+        this.contentMap = new LinkedHashMap<>();
     }
 
     public Configuration(LinkedHashMap<String, Object> contentMap) {
@@ -56,19 +57,37 @@ public class Configuration {
     /**
      */
     public int getInt(String key) {
-        return (Integer) (Object)contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Integer) {
+            return (Integer) value;
+        } else if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return (Integer) (Object)value;
     }
 
     /**
      */
     public double getDouble(String key) {
-        return (Double) contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Double) {
+            return (Double) value;
+        } else if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        return (Double) value;
     }
 
     /**
      */
     public long getLong(String key) {
-        return (Long) contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Long) {
+            return (Long) value;
+        } else if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return (Long) value;
     }
     
     /**
