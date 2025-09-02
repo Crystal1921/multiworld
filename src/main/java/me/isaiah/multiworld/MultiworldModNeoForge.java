@@ -36,7 +36,7 @@ public class MultiworldModNeoForge {
 		BlockRegistry.BLOCKS.register(modEventBus);
 		ItemRegistry.ITEMS.register(modEventBus);
 		GroupRegistry.TABS.register(modEventBus);
-		ModCommandArgumentRegistry.REGISTRY.register(modEventBus);
+		ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
 	}
 
 	public void commonSetup(final FMLCommonSetupEvent event) {

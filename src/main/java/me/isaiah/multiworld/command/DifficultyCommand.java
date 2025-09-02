@@ -20,6 +20,8 @@ public class DifficultyCommand implements Command {
      * @param worldName Target world name (can be null for current world)
      */
     public static int run(MinecraftServer mc, ServerPlayer plr, String difficulty, String worldName) {
+        if (plr == null) return 0;
+
         ServerLevel w = (ServerLevel) plr.level();
 
         // Handle world selection

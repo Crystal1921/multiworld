@@ -35,6 +35,8 @@ public class GameruleCommand implements Command {
      * @param value Gamerule value (can be null to query current value)
      */
 	public static int run(MinecraftServer mc, ServerPlayer plr, String rule, String value) {
+        if (plr == null) return 0;
+
         ServerLevel w = (ServerLevel) plr.level();
 
         return setGamerule(mc, plr, rule, value, w, true);

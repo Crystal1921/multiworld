@@ -2,6 +2,7 @@ package me.isaiah.multiworld.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -9,10 +10,12 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.command.argument.DirectionArgumentType;
 import me.isaiah.multiworld.command.argument.SpaceBreakStringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -212,7 +215,7 @@ public class MultiworldCommand {
                                                     String name = StringArgumentType.getString(ctx, "name");
                                                     String destination = SpaceBreakStringArgumentType.getString(ctx, "destination");
                                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                                    return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination, false);
+                                                    return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination);
                                                 })
                                                 .then(Commands.argument("isTransparent", BoolArgumentType.bool())
                                                         .executes(ctx -> {
@@ -221,7 +224,16 @@ public class MultiworldCommand {
                                                             boolean isTransparent = BoolArgumentType.getBool(ctx, "isTransparent");
                                                             ServerPlayer player = ctx.getSource().getPlayer();
                                                             return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination, isTransparent);
-                                                        })))))
+                                                        })
+                                                        .then(Commands.argument("direction", DirectionArgumentType.direction())
+                                                                .executes(ctx -> {
+                                                                    String name = StringArgumentType.getString(ctx, "name");
+                                                                    String destination = SpaceBreakStringArgumentType.getString(ctx, "destination");
+                                                                    boolean isTransparent = BoolArgumentType.getBool(ctx, "isTransparent");
+                                                                    Direction direction = DirectionArgumentType.getColor(ctx, "direction");
+                                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                                    return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination, isTransparent, direction);
+                                                                }))))))
                         .then(Commands.literal("wand")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
@@ -230,23 +242,33 @@ public class MultiworldCommand {
                         .then(Commands.literal("info")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
-                                    return PortalCommand.runInfo(ctx.getSource().getServer(), player, null);
+                                    return PortalCommand.runInfo(player);
                                 })
-                                .then(Commands.argument("name", StringArgumentType.string())
-                                        .suggests(new PortalNameSuggestionProvider())
-                                        .executes(ctx -> {
-                                            String name = StringArgumentType.getString(ctx, "name");
-                                            ServerPlayer player = ctx.getSource().getPlayer();
-                                            return PortalCommand.runInfo(ctx.getSource().getServer(), player, name);
-                                        })))
-                        .then(Commands.literal("remove")
-                                .then(Commands.argument("name", StringArgumentType.string())
-                                        .suggests(new PortalNameSuggestionProvider())
-                                        .executes(ctx -> {
-                                            String name = StringArgumentType.getString(ctx, "name");
-                                            ServerPlayer player = ctx.getSource().getPlayer();
-                                            return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
-                                        }))))
+                                .then(Commands.literal("name")
+                                        .then(Commands.argument("name", StringArgumentType.string())
+                                                .suggests(new PortalNameSuggestionProvider())
+                                                .executes(ctx -> {
+                                                    String name = StringArgumentType.getString(ctx, "name");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    return PortalCommand.runInfo(ctx.getSource().getServer(), player, name);
+                                                })))
+                                .then(Commands.literal("page")
+                                        .then(Commands.argument("page", IntegerArgumentType.integer())
+                                                .executes(ctx -> {
+                                                    int page = IntegerArgumentType.getInteger(ctx, "page");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    return PortalCommand.runInfo(ctx.getSource().getServer(), player, page);
+                                                }))
+                                )
+                        ))
+                .then(Commands.literal("remove")
+                        .then(Commands.argument("name", StringArgumentType.string())
+                                .suggests(new PortalNameSuggestionProvider())
+                                .executes(ctx -> {
+                                    String name = StringArgumentType.getString(ctx, "name");
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
+                                })))
 
                 // Delete Command
                 .then(Commands.literal("delete")

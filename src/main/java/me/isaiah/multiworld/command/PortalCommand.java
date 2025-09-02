@@ -5,14 +5,19 @@ import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import me.isaiah.multiworld.portal.WandEventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import static me.isaiah.multiworld.command.MultiworldCommand.message;
@@ -73,10 +78,6 @@ public class PortalCommand implements Command {
      */
     public static int runWand(MinecraftServer mc, ServerPlayer plr) {
 
-        if (!true) {
-            message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
-        }
-
         if (!Perm.has(plr, "multiworld.portal.wand")) {
             message(plr, "Invalid permission! Missing: multiworld.portal.wand");
             return 0;
@@ -95,23 +96,6 @@ public class PortalCommand implements Command {
      * @param portalName Portal name (can be null to list all portals)
      */
     public static int runInfo(MinecraftServer mc, ServerPlayer plr, String portalName) {
-
-        if (!true) {
-            message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
-        }
-
-        if (portalName == null || portalName.isEmpty()) {
-            // List all portals
-            message(plr, "&6Multiworld Portals (" + KNOWN_PORTALS.size() + "):");
-            for (Portal p : KNOWN_PORTALS.values()) {
-                message(plr, " Portal: \"" + p.getName() + "\": ");
-                String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
-                String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
-                message(plr, " - " + from + ") -> " + to + ")");
-            }
-            return 1;
-        }
-
         // Show specific portal info
         Portal p = KNOWN_PORTALS.getOrDefault(portalName, getPortalIgnoreCase(portalName));
         if (null == p) {
@@ -127,6 +111,54 @@ public class PortalCommand implements Command {
         return 1;
     }
 
+    public static int runInfo(MinecraftServer mc, ServerPlayer plr, int page) {
+        int pageSize = 5; // 每页显示数量
+        int total = KNOWN_PORTALS.size();
+        int totalPages = (int) Math.ceil(total / (double) pageSize);
+
+        // 页码越界检查
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        message(plr, "&6Multiworld Portals (" + total + ") - Page " + page + "/" + totalPages + ":");
+
+        // 把 map 转换为 list，方便分页
+        List<Portal> portals = new ArrayList<>(KNOWN_PORTALS.values());
+
+        // 计算 start 和 end
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
+
+        // 输出当前页的数据
+        for (int i = start; i < end; i++) {
+            Portal p = portals.get(i);
+            plr.displayClientMessage(Component.literal(" Portal: \"" + p.getName() + "\": ").withStyle(ChatFormatting.AQUA), false);
+            String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
+            String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
+            message(plr, " - " + from + ") -> " + to + ")");
+        }
+
+        return 1;
+    }
+
+    public static int runInfo(ServerPlayer plr) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Multiworld Portals:").append(KNOWN_PORTALS.size()).append("\n");
+        for (String p : KNOWN_PORTALS.keySet()) {
+            stringBuilder.append(p).append(",");
+        }
+        message(plr, stringBuilder.toString());
+        return 1;
+    }
+
+    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination) {
+        return runCreate(mc, plr, portalName, destination, false);
+    }
+
+    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination, boolean isTransparent) {
+        return runCreate(mc, plr, portalName, destination, isTransparent, Direction.NORTH);
+    }
+
     /**
      * Run portal create command
      *
@@ -135,11 +167,7 @@ public class PortalCommand implements Command {
      * @param portalName  Portal name
      * @param destination Portal destination (can be null for default)
      */
-    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination, boolean isTransparent) {
-
-        if (!true) {
-            message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
-        }
+    public static int runCreate(MinecraftServer mc, ServerPlayer plr, String portalName, String destination, boolean isTransparent, Direction direction) {
 
         if (!Perm.has(plr, "multiworld.portal.create")) {
             message(plr, "Invalid permission! Missing: multiworld.portal.create");
@@ -151,7 +179,7 @@ public class PortalCommand implements Command {
             return 0;
         }
 
-        return createPortal(plr, portalName, destination, isTransparent);
+        return createPortal(plr, portalName, destination, isTransparent, direction);
     }
 
     /**
@@ -181,7 +209,7 @@ public class PortalCommand implements Command {
         return null;
     }
 
-    private static int createPortal(ServerPlayer plr, String name, String dest, boolean isTransparent) {
+    private static int createPortal(ServerPlayer plr, String name, String dest, boolean isTransparent, Direction direction) {
         Object[] poss = WandEventHandler.getWandPositionsOrNull(plr.getUUID());
 
         if (null == poss) {
@@ -220,7 +248,8 @@ public class PortalCommand implements Command {
                 world.dimension().location(),
                 dest,
                 pos1,
-                pos2
+                pos2,
+                direction
         );
 
         p.buildPortalArea(pos1, pos2, world, isTransparent);

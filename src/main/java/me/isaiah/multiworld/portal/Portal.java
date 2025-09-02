@@ -56,34 +56,22 @@ public class Portal {
 
     private SimpleGeneratedModel model;
 
-    private Portal(String name, String owner, ResourceLocation worldId, String destination) {
+    private Portal(String name, String owner, ResourceLocation worldId, String destination, Direction direction) {
         // this.blocks = new ArrayList<>();
         this.name = name;
         this.owner = owner;
         this.worldIn = worldId;
         this.destination = destination;
+        this.direction = direction;
     }
 
-    public Portal(String name, String owner, ResourceLocation worldId, String destination, BlockPos a, BlockPos b) {
-        this(name, owner, worldId, destination);
+    public Portal(String name, String owner, ResourceLocation worldId, String destination, BlockPos a, BlockPos b, Direction dir) {
+        this(name, owner, worldId, destination, dir);
 
         this.minEdge = PortalUtil.getMinPos(a, b);
         this.maxEdge = PortalUtil.getMaxPos(a, b);
 
         initAreaModel(this.minEdge != null);
-    }
-
-    public Portal(String name, String owner, ResourceLocation worldId, String destination, String location) {
-        this(name, owner, worldId, destination);
-
-        try {
-            this.locationFromString(location);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            MultiworldMod.LOGGER.info("Oops!");
-            e.printStackTrace();
-        }
-
-        initAreaModel(this.minEdge != null && this.maxEdge != null);
     }
 
     private void initAreaModel(boolean bool) {
@@ -138,10 +126,25 @@ public class Portal {
                 String location = config.getString(prefix + ".location");
                 String world = config.getString(prefix + ".world");
                 String dest = config.getString(prefix + ".destination");
+                Direction direction = Direction.byName(config.getString(prefix + ".direction"));
 
                 ResourceLocation worldIn = MultiworldMod.new_id(world);
+                String[] spl = location.split(Pattern.quote(":"));
+                String[] from = spl[0].split(Pattern.quote(","));
+                String[] to = spl[1].split(Pattern.quote(","));
 
-                Portal p = new Portal(name, owner, worldIn, dest, location);
+                double x1 = Double.parseDouble(from[0]);
+                double y1 = Double.parseDouble(from[1]);
+                double z1 = Double.parseDouble(from[2]);
+
+                double x2 = Double.parseDouble(to[0]);
+                double y2 = Double.parseDouble(to[1]);
+                double z2 = Double.parseDouble(to[2]);
+
+                BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
+                BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
+
+                Portal p = new Portal(name, owner, worldIn, dest, a, b, direction);
 
                 // Refresh Portal Frame
                 //TODO : 是否需要重新生成门
@@ -178,31 +181,6 @@ public class Portal {
         return PortalUtil.getCenterWithLowestY(minEdge, maxEdge, 0);
     }
 
-    private void locationFromString(String s) {
-        String[] spl = s.split(Pattern.quote(":"));
-        String[] from = spl[0].split(Pattern.quote(","));
-        String[] to = spl[1].split(Pattern.quote(","));
-
-        double x1 = Double.parseDouble(from[0]);
-        double y1 = Double.parseDouble(from[1]);
-        double z1 = Double.parseDouble(from[2]);
-
-        double x2 = Double.parseDouble(to[0]);
-        double y2 = Double.parseDouble(to[1]);
-        double z2 = Double.parseDouble(to[2]);
-
-        BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
-        BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
-
-        this.minEdge = PortalUtil.getMinPos(a, b);
-        this.maxEdge = PortalUtil.getMaxPos(a, b);
-
-		/*
-		this.fromPos = MultiworldMod.get_world_creator().get_pos(x1, y1, z1);
-		this.toPos = MultiworldMod.get_world_creator().get_pos(x2, y2, z2);
-		*/
-    }
-
     public void save() throws IOException {
         File config_dir = new File("config");
         config_dir.mkdirs();
@@ -215,34 +193,32 @@ public class Portal {
 
         File wc = new File(cf, "portals.yml");
         FileConfiguration config;
-        try {
-            if (!wc.exists()) {
-                wc.createNewFile();
-            }
-            config = new FileConfiguration(wc);
-
-            // Copied from Multiverse-Portals 5.0.3
-            config.set(prefix + ".entryfee.amount", 0.0);
-            config.set(prefix + ".safeteleport", true);
-            config.set(prefix + ".teleportnonplayers", false);
-            config.set(prefix + ".handlerscript", "''");
-
-            config.set(prefix + ".owner", this.getOwner()); // player
-            config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
-            config.set(prefix + ".world", this.getOriginWorldId());
-            config.set(prefix + ".destination", this.getDestination());
-
-            config.save();
-        } catch (Exception e) {
-            // e.printStackTrace();
-            throw e;
+        if (!wc.exists()) {
+            wc.createNewFile();
         }
+        config = new FileConfiguration(wc);
+
+        // Copied from Multiverse-Portals 5.0.3
+        config.set(prefix + ".entryfee.amount", 0.0);
+        config.set(prefix + ".safeteleport", true);
+        config.set(prefix + ".teleportnonplayers", false);
+        config.set(prefix + ".handlerscript", "''");
+
+        config.set(prefix + ".owner", this.getOwner()); // player
+        config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
+        config.set(prefix + ".world", this.getOriginWorldId());
+        config.set(prefix + ".destination", this.getDestination());
+
+        config.save();
     }
 
     /**
      *
      */
     public ResourceLocation getOriginWorldId() {
+        if (worldIn == null) {
+            return ResourceLocation.withDefaultNamespace("overworld");
+        }
         return this.worldIn;
     }
 
@@ -377,7 +353,11 @@ public class Portal {
         });
 
         // BlockPos sp = SpawnCommand.getSpawn(w);
-        return worlds.get(name);
+        ServerLevel serverLevel = worlds.get(name);
+        if (null == serverLevel) {
+            serverLevel = MultiworldMod.mc.overworld();
+        }
+        return serverLevel;
     }
 
     /**
@@ -390,7 +370,11 @@ public class Portal {
             ServerLevel world = MultiworldMod.mc.getLevel(r);
             worlds.put(r.location().toString(), world);
         });
-        return worlds.get(name);
+        ServerLevel serverLevel = worlds.get(name);
+        if (null == serverLevel) {
+            serverLevel = MultiworldMod.mc.overworld();
+        }
+        return serverLevel;
     }
 
     public void refreshPortalArea() {
