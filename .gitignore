@@ -17,6 +17,9 @@ out
 build
 .gradle
 
+# java
+*.class
+
 # other
 eclipse
 run
