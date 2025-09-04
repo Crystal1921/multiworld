@@ -108,11 +108,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
     implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
+    implementation 'org.yaml:snakeyaml:2.3'
     additionalRuntimeClasspath 'io.lettuce:lettuce-core:6.2.4.RELEASE'
-    
-    // SnakeYAML for YAML configuration handling
-    implementation 'org.yaml:snakeyaml:2.0'
-    additionalRuntimeClasspath 'org.yaml:snakeyaml:2.0'
+    additionalRuntimeClasspath 'org.yaml:snakeyaml:2.3'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

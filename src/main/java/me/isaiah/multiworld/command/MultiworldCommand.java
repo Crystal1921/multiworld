@@ -43,20 +43,6 @@ public class MultiworldCommand {
         return plr;
     }
 
-    public static boolean isPlayer(CommandSourceStack s) {
-        try {
-            ServerPlayer plr = s.getPlayer();
-            if (null == plr) {
-                return false;
-            }
-        } catch (Exception ex) {
-            if (ex instanceof CommandSyntaxException) {
-                if (s.getTextName().equalsIgnoreCase("Server")) return false;
-            }
-        }
-        return true;
-    }
-
     // On command register
     public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
         // Main command with all subcommands
@@ -80,6 +66,18 @@ public class MultiworldCommand {
                                             String playerName = StringArgumentType.getString(ctx, "player");
                                             return TpCommand.run(ctx.getSource().getServer(), null, worldName, playerName);
                                         }))))
+
+                .then(Commands.literal("border")
+                        .then(Commands.argument("world", ResourceLocationArgument.id())
+                                .suggests(new WorldSuggestionProvider())
+                                .then(Commands.argument("number", IntegerArgumentType.integer())
+                                        .executes(ctx -> {
+                                            ResourceLocation worldName = ResourceLocationArgument.getId(ctx, "world");
+                                            int size = IntegerArgumentType.getInteger(ctx, "number");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            return BorderCommand.run(ctx.getSource().getServer(), player, worldName, size);
+                                        }))
+                        ))
 
                 // List Command
                 .then(Commands.literal("list")
