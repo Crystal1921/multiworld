@@ -56,19 +56,31 @@ public class Configuration {
     /**
      */
     public int getInt(String key) {
-        return (Integer) (Object)contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return (Integer) (Object)value;
     }
 
     /**
      */
     public double getDouble(String key) {
-        return (Double) contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        return (Double) value;
     }
 
     /**
      */
     public long getLong(String key) {
-        return (Long) contentMap.get(key);
+        Object value = contentMap.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return (Long) value;
     }
     
     /**
