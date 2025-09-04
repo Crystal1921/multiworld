@@ -8,6 +8,7 @@ import net.minecraft.world.level.border.WorldBorder;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
@@ -23,6 +24,12 @@ public class BorderCommand {
                 if (level != null) {
                     WorldBorder worldBorder = level.getWorldBorder();
                     worldBorder.setSize(size);
+                    BORDERS.put(worldId, size);
+                    try {
+                        save("config\\multiworld\\borders.yml");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
             }
@@ -62,4 +69,35 @@ public class BorderCommand {
             }
         }
     }
+
+    public static void initWorldBorder(MinecraftServer mc) {
+        File configDir = new File("config/multiworld");
+        configDir.mkdirs();
+
+        File wc = new File(configDir, "borders.yml");
+
+        try {
+            if (!wc.exists()) {
+                wc.createNewFile();
+                mc.getAllLevels().forEach(level -> {
+                    WorldBorder border = level.getWorldBorder();
+                    BORDERS.put(level.dimension().location(), (int) border.getSize());
+                });
+                load(wc.getPath());
+                mc.getAllLevels().forEach(level -> {
+                    WorldBorder border = level.getWorldBorder();
+                    Integer size = BORDERS.get(level.dimension().location());
+                    if (size != null) {
+                        border.setSize(size);
+                    }
+                });
+                return;
+            }
+
+            load(wc.getPath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -2,6 +2,7 @@ package me.isaiah.multiworld.network;
 
 import io.netty.buffer.ByteBuf;
 import me.isaiah.multiworld.MultiworldMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -19,7 +20,9 @@ public record WorldBorderPacket(int size) implements CustomPacketPayload {
 
     public static void handleOnClient(final WorldBorderPacket payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
-
+            if (Minecraft.getInstance().level != null) {
+                Minecraft.getInstance().level.getWorldBorder().setSize(payload.size);
+            }
         });
     }
 
