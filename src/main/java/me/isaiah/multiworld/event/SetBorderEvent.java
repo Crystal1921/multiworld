@@ -17,8 +17,8 @@ public class SetBorderEvent {
         ResourceLocation location = event.getTo().location();
         Player entity = event.getEntity();
         if (entity instanceof ServerPlayer serverPlayer) {
-            Integer i = BorderCommand.BORDERS.get(location);
-            PacketDistributor.sendToPlayer(serverPlayer, new WorldBorderPacket(i));
+            BorderCommand.BorderData borderData = BorderCommand.BORDERS.get(location);
+            PacketDistributor.sendToPlayer(serverPlayer, new WorldBorderPacket(borderData.size(), borderData.x(), borderData.y()));
         }
     }
 
@@ -27,8 +27,8 @@ public class SetBorderEvent {
         ResourceLocation location = event.getEntity().level().dimension().location();
         Player entity = event.getEntity();
         if (entity instanceof ServerPlayer serverPlayer) {
-            Integer i = BorderCommand.BORDERS.get(location);
-            PacketDistributor.sendToPlayer(serverPlayer, new WorldBorderPacket(i));
+            BorderCommand.BorderData borderData = BorderCommand.BORDERS.get(location);
+            PacketDistributor.sendToPlayer(serverPlayer, new WorldBorderPacket(borderData.size(), borderData.x(), borderData.y()));
         }
     }
 }

@@ -10,11 +10,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
-public record WorldBorderPacket(int size) implements CustomPacketPayload {
+public record WorldBorderPacket(double size, double x, double y) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<WorldBorderPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "world_border"));
     public static final StreamCodec<ByteBuf, WorldBorderPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT,
+            ByteBufCodecs.DOUBLE,
             WorldBorderPacket::size,
+            ByteBufCodecs.DOUBLE,
+            WorldBorderPacket::x,
+            ByteBufCodecs.DOUBLE,
+            WorldBorderPacket::y,
             WorldBorderPacket::new
     );
 
@@ -22,6 +26,7 @@ public record WorldBorderPacket(int size) implements CustomPacketPayload {
         context.enqueueWork(() -> {
             if (Minecraft.getInstance().level != null) {
                 Minecraft.getInstance().level.getWorldBorder().setSize(payload.size);
+                Minecraft.getInstance().level.getWorldBorder().setCenter(payload.x(), payload.y());
             }
         });
     }

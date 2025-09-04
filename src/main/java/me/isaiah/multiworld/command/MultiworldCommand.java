@@ -70,13 +70,24 @@ public class MultiworldCommand {
                 .then(Commands.literal("border")
                         .then(Commands.argument("world", ResourceLocationArgument.id())
                                 .suggests(new WorldSuggestionProvider())
-                                .then(Commands.argument("number", IntegerArgumentType.integer())
-                                        .executes(ctx -> {
-                                            ResourceLocation worldName = ResourceLocationArgument.getId(ctx, "world");
-                                            int size = IntegerArgumentType.getInteger(ctx, "number");
-                                            ServerPlayer player = ctx.getSource().getPlayer();
-                                            return BorderCommand.run(ctx.getSource().getServer(), player, worldName, size);
-                                        }))
+                                .then(Commands.literal("size")
+                                        .then(Commands.argument("number", IntegerArgumentType.integer())
+                                                .executes(ctx -> {
+                                                    ResourceLocation worldName = ResourceLocationArgument.getId(ctx, "world");
+                                                    int size = IntegerArgumentType.getInteger(ctx, "number");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    return BorderCommand.runSize(ctx.getSource().getServer(), player, worldName, size);
+                                                })))
+                                .then(Commands.literal("center")
+                                        .then(Commands.argument("x", IntegerArgumentType.integer())
+                                                .then(Commands.argument("y", IntegerArgumentType.integer())
+                                                        .executes(ctx -> {
+                                                            ResourceLocation worldName = ResourceLocationArgument.getId(ctx, "world");
+                                                            int x = IntegerArgumentType.getInteger(ctx, "x");
+                                                            int y = IntegerArgumentType.getInteger(ctx, "y");
+                                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                                            return BorderCommand.runCenter(ctx.getSource().getServer(), player, worldName, x, y);
+                                                        }))))
                         ))
 
                 // List Command
