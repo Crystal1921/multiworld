@@ -10,7 +10,8 @@
     "MixinNetherPortalBlock",
     "ServerChunkManagerMixin",
     "ServerWorldMixin",
-    "SimpleRegistryMixin"
+    "SimpleRegistryMixin",
+    "WorldBorderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
