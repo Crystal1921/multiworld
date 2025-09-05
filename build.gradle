@@ -107,8 +107,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-    implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE'
-    implementation 'org.yaml:snakeyaml:2.3'
+    jarJar (implementation 'io.lettuce:lettuce-core:6.2.4.RELEASE')
+    jarJar (implementation 'org.yaml:snakeyaml:2.3')
     additionalRuntimeClasspath 'io.lettuce:lettuce-core:6.2.4.RELEASE'
     additionalRuntimeClasspath 'org.yaml:snakeyaml:2.3'
 }
