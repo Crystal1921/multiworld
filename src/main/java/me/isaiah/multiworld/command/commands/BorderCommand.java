@@ -117,12 +117,12 @@ public class BorderCommand {
                 mc.getAllLevels().forEach(level -> {
                     WorldBorder border = level.getWorldBorder();
                     BORDERS.put(level.dimension().location(), new BorderData(border.getSize(), border.getCenterX(), border.getCenterZ()));
-                    try {
-                        save("config\\multiworld\\borders.yml");
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
                 });
+                try {
+                    save("config\\multiworld\\borders.yml");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 load(wc.getPath());
                 mc.getAllLevels().forEach(level -> {
                     WorldBorder border = level.getWorldBorder();

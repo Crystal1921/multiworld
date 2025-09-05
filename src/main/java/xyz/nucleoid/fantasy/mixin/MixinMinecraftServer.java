@@ -1,7 +1,6 @@
 // (c) 2023 Isaiah
 package xyz.nucleoid.fantasy.mixin;
 
-import me.isaiah.multiworld.command.commands.BorderCommand;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -31,11 +30,6 @@ public class MixinMinecraftServer implements IMC {
     @Redirect(method = "createLevels", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private <K, V> V onLoadWorld(Map<K, V> worlds, K registryKey, V serverWorld) {
         return worlds.put(registryKey, serverWorld);
-    }
-
-    @Inject(method = "createLevels", at = @At("TAIL"))
-    private void afterCreateLevels(CallbackInfo ci) {
-        BorderCommand.initWorldBorder((MinecraftServer) (Object)this);
     }
 
     @Inject(at = @At("HEAD"), method = "tickServer")

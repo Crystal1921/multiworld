@@ -2,13 +2,11 @@ package me.isaiah.multiworld.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import me.isaiah.multiworld.command.commands.BorderCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.border.WorldBorder;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -86,7 +84,7 @@ public class WarpCommand {
         }
     }
 
-    public static void initWorldBorder(MinecraftServer mc) {
+    public static void initWarp(MinecraftServer mc) {
         File configDir = new File("config/multiworld");
         configDir.mkdirs();
 
