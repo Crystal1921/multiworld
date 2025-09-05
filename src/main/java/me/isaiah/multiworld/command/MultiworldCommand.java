@@ -12,6 +12,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.argument.DirectionArgumentType;
 import me.isaiah.multiworld.command.argument.SpaceBreakStringArgumentType;
+import me.isaiah.multiworld.command.commands.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;

@@ -1,7 +1,7 @@
 // (c) 2023 Isaiah
 package xyz.nucleoid.fantasy.mixin;
 
-import me.isaiah.multiworld.command.BorderCommand;
+import me.isaiah.multiworld.command.commands.BorderCommand;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

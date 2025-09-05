@@ -4,6 +4,7 @@
 package me.isaiah.multiworld;
 
 import me.isaiah.multiworld.command.MultiworldCommand;
+import me.isaiah.multiworld.command.WarpCommand;
 import me.isaiah.multiworld.portal.WandEventHandler;
 import me.isaiah.multiworld.registry.BlockRegistry;
 import me.isaiah.multiworld.registry.GroupRegistry;
@@ -50,6 +51,7 @@ public class MultiworldModNeoForge {
 	@SubscribeEvent
 	public void onCommandsRegister(RegisterCommandsEvent event) {
 		MultiworldCommand.register_commands(event.getDispatcher());
+		WarpCommand.register_commands(event.getDispatcher());
 	}
 	
 	@SubscribeEvent

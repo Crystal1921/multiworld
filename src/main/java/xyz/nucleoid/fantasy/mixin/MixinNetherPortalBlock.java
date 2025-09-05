@@ -1,7 +1,7 @@
 package xyz.nucleoid.fantasy.mixin;
 
 import me.isaiah.multiworld.MultiworldMod;
-import me.isaiah.multiworld.command.PortalCommand;
+import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;

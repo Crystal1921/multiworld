@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import java.util.HashMap;
 import net.minecraft.core.BlockPos;

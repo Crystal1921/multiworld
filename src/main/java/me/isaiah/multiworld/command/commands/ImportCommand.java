@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import me.isaiah.multiworld.MultiworldMod;
 import net.minecraft.commands.CommandSourceStack;
@@ -11,8 +11,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
 import static me.isaiah.multiworld.NeoForgeWorldCreator.getStaticVoidGen;
-import static me.isaiah.multiworld.command.CreateCommand.get_dim_id;
-import static me.isaiah.multiworld.command.CreateCommand.make_config;
+import static me.isaiah.multiworld.command.commands.CreateCommand.get_dim_id;
+import static me.isaiah.multiworld.command.commands.CreateCommand.make_config;
 
 public class ImportCommand {
     public static int run(MinecraftServer mc, CommandSourceStack source, ResourceLocation worldName) {

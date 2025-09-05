@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import static me.isaiah.multiworld.command.MultiworldCommand.message;
 import static me.isaiah.multiworld.MultiworldMod.text_plain;

@@ -2,7 +2,7 @@ package me.isaiah.multiworld.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.isaiah.multiworld.MultiworldMod;
-import me.isaiah.multiworld.command.PortalCommand;
+import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.registry.ItemRegistry;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;

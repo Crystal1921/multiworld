@@ -5,6 +5,7 @@
 package me.isaiah.multiworld;
 
 import me.isaiah.multiworld.command.*;
+import me.isaiah.multiworld.command.commands.CreateCommand;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

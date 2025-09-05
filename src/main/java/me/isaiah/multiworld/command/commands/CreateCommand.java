@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import me.isaiah.multiworld.I18n;
 import me.isaiah.multiworld.MultiworldMod;

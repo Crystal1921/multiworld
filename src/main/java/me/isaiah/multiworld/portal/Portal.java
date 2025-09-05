@@ -2,8 +2,8 @@ package me.isaiah.multiworld.portal;
 
 import lombok.Getter;
 import me.isaiah.multiworld.MultiworldMod;
-import me.isaiah.multiworld.command.PortalCommand;
-import me.isaiah.multiworld.command.SpawnCommand;
+import me.isaiah.multiworld.command.commands.PortalCommand;
+import me.isaiah.multiworld.command.commands.SpawnCommand;
 import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.registry.BlockRegistry;
 import net.minecraft.client.Minecraft;

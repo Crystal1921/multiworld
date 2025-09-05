@@ -1,9 +1,10 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.config.FileConfiguration;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;

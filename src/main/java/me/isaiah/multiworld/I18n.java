@@ -3,7 +3,7 @@ package me.isaiah.multiworld;
 import java.util.Locale;
 
 import me.isaiah.multiworld.command.MultiworldCommand;
-import me.isaiah.multiworld.command.Util;
+import me.isaiah.multiworld.command.commands.Util;
 import net.minecraft.server.level.ServerPlayer;
 
 /**

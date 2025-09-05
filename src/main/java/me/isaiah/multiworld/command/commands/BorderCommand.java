@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.command;
+package me.isaiah.multiworld.command.commands;
 
 import me.isaiah.multiworld.network.WorldBorderPacket;
 import net.minecraft.resources.ResourceLocation;
