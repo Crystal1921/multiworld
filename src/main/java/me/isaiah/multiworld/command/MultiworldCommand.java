@@ -353,6 +353,16 @@ public class MultiworldCommand {
         }
     }
 
+    public static class WarpSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
+        @Override
+        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+            for (String name : WarpCommand.WARPS.keySet()) {
+                builder.suggest(name);
+            }
+            return builder.buildFuture();
+        }
+    }
+
     public static class IdSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
         @Override
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {

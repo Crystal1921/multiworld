@@ -1,6 +1,7 @@
 package me.isaiah.multiworld.command.commands;
 
 import me.isaiah.multiworld.network.WorldBorderPacket;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -28,6 +29,7 @@ public class BorderCommand {
                     worldBorder.setSize(size);
                     PacketDistributor.sendToPlayersInDimension(level, new WorldBorderPacket(size, worldBorder.getCenterX(), worldBorder.getCenterZ()));
                     BORDERS.put(worldId, new BorderData(size, worldBorder.getCenterX(), worldBorder.getCenterZ()));
+                    plr.sendSystemMessage(Component.literal("Set border size of " + worldId + " to " + size));
                     // 保存到文件
                     try {
                         save("config\\multiworld\\borders.yml");
@@ -50,6 +52,7 @@ public class BorderCommand {
                     worldBorder.setCenter(x, y);
                     PacketDistributor.sendToPlayersInDimension(level, new WorldBorderPacket(worldBorder.getSize(), x, y));
                     BORDERS.put(worldName, new BorderData(worldBorder.getSize(), x, y));
+                    player.sendSystemMessage(Component.literal("Set border center of " + worldName + " to " + x + ", " + y));
                     // 保存到文件
                     try {
                         save("config\\multiworld\\borders.yml");
