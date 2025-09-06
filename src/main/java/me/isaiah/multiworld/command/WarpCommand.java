@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.core.registries.Registries.DIMENSION;
 
+@EventBusSubscriber
 public class WarpCommand {
     public static HashMap<String, WarpData> WARPS = new HashMap<>();
     public static final Map<UUID, WarpData> POSITION_BEFORE_WARP = new HashMap<>();
