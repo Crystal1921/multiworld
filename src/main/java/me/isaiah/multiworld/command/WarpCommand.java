@@ -76,7 +76,7 @@ public class WarpCommand {
                                 WARPS.remove(name);
                                 // 保存到文件
                                 try {
-                                    save("config\\multiworld\\warps.yml");
+                                    save("config/multiworld/warps.yml");
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
@@ -141,7 +141,7 @@ public class WarpCommand {
             player.sendSystemMessage(Component.literal("Set warp point '" + name + "' at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " in dimension " + location.toString()));
             // 保存到文件
             try {
-                save("config\\multiworld\\warps.yml");
+                save("config/multiworld/warps.yml");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -206,7 +206,7 @@ public class WarpCommand {
             if (!wc.exists()) {
                 wc.createNewFile();
             } else {
-                load("config\\multiworld\\warps.yml");
+                load("config/multiworld/warps.yml");
             }
         } catch (Exception e) {
             e.printStackTrace();

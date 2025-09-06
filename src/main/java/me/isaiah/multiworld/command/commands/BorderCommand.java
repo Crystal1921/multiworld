@@ -32,7 +32,7 @@ public class BorderCommand {
                     plr.sendSystemMessage(Component.literal("Set border size of " + worldId + " to " + size));
                     // 保存到文件
                     try {
-                        save("config\\multiworld\\borders.yml");
+                        save("config/multiworld/borders.yml");
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -55,7 +55,7 @@ public class BorderCommand {
                     player.sendSystemMessage(Component.literal("Set border center of " + worldName + " to " + x + ", " + y));
                     // 保存到文件
                     try {
-                        save("config\\multiworld\\borders.yml");
+                        save("config/multiworld/borders.yml");
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -122,7 +122,7 @@ public class BorderCommand {
                     BORDERS.put(level.dimension().location(), new BorderData(border.getSize(), border.getCenterX(), border.getCenterZ()));
                 });
                 try {
-                    save("config\\multiworld\\borders.yml");
+                    save("config/multiworld/borders.yml");
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
