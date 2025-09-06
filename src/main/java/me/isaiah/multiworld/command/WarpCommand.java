@@ -58,10 +58,6 @@ public class WarpCommand {
                             if (player != null) {
                                 BlockPos pos = player.blockPosition();
                                 String name = StringArgumentType.getString(context, "name");
-                                if (name.equals("spawn")) {
-                                    context.getSource().sendFailure(Component.literal("Warp name 'spawn' is reserved."));
-                                    return 0;
-                                }
                                 return setWarpPoint(context, name, pos);
                             }
                             context.getSource().sendFailure(Component.literal("Invalid Operation"));
