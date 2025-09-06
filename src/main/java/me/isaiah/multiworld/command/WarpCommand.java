@@ -7,7 +7,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -56,7 +55,7 @@ public class WarpCommand {
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayer();
                             if (player != null) {
-                                BlockPos pos = player.blockPosition();
+                                Vec3 pos = player.position();
                                 String name = StringArgumentType.getString(context, "name");
                                 return setWarpPoint(context, name, pos);
                             }
@@ -67,7 +66,7 @@ public class WarpCommand {
                                 .executes(context -> {
                                     var pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
                                     String name = StringArgumentType.getString(context, "name");
-                                    return setWarpPoint(context, name, pos);
+                                    return setWarpPoint(context, name, new Vec3(pos.getX(), pos.getY(), pos.getZ()));
                                 }))));
 
         dispatcher.register(literal("delwarp")
@@ -100,8 +99,8 @@ public class WarpCommand {
         if (event.getEntity() instanceof ServerPlayer player) {
             // 记录传送前位置
             String currentWorldId = player.level().dimension().location().toString();
-            BlockPos currentPos = player.blockPosition();
-            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+            Vec3 currentPos = player.position();
+            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.x, currentPos.y, currentPos.z));
         }
     }
 
@@ -111,18 +110,18 @@ public class WarpCommand {
         }
         // 记录传送前位置
         String currentWorldId = player.level().dimension().location().toString();
-        BlockPos currentPos = player.blockPosition();
+        Vec3 currentPos = player.position();
         ResourceLocation levelID = ResourceLocation.parse(warpData.worldId());
         if (player.level().dimension().location().equals(levelID)) {
             player.teleportTo(warpData.x(), warpData.y(), warpData.z());
-            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.x, currentPos.y, currentPos.z));
             return 1;
         } else {
             ServerLevel level = player.server.getLevel(ResourceKey.create(DIMENSION, levelID));
             if (level != null) {
                 DimensionTransition target = new DimensionTransition(level, new Vec3(warpData.x(), warpData.y(), warpData.z()), new Vec3(0, 0, 0), 0f, 0f, DimensionTransition.DO_NOTHING);
                 player.changeDimension(target);
-                POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+                POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.x, currentPos.y, currentPos.z));
                 return 1;
             }
         }
@@ -162,12 +161,12 @@ public class WarpCommand {
         return 0;
     }
 
-    private static int setWarpPoint(CommandContext<CommandSourceStack> context, String name, BlockPos pos) {
+    private static int setWarpPoint(CommandContext<CommandSourceStack> context, String name, Vec3 pos) {
         ServerPlayer player = context.getSource().getPlayer();
         if (player != null) {
             ResourceLocation location = player.level().dimension().location();
-            WARPS.put(name, new WarpData(location.toString(), name, pos.getX(), pos.getY(), pos.getZ()));
-            player.sendSystemMessage(Component.literal("Set warp point '" + name + "' at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " in dimension " + location.toString()));
+            WARPS.put(name, new WarpData(location.toString(), name, pos.x, pos.y, pos.z));
+            player.sendSystemMessage(Component.literal("Set warp point '" + name + "' at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location.toString()));
             // 保存到文件
             try {
                 save("config/multiworld/warps.yml");

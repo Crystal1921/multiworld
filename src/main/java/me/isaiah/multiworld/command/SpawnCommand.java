@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,10 +41,10 @@ public class SpawnCommand {
             context.getSource().sendFailure(Component.literal("Invalid Operation"));
             return 0;
         }
-        BlockPos pos = player.blockPosition();
+        var pos = player.position();
         String location = player.level().dimension().location().toString();
-        SPAWN = new SpawnData(location, pos.getX(), pos.getY(), pos.getZ());
-        context.getSource().sendSuccess(() -> Component.literal("Set spawn point at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " in dimension " + location), true);
+        SPAWN = new SpawnData(location, pos.x, pos.y, pos.z);
+        context.getSource().sendSuccess(() -> Component.literal("Set spawn point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location), true);
         // 保存到文件
         try {
             saveSpawn("config/multiworld/spawn.yml");

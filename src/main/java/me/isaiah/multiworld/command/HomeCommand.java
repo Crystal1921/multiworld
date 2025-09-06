@@ -5,10 +5,10 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -43,10 +43,10 @@ public class HomeCommand {
             context.getSource().sendFailure(Component.literal("Invalid Operation"));
             return 0;
         }
-        BlockPos pos = player.blockPosition();
+        Vec3 pos = player.position();
         String location = player.level().dimension().location().toString();
-        HOMES.put(player.getUUID(), new HomeData(location, pos.getX(), pos.getY(), pos.getZ()));
-        context.getSource().sendSuccess(() -> Component.literal("Set home point at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + " in dimension " + location), true);
+        HOMES.put(player.getUUID(), new HomeData(location, pos.x, pos.y, pos.z));
+        context.getSource().sendSuccess(() -> Component.literal("Set home point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location), true);
         // 保存到文件
         try {
             saveHome("config/multiworld/homes.yml");
