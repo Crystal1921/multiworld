@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -23,12 +26,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static net.minecraft.commands.Commands.literal;
 import static net.minecraft.core.registries.Registries.DIMENSION;
 
 public class WarpCommand {
     public static HashMap<String, WarpData> WARPS = new HashMap<>();
+    public static final Map<UUID, WarpData> POSITION_BEFORE_WARP = new HashMap<>();
 
     // On command register
     public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -37,10 +42,16 @@ public class WarpCommand {
                         .suggests(new MultiworldCommand.WarpSuggestionProvider())
                         .executes(context -> {
                             String destination = StringArgumentType.getString(context, "name");
-                            return warpPoint(context, destination);
-                        })));
+                            return warpPoint(context, destination, context.getSource().getPlayer());
+                        })
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> {
+                                    String destination = StringArgumentType.getString(context, "name");
+                                    ServerPlayer player = EntityArgument.getPlayer(context, "player");
+                                    return warpPoint(context, destination, player);
+                                }))));
 
-        dispatcher.register(literal("setWarp")
+        dispatcher.register(literal("setwarp")
                 .then(Commands.argument("name", StringArgumentType.string())
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayer();
@@ -60,14 +71,10 @@ public class WarpCommand {
                                 .executes(context -> {
                                     var pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
                                     String name = StringArgumentType.getString(context, "name");
-                                    if (name.equals("spawn")) {
-                                        context.getSource().sendFailure(Component.literal("Warp name 'spawn' is reserved."));
-                                        return 0;
-                                    }
                                     return setWarpPoint(context, name, pos);
                                 }))));
 
-        dispatcher.register(literal("removeWarp")
+        dispatcher.register(literal("delwarp")
                 .then(Commands.argument("name", StringArgumentType.string())
                         .suggests(new MultiworldCommand.WarpSuggestionProvider())
                         .executes(context -> {
@@ -80,7 +87,7 @@ public class WarpCommand {
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
-                                context.getSource().sendSuccess(() ->Component.literal("Warp point '" + name + "' has been removed."), true);
+                                context.getSource().sendSuccess(() -> Component.literal("Warp point '" + name + "' has been removed."), true);
                                 return 1;
                             } else {
                                 context.getSource().sendFailure(Component.literal("Warp point '" + name + "' does not exist."));
@@ -88,46 +95,72 @@ public class WarpCommand {
                             }
                         })));
 
-        dispatcher.register(literal("setSpawn")
-                .executes(context -> {
-                    ServerPlayer player = context.getSource().getPlayer();
-                    if (player != null) {
-                        BlockPos pos = player.blockPosition();
-                        String name = "spawn";
-                        return setWarpPoint(context, name, pos);
-                    }
-                    context.getSource().sendFailure(Component.literal("Invalid Operation"));
-                    return 0;
-                })
-                .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                        .executes(context -> {
-                            var pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
-                            String name = "spawn";
-                            return setWarpPoint(context, name, pos);
-                        })));
-
-        dispatcher.register(literal("spawn")
-                .executes(context -> warpPoint(context, "spawn")));
+        dispatcher.register(literal("back")
+                .executes(WarpCommand::backWarp));
     }
 
-    private static int warpPoint(CommandContext<CommandSourceStack> context, String destination) {
-        ServerPlayer player = context.getSource().getPlayer();
-        WarpData warpData = WARPS.get(destination);
-        if (player != null && warpData != null) {
-            ResourceLocation levelID = ResourceLocation.parse(warpData.worldId);
-            if (player.level().dimension().location().equals(levelID)) {
-                player.teleportTo(warpData.x, warpData.y, warpData.z);
-                player.sendSystemMessage(Component.literal("Teleported to position " + warpData.x + ", " + warpData.y + ", " + warpData.z + " in current dimension."));
+    @SubscribeEvent
+    public static void onTeleportCommand(EntityTeleportEvent.TeleportCommand event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            // 记录传送前位置
+            String currentWorldId = player.level().dimension().location().toString();
+            BlockPos currentPos = player.blockPosition();
+            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+        }
+    }
+
+    public static int warpTo(ServerPlayer player, WarpData warpData) {
+        if (player == null || warpData == null) {
+            return 0;
+        }
+        // 记录传送前位置
+        String currentWorldId = player.level().dimension().location().toString();
+        BlockPos currentPos = player.blockPosition();
+        ResourceLocation levelID = ResourceLocation.parse(warpData.worldId());
+        if (player.level().dimension().location().equals(levelID)) {
+            player.teleportTo(warpData.x(), warpData.y(), warpData.z());
+            POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+            return 1;
+        } else {
+            ServerLevel level = player.server.getLevel(ResourceKey.create(DIMENSION, levelID));
+            if (level != null) {
+                DimensionTransition target = new DimensionTransition(level, new Vec3(warpData.x(), warpData.y(), warpData.z()), new Vec3(0, 0, 0), 0f, 0f, DimensionTransition.DO_NOTHING);
+                player.changeDimension(target);
+                POSITION_BEFORE_WARP.put(player.getUUID(), new WarpData(currentWorldId, "before_warp", currentPos.getX(), currentPos.getY(), currentPos.getZ()));
                 return 1;
-            } else {
-                ServerLevel level = player.server.getLevel(ResourceKey.create(DIMENSION, levelID));
-                if (level != null) {
-                    DimensionTransition target = new DimensionTransition(level, new Vec3(warpData.x, warpData.y, warpData.z), new Vec3(0, 0, 0), 0f, 0f, DimensionTransition.DO_NOTHING);
-                    player.changeDimension(target);
-                    player.sendSystemMessage(Component.literal("Teleported to dimension " + warpData.worldId + " at position " + warpData.x + ", " + warpData.y + ", " + warpData.z + "."));
-                    return 1;
-                }
             }
+        }
+        return 0;
+    }
+
+    private static int backWarp(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
+        if (player == null) {
+            context.getSource().sendFailure(Component.literal("Player not found"));
+            return 0;
+        }
+        WarpData previousPosition = POSITION_BEFORE_WARP.get(player.getUUID());
+        if (previousPosition == null) {
+            context.getSource().sendFailure(Component.literal("No previous position recorded"));
+            return 0;
+        }
+        int ret = warpTo(player, previousPosition);
+        if (ret == 1) {
+            return 1;
+        }
+        context.getSource().sendFailure(Component.literal("Failed to warp back to previous position"));
+        return 0;
+    }
+
+    private static int warpPoint(CommandContext<CommandSourceStack> context, String destination, ServerPlayer player) {
+        WarpData warpData = WARPS.get(destination);
+        if (player == null) {
+            context.getSource().sendFailure(Component.literal("Player to be warped not found"));
+            return 0;
+        }
+        int ret = warpTo(player, warpData);
+        if (ret == 1) {
+            return 1;
         }
         context.getSource().sendFailure(Component.literal("Invalid destination"));
         return 0;

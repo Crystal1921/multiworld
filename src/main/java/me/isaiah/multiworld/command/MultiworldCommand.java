@@ -163,7 +163,7 @@ public class MultiworldCommand {
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
-                            return SpawnCommand.run(ctx.getSource().getServer(), player);
+                            return me.isaiah.multiworld.command.commands.SpawnCommand.run(ctx.getSource().getServer(), player);
                         }))
 
                 // SetSpawn Command
