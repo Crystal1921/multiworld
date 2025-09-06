@@ -44,7 +44,7 @@ public class SpawnCommand {
         var pos = player.position();
         String location = player.level().dimension().location().toString();
         SPAWN = new SpawnData(location, pos.x, pos.y, pos.z);
-        context.getSource().sendSuccess(() -> Component.literal("Set spawn point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location), true);
+        player.sendSystemMessage(Component.literal("Set spawn point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location));
         // 保存到文件
         try {
             saveSpawn("config/multiworld/spawn.yml");

@@ -21,9 +21,14 @@ public class DeleteCommand implements Command {
 	 * @param worldId World identifier to delete
 	 */
     public static int run(MinecraftServer mc, CommandSourceStack source, String worldId) {
+        var player = source.getPlayer();
         if (!map.containsKey(worldId)) {
         	map.put(worldId, System.currentTimeMillis() );
-            source.sendSuccess(() -> Component.literal("Delete request for world \"" + worldId + "\" received. Type the command again to confirm."), false);
+            if (player != null) {
+                player.sendSystemMessage(Component.literal("Delete request for world \"" + worldId + "\" received. Type the command again to confirm."));
+            } else {
+                source.sendSuccess(() -> Component.literal("Delete request for world \"" + worldId + "\" received. Type the command again to confirm."), false);
+            }
         	return 1;
         }
         
@@ -32,19 +37,31 @@ public class DeleteCommand implements Command {
         long TIMEOUT = 20_000;
         
         if (now - start > TIMEOUT) {
-            source.sendSuccess(() -> Component.literal("Delete request timed-out (>20s). Please try again."), false);
+            if (player != null) {
+                player.sendSystemMessage(Component.literal("Delete request timed-out (>20s). Please try again."));
+            } else {
+                source.sendSuccess(() -> Component.literal("Delete request timed-out (>20s). Please try again."), false);
+            }
         	map.remove(worldId);
         	return 0;
         }
 
-        source.sendSuccess(() -> Component.literal("Deleting multiworld config for \"" + worldId + "\"..."), false);
+        if (player != null) {
+            player.sendSystemMessage(Component.literal("Deleting multiworld config for \"" + worldId + "\"..."));
+        } else {
+            source.sendSuccess(() -> Component.literal("Deleting multiworld config for \"" + worldId + "\"..."), false);
+        }
         try {
 			File config = Util.get_config_file(MultiworldMod.new_id(worldId));
 			config.delete();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        source.sendSuccess(() -> Component.literal("Deleting world folder \"" + worldId + "\"..."), false);
+        if (player != null) {
+            player.sendSystemMessage(Component.literal("Deleting world folder \"" + worldId + "\"..."));
+        } else {
+            source.sendSuccess(() -> Component.literal("Deleting world folder \"" + worldId + "\"..."), false);
+        }
         MultiworldMod.get_world_creator().deleteWorld(worldId);
 
         return 1;

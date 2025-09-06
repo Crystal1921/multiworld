@@ -46,7 +46,7 @@ public class HomeCommand {
         Vec3 pos = player.position();
         String location = player.level().dimension().location().toString();
         HOMES.put(player.getUUID(), new HomeData(location, pos.x, pos.y, pos.z));
-        context.getSource().sendSuccess(() -> Component.literal("Set home point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location), true);
+        player.sendSystemMessage(Component.literal("Set home point at " + pos.x + ", " + pos.y + ", " + pos.z + " in dimension " + location));
         // 保存到文件
         try {
             saveHome("config/multiworld/homes.yml");

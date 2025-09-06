@@ -84,7 +84,11 @@ public class WarpCommand {
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
-                                context.getSource().sendSuccess(() -> Component.literal("Warp point '" + name + "' has been removed."), true);
+                                if (context.getSource().getPlayer() != null) {
+                                    context.getSource().getPlayer().sendSystemMessage(Component.literal("Warp point '" + name + "' has been removed."));
+                                } else {
+                                    context.getSource().sendSuccess(() -> Component.literal("Warp point '" + name + "' has been removed."), true);
+                                }
                                 return 1;
                             } else {
                                 context.getSource().sendFailure(Component.literal("Warp point '" + name + "' does not exist."));
