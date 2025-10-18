@@ -17,6 +17,15 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 | /mv create   | 创建一个新世界                               | /mv create myLovelyWorld NORMAL -g=FLAT -s=1234 |
 | /mv delete   | 删除一个世界（仅限控制台）                   | /mv delete myWorld |
 
+#### 创建世界
+/mv create myid:myvalue NORMAL -g=VOID
+
+- `myid:myvalue` 是你想要创建的世界的唯一标识符。
+- `NORMAL` 是维度类型，可以是 `NORMAL`（主世界）、`NETHER`（下界）或 `THE_END`（末地）。
+- `-g=GENERATOR` 是可选参数，用于指定生成器类型，例如 `FLAT`（平坦）、`VOID`（虚空）等。
+- `-s=SEED` 是可选参数，用于指定世界种子。
+
+
 #### 游戏规则 & 难度
 | 指令           | 说明                                         | 示例                                |
 |----------------|----------------------------------------------|-------------------------------------|
@@ -38,30 +47,28 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 | /mv portal info   | 列出所有传送门                             |                                                 |
 | /mv portal remove | 移除一个传送门                             | /mv portal remove myPortal                      |
 
+当isTransparent为true时，会在门框处生成透明不可见的传送门方块。接触这些方块就可以触发传送
+
+传送本质上就是截断传送门方块的检测，在世界传送门列表里面遍历是否存在对应的传送门
+
 ### 导入世界
 你可以使用 `/mv import <路径>` 命令将已有世界导入 Multiworld，例如 `/mv import mcg:void1`。
 世界必须位于服务器的 dimensions 文件夹下，例如 `world\dimensions\mcg\void1`。
 
 导入的世界将会是虚空世界。
 
-## 权限
+## 其他指令
+| 指令                  | 说明             | 示例            |
+|---------------------|----------------|---------------|
+| /setwarp name [pos] | 设置传送点          | /setwarp test |
+| /warp name [player] | 传送到目标传送点       | /warp test    |
+| /delwarp            | 删除传送点          | /delwarp test |
+| /back               | 返回上次传送位置       |               |
 
-Multiworld 支持 LuckPerms 或 CyberPerms。
-拥有 `multiworld.admin` 权限或被 `/op` 授予管理员即可访问所有指令。
+需要注意的是，传送点名称是特殊匹配的，如果名字中没有空格，则<name>会直接匹配中间的内容
 
-| 指令 | 权限 |
-|------|------|
-| /mv  | multiworld.cmd |
-| /mv tp | multiworld.tp |
-| /mv spawn | multiworld.spawn |
-| /mv setspawn | multiworld.setspawn |
-| /mv create <id> <dim> [-g=GENERATOR -s=SEED] | multiworld.create |
-| /mv gamerule | multiworld.gamerule |
-等等……
-
-## 即将推出
-
-- 自定义生成器支持
+如果名字中间需要空格，则需要使用引号括起来，例如 `/setwarp "my home" ~ ~ ~`，当然没有空格可以使用引号标明需要的是内部内容也是可以的，例如 `/setwarp "test" ~ ~ ~`，这样设置的传送点名称就是test
+同样的，delwarp和warp也使用这种用法
 
 ## 许可证与致谢
 

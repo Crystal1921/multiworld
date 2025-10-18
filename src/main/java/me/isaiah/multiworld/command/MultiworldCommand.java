@@ -270,15 +270,15 @@ public class MultiworldCommand {
                                                     return PortalCommand.runInfo(ctx.getSource().getServer(), player, page);
                                                 }))
                                 )
-                        ))
-                .then(Commands.literal("remove")
-                        .then(Commands.argument("name", StringArgumentType.string())
-                                .suggests(new PortalNameSuggestionProvider())
-                                .executes(ctx -> {
-                                    String name = StringArgumentType.getString(ctx, "name");
-                                    ServerPlayer player = ctx.getSource().getPlayer();
-                                    return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
-                                })))
+                        )
+                        .then(Commands.literal("remove")
+                                .then(Commands.argument("name", StringArgumentType.string())
+                                        .suggests(new PortalNameSuggestionProvider())
+                                        .executes(ctx -> {
+                                            String name = StringArgumentType.getString(ctx, "name");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
+                                        }))))
 
                 // Delete Command
                 .then(Commands.literal("delete")
@@ -357,7 +357,7 @@ public class MultiworldCommand {
         @Override
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             for (String name : WarpCommand.WARPS.keySet()) {
-                builder.suggest(name);
+                builder.suggest("\"" + name + "\"");
             }
             return builder.buildFuture();
         }
