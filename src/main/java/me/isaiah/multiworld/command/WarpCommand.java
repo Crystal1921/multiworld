@@ -1,8 +1,8 @@
 package me.isaiah.multiworld.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import me.isaiah.multiworld.command.argument.SpaceBreakStringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -33,32 +33,32 @@ import static net.minecraft.core.registries.Registries.DIMENSION;
 
 @EventBusSubscriber
 public class WarpCommand {
-    public static HashMap<String, WarpData> WARPS = new HashMap<>();
     public static final Map<UUID, WarpData> POSITION_BEFORE_WARP = new HashMap<>();
+    public static HashMap<String, WarpData> WARPS = new HashMap<>();
 
     // On command register
     public static void register_commands(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(literal("warp")
-                .then(Commands.argument("name", StringArgumentType.string())
+                .then(Commands.argument("name", SpaceBreakStringArgumentType.string())
                         .suggests(new MultiworldCommand.WarpSuggestionProvider())
                         .executes(context -> {
-                            String destination = StringArgumentType.getString(context, "name");
-                            return warpPoint(context, destination, context.getSource().getPlayer());
+                            String name = SpaceBreakStringArgumentType.getString(context, "name");
+                            return warpPoint(context, name, context.getSource().getPlayer());
                         })
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(context -> {
-                                    String destination = StringArgumentType.getString(context, "name");
+                                    String name = SpaceBreakStringArgumentType.getString(context, "name");
                                     ServerPlayer player = EntityArgument.getPlayer(context, "player");
-                                    return warpPoint(context, destination, player);
+                                    return warpPoint(context, name, player);
                                 }))));
 
         dispatcher.register(literal("setwarp")
-                .then(Commands.argument("name", StringArgumentType.string())
+                .then(Commands.argument("name", SpaceBreakStringArgumentType.string())
                         .executes(context -> {
                             ServerPlayer player = context.getSource().getPlayer();
                             if (player != null) {
                                 Vec3 pos = player.position();
-                                String name = StringArgumentType.getString(context, "name");
+                                String name = SpaceBreakStringArgumentType.getString(context, "name");
                                 return setWarpPoint(context, name, pos);
                             }
                             context.getSource().sendFailure(Component.literal("Invalid Operation"));
@@ -67,15 +67,15 @@ public class WarpCommand {
                         .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                 .executes(context -> {
                                     var pos = BlockPosArgument.getLoadedBlockPos(context, "pos");
-                                    String name = StringArgumentType.getString(context, "name");
+                                    String name = SpaceBreakStringArgumentType.getString(context, "name");
                                     return setWarpPoint(context, name, new Vec3(pos.getX(), pos.getY(), pos.getZ()));
                                 }))));
 
         dispatcher.register(literal("delwarp")
-                .then(Commands.argument("name", StringArgumentType.string())
+                .then(Commands.argument("name", SpaceBreakStringArgumentType.string())
                         .suggests(new MultiworldCommand.WarpSuggestionProvider())
                         .executes(context -> {
-                            String name = StringArgumentType.getString(context, "name");
+                            String name = SpaceBreakStringArgumentType.getString(context, "name");
                             if (WARPS.containsKey(name)) {
                                 WARPS.remove(name);
                                 // 保存到文件
