@@ -3,6 +3,7 @@ package xyz.nucleoid.fantasy.mixin;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
+import me.isaiah.multiworld.registry.DataAttachmentsRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +23,10 @@ public class MixinNetherPortalBlock {
     @Inject(at = @At("HEAD"), method = "entityInside", cancellable = true)
     private void onEntityCollision(BlockState state, Level world, BlockPos pos, Entity entity, CallbackInfo ci) {
         if (!(entity instanceof ServerPlayer)) {
+            return;
+        }
+
+        if (entity.getData(DataAttachmentsRegistry.PORTAL_DEBUG.get())) {
             return;
         }
 

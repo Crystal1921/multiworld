@@ -5,6 +5,7 @@ import me.isaiah.multiworld.config.FileConfiguration;
 import me.isaiah.multiworld.perm.Perm;
 import me.isaiah.multiworld.portal.Portal;
 import me.isaiah.multiworld.portal.WandEventHandler;
+import me.isaiah.multiworld.registry.DataAttachmentsRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -330,5 +331,17 @@ public class PortalCommand implements Command {
 
     private static boolean isValidDestination(String dest) {
         return dest.matches(DEST_POS_REGEX) || dest.matches(DEST_REGEX);
+    }
+
+    public static int runDebug(MinecraftServer server, ServerPlayer player) {
+        Boolean data = player.getData(DataAttachmentsRegistry.PORTAL_DEBUG.get());
+        if (!data) {
+            player.setData(DataAttachmentsRegistry.PORTAL_DEBUG.get(), true);
+            message(player, "&aPortal debug enabled.");
+        } else {
+            player.setData(DataAttachmentsRegistry.PORTAL_DEBUG.get(), false);
+            message(player, "&cPortal debug disabled.");
+        }
+        return 1;
     }
 }

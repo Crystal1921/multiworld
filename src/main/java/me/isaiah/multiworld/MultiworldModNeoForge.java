@@ -8,10 +8,7 @@ import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.WarpCommand;
 import me.isaiah.multiworld.portal.WandEventHandler;
-import me.isaiah.multiworld.registry.BlockRegistry;
-import me.isaiah.multiworld.registry.GroupRegistry;
-import me.isaiah.multiworld.registry.ItemRegistry;
-import me.isaiah.multiworld.registry.ModCommandArgumentRegistry;
+import me.isaiah.multiworld.registry.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -40,6 +37,7 @@ public class MultiworldModNeoForge {
 		ItemRegistry.ITEMS.register(modEventBus);
 		GroupRegistry.TABS.register(modEventBus);
 		ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
+		DataAttachmentsRegistry.ATTACHMENT_TYPES.register(modEventBus);
 	}
 
 	public void commonSetup(final FMLCommonSetupEvent event) {

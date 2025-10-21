@@ -3,6 +3,7 @@ package me.isaiah.multiworld.block;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.portal.Portal;
+import me.isaiah.multiworld.registry.DataAttachmentsRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +48,9 @@ public class PortalBlock extends Block {
             return;
         }
 
+        if (entity.getData(DataAttachmentsRegistry.PORTAL_DEBUG.get())) {
+            return;
+        }
         // Check if portal
 
         for (Portal p : PortalCommand.KNOWN_PORTALS.values()) {

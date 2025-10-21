@@ -283,7 +283,12 @@ public class MultiworldCommand {
                                             String name = StringArgumentType.getString(ctx, "name");
                                             ServerPlayer player = ctx.getSource().getPlayer();
                                             return PortalCommand.runRemove(ctx.getSource().getServer(), player, name);
-                                        }))))
+                                        })))
+                        .then(Commands.literal("debug")
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    return PortalCommand.runDebug(ctx.getSource().getServer(), player);
+                                })))
 
                 // Delete Command
                 .then(Commands.literal("delete")
