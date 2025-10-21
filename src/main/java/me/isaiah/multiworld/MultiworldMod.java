@@ -4,6 +4,7 @@
  */
 package me.isaiah.multiworld;
 
+import lombok.Getter;
 import me.isaiah.multiworld.command.*;
 import me.isaiah.multiworld.command.commands.CreateCommand;
 import me.isaiah.multiworld.portal.Portal;
@@ -30,7 +31,12 @@ public class MultiworldMod {
     public static final String VERSION = "1.10";
     public static MinecraftServer mc;
     public static String CMD = "mv";
-    public static ICreator world_creator;
+    /**
+     * -- GETTER --
+     *  Gets the Multiversion ICreator instance
+     */
+    @Getter
+    public static ICreator worldCreator;
     public static String[] COMMAND_HELP = {
             "&4Multiworld Mod Commands:&r",
             "&a/mw spawn&r - Teleport to current world spawn",
@@ -43,18 +49,11 @@ public class MultiworldMod {
     };
 
     public static void setICreator(ICreator ic) {
-        world_creator = ic;
-    }
-
-    /**
-     * Gets the Multiversion ICreator instance
-     */
-    public static ICreator get_world_creator() {
-        return world_creator;
+        worldCreator = ic;
     }
 
     public static ServerLevel create_world(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
-        return world_creator.createWorld(id, dim, gen, dif, seed);
+        return worldCreator.createWorld(id, dim, gen, dif, seed);
     }
 
     /**

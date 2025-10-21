@@ -32,24 +32,27 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 | /mv gamerule   | 为自定义世界设置游戏规则                     | /mv gamerule doDaylightCycle false  |
 | /mv difficulty | 设置当前世界的难度                           | /mv difficulty EASY                 |
 
-## 传送门 <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/03/Nether_portal_%28animated%29.png/revision/latest?cb=20191114182303" width="128" float="right" align="right">
+## 传送门
 最新版本的 Multiworld 引入了传送门功能。
 传送门可以通向目标，目标可以是一个世界 *(`myWorld`)*，另一个传送门 *(`p:myOtherPortal`)*，或者是精确坐标 *(`w:myWorld:0,0,0`)*。
 
 要制作传送门，请使用 *`/mv portal wand`* 获得的传送门魔杖。持有魔杖物品时，类似于 WorldEdit，左键和右键点击方块以选择传送门框架的两个角。选中区域将在使用创建传送门指令时被用于生成传送门。
 
 ### 传送门指令
-| 指令              | 说明                                       | 示例                                            |
-|-------------------|--------------------------------------------|-------------------------------------------------|
-| /mv portal        | 查看帮助                                   |                                                 |
-| /mv portal create | 用魔杖选择的区域创建新传送门               | /mv create myPortal myWorld [isTransparent]     |
-| /mv portal wand   | 获得传送门魔杖，用于选择传送门区域         | 选择传送门框架的黑曜石角                        |
-| /mv portal info   | 列出所有传送门                             |                                                 |
-| /mv portal remove | 移除一个传送门                             | /mv portal remove myPortal                      |
+| 指令                          | 说明                | 示例                                            |
+|-----------------------------|-------------------|-------------------------------------------------|
+| /mv portal                  | 查看帮助              |                                                 |
+| /mv portal create           | 用魔杖选择的区域创建新传送门    | /mv create myPortal myWorld [isTransparent]     |
+| /mv portal wand             | 获得传送门魔杖，用于选择传送门区域 | 选择传送门框架的黑曜石角                        |
+| /mv portal list             | 列出所有传送门           |                                                 |
+| /mv portal list [name/page] | 列出对应传送门/第x页传送门    |                                                 |
+| /mv portal remove           | 移除一个传送门           | /mv portal remove myPortal                      |
 
 当isTransparent为true时，会在门框处生成透明不可见的传送门方块。接触这些方块就可以触发传送
 
 传送本质上就是截断传送门方块的检测，在世界传送门列表里面遍历是否存在对应的传送门
+
+手持传送门探测器时，会高亮此维度的传送门
 
 ### 导入世界
 你可以使用 `/mv import <路径>` 命令将已有世界导入 Multiworld，例如 `/mv import mcg:void1`。

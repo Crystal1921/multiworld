@@ -178,7 +178,7 @@ public class CreateCommand implements Command {
      * or NULL if the passed argument is not NORMAL / NETHER / END.
      */
     public static ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
-        ChunkGenerator gen = MultiworldMod.get_world_creator().getChunkGen(mc, env.toUpperCase(Locale.ROOT));
+        ChunkGenerator gen = MultiworldMod.getWorldCreator().getChunkGen(mc, env.toUpperCase(Locale.ROOT));
 
         if (customs.containsKey(env)) {
             return customs.get(env);
@@ -270,7 +270,7 @@ public class CreateCommand implements Command {
 
             ServerLevel world = MultiworldMod.create_world(id, dim, gen, d, seed);
 
-            MultiworldMod.get_world_creator().setDifficulty(id, d);
+            MultiworldMod.getWorldCreator().setDifficulty(id, d);
 
             if (GameruleCommand.keys.size() == 0) {
                 GameruleCommand.setupServer(MultiworldMod.mc);

@@ -62,7 +62,7 @@ public class DeleteCommand implements Command {
         } else {
             source.sendSuccess(() -> Component.literal("Deleting world folder \"" + worldId + "\"..."), false);
         }
-        MultiworldMod.get_world_creator().deleteWorld(worldId);
+        MultiworldMod.getWorldCreator().deleteWorld(worldId);
 
         return 1;
     }

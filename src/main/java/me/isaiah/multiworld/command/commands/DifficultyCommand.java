@@ -56,7 +56,7 @@ public class DifficultyCommand implements Command {
 			return 0;
 		}
 
-        MultiworldMod.get_world_creator().setDifficulty(w.dimension().location().toString(), d);
+        MultiworldMod.getWorldCreator().setDifficulty(w.dimension().location().toString(), d);
 
         try {
 			FileConfiguration config = Util.get_config(w);

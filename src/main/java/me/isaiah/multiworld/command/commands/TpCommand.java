@@ -19,9 +19,9 @@ public class TpCommand implements Command {
      * @param mc MinecraftServer instance
      * @param plr ServerPlayer to teleport (can be null for console commands)
      * @param worldName Target world name (will be prefixed with "multiworld:" if no namespace)
-     * @param targetPlayerName Target player name (for console teleporting another player, can be null)
+     * @param blockPos Target BlockPos
      */
-    public static int run(MinecraftServer mc, ServerPlayer plr, String worldName, String targetPlayerName) {
+    public static int run(MinecraftServer mc, ServerPlayer plr, String worldName, BlockPos blockPos) {
         HashMap<String,ServerLevel> worlds = new HashMap<>();
         mc.levelKeys().forEach(r -> {
             ServerLevel world = mc.getLevel(r);
@@ -33,17 +33,6 @@ public class TpCommand implements Command {
         if (worldName.indexOf(':') == -1) {
             processedWorldName = "multiworld:" + worldName;
         }
-        
-        // Handle console commands
-        if (null == plr) {
-        	if (targetPlayerName == null || targetPlayerName.isEmpty()) {
-        		return 0;
-        	}
-        	plr = mc.getPlayerList().getPlayerByName(targetPlayerName);
-        	if (plr == null) {
-        		return 0;
-        	}
-        }
 
         if (worlds.containsKey(processedWorldName)) {
             ServerLevel w = worlds.get(processedWorldName);
@@ -53,7 +42,7 @@ public class TpCommand implements Command {
 			boolean isEnd = false;
 			
 			try {
-				boolean is_the_end = MultiworldMod.get_world_creator().isTheEnd(w);
+				boolean is_the_end = MultiworldMod.getWorldCreator().isTheEnd(w);
 				if (is_the_end) {
 					isEnd = true;
 				}
@@ -85,10 +74,11 @@ public class TpCommand implements Command {
 
             sp = findSafePos(w, sp);
 
-            // TeleportTarget target = new TeleportTarget(new Vec3d(sp.getX(), sp.getY(), sp.getZ()), new Vec3d(0, 0, 0), 0f, 0f);
-            // FabricDimensionInternals.changeDimension(plr, w, target);
+            if (blockPos != null) {
+                sp = blockPos;
+            }
 
-            MultiworldMod.get_world_creator().teleport(plr, w, sp.getX(), sp.getY(), sp.getZ());
+            MultiworldMod.getWorldCreator().teleport(plr, w, sp.getX(), sp.getY(), sp.getZ());
             
             return 1;
         }

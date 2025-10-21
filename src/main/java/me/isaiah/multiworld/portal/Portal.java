@@ -141,8 +141,8 @@ public class Portal {
                 double y2 = Double.parseDouble(to[1]);
                 double z2 = Double.parseDouble(to[2]);
 
-                BlockPos a = MultiworldMod.get_world_creator().getPos(x1, y1, z1);
-                BlockPos b = MultiworldMod.get_world_creator().getPos(x2, y2, z2);
+                BlockPos a = MultiworldMod.getWorldCreator().getPos(x1, y1, z1);
+                BlockPos b = MultiworldMod.getWorldCreator().getPos(x2, y2, z2);
 
                 Portal p = new Portal(name, owner, worldIn, dest, a, b, direction);
 

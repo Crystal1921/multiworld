@@ -8,11 +8,16 @@ import me.isaiah.multiworld.portal.WandEventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -104,11 +109,23 @@ public class PortalCommand implements Command {
         }
         message(plr, "&6Multiworld Portals:");
         message(plr, " Portal: \"" + p.getName() + "\": ");
-        message(plr, "  &6- From:&r " + p.getOriginWorldId() + " @ (" + p.getMinPos().toShortString() + ")");
-        message(plr, "  &6- To:&r " + p.getDestWorldName() + " @ (" + p.getDestLocation().toShortString() + ")");
+        BlockPos addPos = p.getMinPos().offset(p.getMaxPos());
+        BlockPos avgPos = new BlockPos(addPos.getX() / 2, addPos.getY() / 2, addPos.getZ() / 2);
+        MutableComponent from = Component.literal("  - From: ").withColor(Color.ORANGE.getRGB()).append(Component.literal( p.getOriginWorldId() + "@ (").withColor(Color.WHITE.getRGB()))
+                .append(Component.literal(avgPos.toShortString()).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getOriginWorldId() + " " + getString(avgPos)))))
+                .append(Component.literal(")").withColor(Color.WHITE.getRGB()));
+        plr.displayClientMessage(from, false);
+        MutableComponent to = Component.literal("  - To: ").withColor(Color.ORANGE.getRGB()).append(Component.literal( p.getOriginWorldId() + "@ (").withColor(Color.WHITE.getRGB()))
+                .append(Component.literal(avgPos.toShortString()).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getOriginWorldId() + " " + getString(p.getDestLocation())))))
+                .append(Component.literal(")").withColor(Color.WHITE.getRGB()));
+        plr.displayClientMessage(to, false);
         message(plr, "  &6- Destination:&r " + p.getDestination());
         message(plr, "  &6- Portal Frame:&r " + p.getLocationConfigString());
         return 1;
+    }
+
+    private static @NotNull String getString(BlockPos avgPos) {
+        return avgPos.getX() + " " + avgPos.getY() + " " + avgPos.getZ();
     }
 
     public static int runInfo(MinecraftServer mc, ServerPlayer plr, int page) {
@@ -132,10 +149,14 @@ public class PortalCommand implements Command {
         // 输出当前页的数据
         for (int i = start; i < end; i++) {
             Portal p = portals.get(i);
+            BlockPos addPos = p.getMinPos().offset(p.getMaxPos());
+            BlockPos avgPos = new BlockPos(addPos.getX() / 2, addPos.getY() / 2, addPos.getZ() / 2);
             plr.displayClientMessage(Component.literal(" Portal: \"" + p.getName() + "\": ").withStyle(ChatFormatting.AQUA), false);
-            String from = p.getOriginWorldId() + " (" + p.getMinPos().toShortString();
-            String to = p.getDestWorldName() + " (" + p.getDestLocation().toShortString();
-            message(plr, " - " + from + ") -> " + to + ")");
+            MutableComponent component = Component.literal("  - ")
+                    .append(Component.literal(p.getOriginWorldId() + " (" + p.getMinPos().toShortString() + ")").withStyle(Style.EMPTY.withColor(Color.GREEN.getRGB()).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getOriginWorldId() + " " + getString(avgPos)))))
+                    .append(Component.literal(" -> "))
+                    .append(Component.literal(p.getDestWorldName() + " (" + p.getDestLocation().toShortString() + ")").withStyle(Style.EMPTY.withColor(Color.GREEN.getRGB()).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getDestWorld().dimension().location() + " " + getString(p.getDestLocation())))));
+            plr.displayClientMessage(component, false);
         }
 
         return 1;
@@ -190,10 +211,6 @@ public class PortalCommand implements Command {
      * @param portalName Portal name to remove
      */
     public static int runRemove(MinecraftServer mc, ServerPlayer plr, String portalName) {
-
-        if (!true) {
-            message(plr, "&4WARN: iCommonLib is required for Portals to function properly");
-        }
 
         // Create args array for the existing removePortal method
         String[] args = {"portal", "remove", portalName};

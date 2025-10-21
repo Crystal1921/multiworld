@@ -13,11 +13,14 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.argument.DirectionArgumentType;
 import me.isaiah.multiworld.command.argument.SpaceBreakStringArgumentType;
 import me.isaiah.multiworld.command.commands.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -60,12 +63,12 @@ public class MultiworldCommand {
                                     ServerPlayer player = ctx.getSource().getPlayer();
                                     return TpCommand.run(ctx.getSource().getServer(), player, worldName, null);
                                 })
-                                .then(Commands.argument("player", StringArgumentType.string())
-                                        .suggests(new PlayerSuggestionProvider())
+                                .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                         .executes(ctx -> {
                                             String worldName = ResourceLocationArgument.getId(ctx, "world").toString();
-                                            String playerName = StringArgumentType.getString(ctx, "player");
-                                            return TpCommand.run(ctx.getSource().getServer(), null, worldName, playerName);
+                                            BlockPos pos = BlockPosArgument.getBlockPos(ctx, "pos");
+                                            ServerPlayer player = ctx.getSource().getPlayer();
+                                            return TpCommand.run(ctx.getSource().getServer(), player, worldName, pos);
                                         }))))
 
                 .then(Commands.literal("border")
@@ -107,9 +110,11 @@ public class MultiworldCommand {
                                 if (name.startsWith("multiworld:")) name = name.replace("multiworld:", "");
 
                                 if (id.equals(pwid)) {
-                                    message(player, "- " + name + " &a(Currently in)");
+                                    MutableComponent mutableComponent = Component.literal(name + " &a(Currently in)").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + name)).withHoverEvent(new HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip"))));
+                                    player.displayClientMessage(mutableComponent, false);
                                 } else {
-                                    message(player, "- " + name);
+                                    MutableComponent mutableComponent = Component.literal(name).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + name)).withHoverEvent(new HoverEvent(net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.coordinates.tooltip"))));
+                                    player.displayClientMessage(mutableComponent, false);
                                 }
                             });
                             return 1;
@@ -249,7 +254,7 @@ public class MultiworldCommand {
                                     ServerPlayer player = ctx.getSource().getPlayer();
                                     return PortalCommand.runWand(ctx.getSource().getServer(), player);
                                 }))
-                        .then(Commands.literal("info")
+                        .then(Commands.literal("list")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
                                     return PortalCommand.runInfo(player);
