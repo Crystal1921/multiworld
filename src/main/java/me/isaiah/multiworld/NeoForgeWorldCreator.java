@@ -1,5 +1,6 @@
 package me.isaiah.multiworld;
 
+import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -45,7 +46,9 @@ public class NeoForgeWorldCreator implements ICreator {
     public static ChunkGenerator getStaticVoidGen(MinecraftServer mc) {
         Registry<FlatLevelGeneratorPreset> flatLevelGeneratorPresets = mc.registryAccess().registryOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET);
         FlatLevelGeneratorPreset preset = flatLevelGeneratorPresets.getOrThrow(FlatLevelGeneratorPresets.THE_VOID);
-        return new CustomFlatChunkGenerator(preset.settings());
+        FlatLevelGeneratorSettings settings = preset.settings();
+        FlatLevelGeneratorSettings newSettings = new FlatLevelGeneratorSettings(settings.structureOverrides(), settings.getBiome(), Lists.newArrayList());
+        return new CustomFlatChunkGenerator(newSettings);
     }
 
     public ServerLevel createWorld(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {

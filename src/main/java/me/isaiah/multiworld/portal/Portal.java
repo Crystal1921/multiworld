@@ -128,7 +128,7 @@ public class Portal {
                 String dest = config.getString(prefix + ".destination");
                 Direction direction = Direction.byName(config.getString(prefix + ".direction"));
 
-                ResourceLocation worldIn = MultiworldMod.new_id(world);
+                ResourceLocation worldIn = MultiworldMod.newId(world);
                 String[] spl = location.split(Pattern.quote(":"));
                 String[] from = spl[0].split(Pattern.quote(","));
                 String[] to = spl[1].split(Pattern.quote(","));

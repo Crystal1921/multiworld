@@ -52,7 +52,7 @@ public class DeleteCommand implements Command {
             source.sendSuccess(() -> Component.literal("Deleting multiworld config for \"" + worldId + "\"..."), false);
         }
         try {
-			File config = Util.get_config_file(MultiworldMod.new_id(worldId));
+			File config = Util.get_config_file(MultiworldMod.newId(worldId));
 			config.delete();
 		} catch (IOException e) {
 			e.printStackTrace();

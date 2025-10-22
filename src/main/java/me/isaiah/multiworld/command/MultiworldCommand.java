@@ -399,6 +399,7 @@ public class MultiworldCommand {
             builder.suggest("-g=VOID");
             builder.suggest("-s=1234");
             builder.suggest("-s=RANDOM");
+            builder.suggest("-r=minecraft:overworld");
 
             for (String key : CreateCommand.customs.keySet()) {
                 builder.suggest("-g=" + key.toUpperCase(Locale.ROOT));

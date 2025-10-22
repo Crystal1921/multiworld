@@ -52,7 +52,7 @@ public class MultiworldMod {
         worldCreator = ic;
     }
 
-    public static ServerLevel create_world(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
+    public static ServerLevel createWorld(String id, ResourceLocation dim, ChunkGenerator gen, Difficulty dif, long seed) {
         return worldCreator.createWorld(id, dim, gen, dif, seed);
     }
 
@@ -63,13 +63,13 @@ public class MultiworldMod {
         System.out.println("Multiworld init");
     }
 
-    public static ResourceLocation new_id(String id) {
+    public static ResourceLocation newId(String id) {
         // tryParse works from 1.18 to 1.21+
         return ResourceLocation.tryParse(id);
     }
 
     // On server start
-    public static void on_server_started(MinecraftServer mc) {
+    public static void onServerStarted(MinecraftServer mc) {
         MultiworldMod.mc = mc;
 
         // LOGGER.info("Registering events...");
@@ -87,7 +87,7 @@ public class MultiworldMod {
                     for (File fi : f.listFiles()) {
                         String id = f.getName() + ":" + fi.getName().replace(".yml", "");
                         LOGGER.info("Found saved world " + id);
-                        CreateCommand.reinit_world_from_config(mc, id);
+                        CreateCommand.reinitWorldFromConfig(mc, id);
                     }
                 }
             }
@@ -104,11 +104,11 @@ public class MultiworldMod {
             return Component.nullToEmpty(MultiworldCommand.translate_alternate_color_codes('&', message));
         } catch (Exception e) {
             e.printStackTrace();
-            return text_plain(message);
+            return textPlain(message);
         }
     }
 
-    public static Component text_plain(String txt) {
+    public static Component textPlain(String txt) {
         return Component.nullToEmpty(txt);
     }
 

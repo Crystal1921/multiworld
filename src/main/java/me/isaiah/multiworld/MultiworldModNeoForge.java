@@ -45,7 +45,7 @@ public class MultiworldModNeoForge {
 
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
-		MultiworldMod.on_server_started(event.getServer());
+		MultiworldMod.onServerStarted(event.getServer());
 	}
 
 	@SubscribeEvent

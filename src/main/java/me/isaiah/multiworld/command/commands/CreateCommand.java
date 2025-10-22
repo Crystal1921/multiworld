@@ -8,17 +8,20 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static me.isaiah.multiworld.command.MultiworldCommand.message;
+import static me.isaiah.multiworld.command.commands.GameruleCommand.setRuleConfig;
+import static net.minecraft.world.level.GameRules.visitGameRuleTypes;
 
 /**
  * The "/mw create" Command
@@ -46,7 +49,7 @@ public class CreateCommand implements Command {
         if (arg.startsWith("-g ") || arg.startsWith("-g=")) {
             String ab = arg.substring("-g=".length());
 
-            ChunkGenerator gen1 = get_chunk_gen(mc, ab);
+            ChunkGenerator gen1 = getChunkGen(mc, ab);
             if (null != gen1) {
                 return new Tuple<>(gen1, ab);
             } else {
@@ -77,6 +80,22 @@ public class CreateCommand implements Command {
         return Optional.empty();
     }
 
+    @Nullable
+    private static GameRules checkArgForGamerule(MinecraftServer mc, String arg) {
+        AtomicReference<GameRules> gameRules = new AtomicReference<>();
+        if (arg.startsWith("-r ") || arg.startsWith("-r=")) {
+            String ab = arg.substring("-r=".length());
+            ResourceLocation resourceLocation = ResourceLocation.parse(ab);
+            mc.levelKeys().forEach(r -> {
+                if (r.location().equals(resourceLocation)) {
+                    ServerLevel level = mc.getLevel(r);
+                    gameRules.set(level.getGameRules());
+                }
+            });
+        }
+        return gameRules.get();
+    }
+
     /**
      * Run Command with native command logic
      *
@@ -91,8 +110,8 @@ public class CreateCommand implements Command {
         Random r = new Random();
         long seed = r.nextInt(); // Default: random seed
 
-        ChunkGenerator gen = get_chunk_gen(mc, environment);
-        ResourceLocation dim = get_dim_id(environment);
+        ChunkGenerator gen = getChunkGen(mc, environment);
+        ResourceLocation dim = getDimId(environment);
 
         // Default dimension fallback
         if (null == dim) {
@@ -107,6 +126,7 @@ public class CreateCommand implements Command {
         }
 
         String customGen = "";
+        GameRules gameRules = null;
 
         // Process optional parameters
         if (options != null && !options.trim().isEmpty()) {
@@ -130,11 +150,36 @@ public class CreateCommand implements Command {
                     message(plr, "Using seed \"" + resultB.get() + "\".");
                     seed = resultB.get();
                 }
+
+                if (gameRules == null) {
+                    gameRules = checkArgForGamerule(mc, arg);
+                }
             }
         }
 
-        ServerLevel world = MultiworldMod.create_world(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
-        make_config(world, environment, seed, customGen);
+        ServerLevel world = MultiworldMod.createWorld(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
+        makeConfig(world, environment, seed, customGen);
+        
+        if (gameRules != null) {
+            GameRules finalGameRules = gameRules.copy();
+            visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+                public void visitBoolean(GameRules.Key<GameRules.BooleanValue> key, GameRules.Type<GameRules.BooleanValue> type) {
+                    try {
+                        setRuleConfig(world, key.getId(), String.valueOf(finalGameRules.getRule(key).get()));
+                    } catch (IOException e) {
+                        MultiworldMod.LOGGER.error(e.getMessage());
+                    }
+                }
+
+                public void visitInteger(GameRules.Key<GameRules.IntegerValue> key, GameRules.Type<GameRules.IntegerValue> type) {
+                    try {
+                        setRuleConfig(world, key.getId(), String.valueOf(finalGameRules.getRule(key).get()));
+                    } catch (IOException e) {
+                        MultiworldMod.LOGGER.error(e.getMessage());
+                    }
+                }
+            });
+        }
 
         message(plr, I18n.CREATED_WORLD + worldId);
 
@@ -145,7 +190,7 @@ public class CreateCommand implements Command {
      * Return a {@link ResourceLocation} representing the given vanilla environment,
      * or NULL if the passed argument is not NORMAL / NETHER / END.
      */
-    public static ResourceLocation get_dim_id(String env) {
+    public static ResourceLocation getDimId(String env) {
         if (env.contains("NORMAL")) {
             return Util.OVERWORLD_ID;
         }
@@ -159,15 +204,15 @@ public class CreateCommand implements Command {
         }
 
         if (customs.containsKey(env)) {
-            return MultiworldMod.new_id(env);
+            return MultiworldMod.newId(env);
         }
 
         if (customs.containsKey(env.toLowerCase(Util.AMERICAN_STANDARD))) {
-            return MultiworldMod.new_id(env);
+            return MultiworldMod.newId(env);
         }
 
         if (customs.containsKey(env.toUpperCase(Util.AMERICAN_STANDARD))) {
-            return MultiworldMod.new_id(env);
+            return MultiworldMod.newId(env);
         }
 
         return null;
@@ -177,7 +222,7 @@ public class CreateCommand implements Command {
      * Return a {@link ChunkGenerator} for the given vanilla environment,
      * or NULL if the passed argument is not NORMAL / NETHER / END.
      */
-    public static ChunkGenerator get_chunk_gen(MinecraftServer mc, String env) {
+    public static ChunkGenerator getChunkGen(MinecraftServer mc, String env) {
         ChunkGenerator gen = MultiworldMod.getWorldCreator().getChunkGen(mc, env.toUpperCase(Locale.ROOT));
 
         if (customs.containsKey(env)) {
@@ -197,7 +242,7 @@ public class CreateCommand implements Command {
     /**
      * Load an existing saved World from config (YAML)
      */
-    public static void reinit_world_from_config(MinecraftServer mc, String id) {
+    public static void reinitWorldFromConfig(MinecraftServer mc, String id) {
         File config_dir = new File("config");
         config_dir.mkdirs();
 
@@ -228,8 +273,8 @@ public class CreateCommand implements Command {
                 seed = config.getInt("seed");
             }
 
-            ChunkGenerator gen = get_chunk_gen(mc, env);
-            ResourceLocation dim = get_dim_id(env);
+            ChunkGenerator gen = getChunkGen(mc, env);
+            ResourceLocation dim = getDimId(env);
 
             if (null == dim) {
                 dim = Util.OVERWORLD_ID;
@@ -260,7 +305,7 @@ public class CreateCommand implements Command {
             if (config.is_set("custom_generator")) {
                 String cg = config.getString("custom_generator");
 
-                ChunkGenerator gen1 = get_chunk_gen(mc, cg);
+                ChunkGenerator gen1 = getChunkGen(mc, cg);
                 if (null != gen1) {
                     gen = gen1;
                 } else {
@@ -268,7 +313,7 @@ public class CreateCommand implements Command {
                 }
             }
 
-            ServerLevel world = MultiworldMod.create_world(id, dim, gen, d, seed);
+            ServerLevel world = MultiworldMod.createWorld(id, dim, gen, d, seed);
 
             MultiworldMod.getWorldCreator().setDifficulty(id, d);
 
@@ -305,10 +350,10 @@ public class CreateCommand implements Command {
 
     /**
      * Saves the World Info to a YAML Config File, to be loaded by
-     * {@link #reinit_world_from_config(MinecraftServer, String)}
+     * {@link #reinitWorldFromConfig(MinecraftServer, String)}
      * on next server start.
      */
-    public static void make_config(ServerLevel w, String dim, long seed, String cgen) {
+    public static void makeConfig(ServerLevel w, String dim, long seed, String cgen) {
         File config_dir = new File("config");
         config_dir.mkdirs();
 

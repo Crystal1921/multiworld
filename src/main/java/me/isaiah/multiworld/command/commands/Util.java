@@ -24,7 +24,7 @@ public class Util {
    
 
     public static ResourceLocation id(String id) {
-    	return MultiworldMod.new_id(id);
+    	return MultiworldMod.newId(id);
     }
     
     public static File get_platform_config_dir() {

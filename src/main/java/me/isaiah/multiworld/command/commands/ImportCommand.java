@@ -11,8 +11,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
 import static me.isaiah.multiworld.NeoForgeWorldCreator.getStaticVoidGen;
-import static me.isaiah.multiworld.command.commands.CreateCommand.get_dim_id;
-import static me.isaiah.multiworld.command.commands.CreateCommand.make_config;
+import static me.isaiah.multiworld.command.commands.CreateCommand.getDimId;
+import static me.isaiah.multiworld.command.commands.CreateCommand.makeConfig;
 
 public class ImportCommand {
     public static int run(MinecraftServer mc, CommandSourceStack source, ResourceLocation worldName) {
@@ -23,12 +23,12 @@ public class ImportCommand {
         String processedWorldId = worldName.toString();
         String environment = "NORMAL";
         String customGen = "VOID";
-        ResourceLocation dim = get_dim_id(environment);
+        ResourceLocation dim = getDimId(environment);
         ChunkGenerator gen = getStaticVoidGen(mc);
         long seed = 0;
 
-        ServerLevel world = MultiworldMod.create_world(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
-        make_config(world, environment, seed, customGen);
+        ServerLevel world = MultiworldMod.createWorld(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
+        makeConfig(world, environment, seed, customGen);
 
         initGamerule(mc, player, world);
 

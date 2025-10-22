@@ -1,6 +1,6 @@
 <img src="https://cdn.modrinth.com/data/cached_images/01d4b3f0a8d469b8d7b36030f2039007500b00f4.png" height="64" alt="Multiworld Logo">
 
-# Multiworld ![](http://cf.way2muchnoise.eu/multiworld-mod.svg) ![](http://cf.way2muchnoise.eu/versions/multiworld-mod.svg)
+# Multiworld ![](http://cf.way2muchnoise.eu/multiworld-mod.svg)
 
 Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 
@@ -24,7 +24,11 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 - `NORMAL` 是维度类型，可以是 `NORMAL`（主世界）、`NETHER`（下界）或 `THE_END`（末地）。
 - `-g=GENERATOR` 是可选参数，用于指定生成器类型，例如 `FLAT`（平坦）、`VOID`（虚空）等。
 - `-s=SEED` 是可选参数，用于指定世界种子。
+- `-r=myid:myvalue` 是可选参数，用于指定一个现有世界的世界规则作为新世界的模板。
 
+这里末尾的 -g 和 -s 参数是可选的，每个参数直接用空格分开，如果同时使用多个参数的指令就像这样
+
+*(`/mv create myid:myvalue NORMAL -g=VOID -r=minecraft:overworld`)*
 
 #### 游戏规则 & 难度
 | 指令           | 说明                                         | 示例                                |

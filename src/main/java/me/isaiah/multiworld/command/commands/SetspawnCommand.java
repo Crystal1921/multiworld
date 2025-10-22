@@ -1,7 +1,7 @@
 package me.isaiah.multiworld.command.commands;
 
 import static me.isaiah.multiworld.command.MultiworldCommand.message;
-import static me.isaiah.multiworld.MultiworldMod.text_plain;
+import static me.isaiah.multiworld.MultiworldMod.textPlain;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class SetspawnCommand implements Command {
 			String txt = "Spawn for world \"" + w.dimension().location() + "\" changed to " + pos.toShortString();
             message(plr, "&6" + txt);
         } catch (IOException e) {
-            plr.displayClientMessage(text_plain("Error: " + e.getMessage()), false);
+            plr.displayClientMessage(textPlain("Error: " + e.getMessage()), false);
             e.printStackTrace();
         }
         return 1;
