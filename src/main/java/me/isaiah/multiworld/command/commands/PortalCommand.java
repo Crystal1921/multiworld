@@ -117,7 +117,7 @@ public class PortalCommand implements Command {
                 .append(Component.literal(")").withColor(Color.WHITE.getRGB()));
         plr.displayClientMessage(from, false);
         MutableComponent to = Component.literal("  - To: ").withColor(Color.ORANGE.getRGB()).append(Component.literal( p.getOriginWorldId() + "@ (").withColor(Color.WHITE.getRGB()))
-                .append(Component.literal(avgPos.toShortString()).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getOriginWorldId() + " " + getString(p.getDestLocation())))))
+                .append(Component.literal(p.getDestLocation().toShortString()).withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mv tp " + p.getOriginWorldId() + " " + getString(p.getDestLocation())))))
                 .append(Component.literal(")").withColor(Color.WHITE.getRGB()));
         plr.displayClientMessage(to, false);
         message(plr, "  &6- Destination:&r " + p.getDestination());
