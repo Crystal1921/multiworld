@@ -206,7 +206,7 @@ public class Portal {
 
         config.set(prefix + ".owner", this.getOwner()); // player
         config.set(prefix + ".location", this.getLocationConfigString()); // x1,y1,z1:x2,y2,z2
-        config.set(prefix + ".world", this.getOriginWorldId());
+        config.set(prefix + ".world", this.getOriginWorldId().toString());
         config.set(prefix + ".destination", this.getDestination());
 
         config.save();

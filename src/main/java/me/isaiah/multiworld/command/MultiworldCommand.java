@@ -223,11 +223,11 @@ public class MultiworldCommand {
                             return PortalCommand.runHelp(ctx.getSource().getServer(), player);
                         })
                         .then(Commands.literal("create")
-                                .then(Commands.argument("name", StringArgumentType.string())
+                                .then(Commands.argument("name", SpaceBreakStringArgumentType.string())
                                         .then(Commands.argument("destination", SpaceBreakStringArgumentType.string())
                                                 .suggests(new DestinationSuggestionProvider())
                                                 .executes(ctx -> {
-                                                    String name = StringArgumentType.getString(ctx, "name");
+                                                    String name = SpaceBreakStringArgumentType.getString(ctx, "name");
                                                     String destination = SpaceBreakStringArgumentType.getString(ctx, "destination");
                                                     ServerPlayer player = ctx.getSource().getPlayer();
                                                     return PortalCommand.runCreate(ctx.getSource().getServer(), player, name, destination);
@@ -451,7 +451,7 @@ public class MultiworldCommand {
         @Override
         public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
             for (String portalName : PortalCommand.KNOWN_PORTALS.keySet()) {
-                builder.suggest(portalName);
+                builder.suggest("\"" + portalName + "\"");
             }
             return builder.buildFuture();
         }
