@@ -196,6 +196,18 @@ public class MultiworldCommand {
                                             ServerPlayer player = ctx.getSource().getPlayer();
                                             return GameruleCommand.run(ctx.getSource().getServer(), player, rule, value);
                                         }))))
+                .then(Commands.literal("migrate")
+                        .then(Commands.literal("gamerule")
+                                .then(Commands.argument("fromWorld", ResourceLocationArgument.id())
+                                        .suggests(new WorldSuggestionProvider())
+                                        .then(Commands.argument("toWorld", ResourceLocationArgument.id())
+                                                .suggests(new WorldSuggestionProvider())
+                                                .executes(ctx -> {
+                                                    ResourceLocation fromWorld = ResourceLocationArgument.getId(ctx, "fromWorld");
+                                                    ResourceLocation toWorld = ResourceLocationArgument.getId(ctx, "toWorld");
+                                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                                    return MigrateCommands.runMigrate(ctx.getSource().getServer(), player, fromWorld, toWorld);
+                                                })))))
 
                 // Difficulty Command
                 .then(Commands.literal("difficulty")

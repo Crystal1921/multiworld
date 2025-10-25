@@ -15,13 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static me.isaiah.multiworld.command.MultiworldCommand.message;
-import static me.isaiah.multiworld.command.commands.GameruleCommand.setRuleConfig;
-import static net.minecraft.world.level.GameRules.visitGameRuleTypes;
 
 /**
  * The "/mw create" Command
@@ -73,7 +73,7 @@ public class CreateCommand implements Command {
                 Long f = Long.parseLong(ab);
                 return Optional.of(f);
             } catch (NumberFormatException e) {
-                Long seed = Long.valueOf(ab.hashCode());
+                Long seed = (long) ab.hashCode();
                 return Optional.of(seed);
             }
         }
@@ -159,26 +159,9 @@ public class CreateCommand implements Command {
 
         ServerLevel world = MultiworldMod.createWorld(processedWorldId, dim, gen, Difficulty.PEACEFUL, seed);
         makeConfig(world, environment, seed, customGen);
-        
-        if (gameRules != null) {
-            GameRules finalGameRules = gameRules.copy();
-            visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
-                public void visitBoolean(GameRules.Key<GameRules.BooleanValue> key, GameRules.Type<GameRules.BooleanValue> type) {
-                    try {
-                        setRuleConfig(world, key.getId(), String.valueOf(finalGameRules.getRule(key).get()));
-                    } catch (IOException e) {
-                        MultiworldMod.LOGGER.error(e.getMessage());
-                    }
-                }
 
-                public void visitInteger(GameRules.Key<GameRules.IntegerValue> key, GameRules.Type<GameRules.IntegerValue> type) {
-                    try {
-                        setRuleConfig(world, key.getId(), String.valueOf(finalGameRules.getRule(key).get()));
-                    } catch (IOException e) {
-                        MultiworldMod.LOGGER.error(e.getMessage());
-                    }
-                }
-            });
+        if (gameRules != null) {
+            MigrateCommands.setGamerules(world, gameRules);
         }
 
         message(plr, I18n.CREATED_WORLD + worldId);
@@ -265,7 +248,7 @@ public class CreateCommand implements Command {
             }
             config = new FileConfiguration(wc);
             String env = config.getString("environment");
-            long seed = 0;
+            long seed;
 
             try {
                 seed = config.getLong("seed");
@@ -336,7 +319,7 @@ public class CreateCommand implements Command {
 
                     // IntRule
                     if (o instanceof Integer) {
-                        o = String.valueOf((Integer) o);
+                        o = String.valueOf(o);
                     }
 
                     GameruleCommand.setGameruleFromConfig(world, key, (String) o);
