@@ -26,7 +26,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
@@ -157,9 +156,7 @@ public class MultiworldCommand {
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayer();
                             if (player == null) return 1;
-                            for (String s : MultiworldMod.COMMAND_HELP) {
-                                message(player, s);
-                            }
+                            player.displayClientMessage(Component.literal("Click To READ").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://github.com/Crystal1921/multiworld/blob/1.21/README.md"))), false);
                             return 1;
                         }))
 
@@ -299,6 +296,7 @@ public class MultiworldCommand {
                         .then(Commands.literal("debug")
                                 .executes(ctx -> {
                                     ServerPlayer player = ctx.getSource().getPlayer();
+                                    if (player == null) return 0;
                                     return PortalCommand.runDebug(ctx.getSource().getServer(), player);
                                 })))
 
@@ -336,7 +334,7 @@ public class MultiworldCommand {
         try {
             player.displayClientMessage(Component.nullToEmpty(translate_alternate_color_codes('&', message)), false);
         } catch (Exception e) {
-            e.printStackTrace();
+            MultiworldMod.LOGGER.error(e.getMessage());
         }
     }
 
@@ -363,14 +361,6 @@ public class MultiworldCommand {
                 }
                 builder.suggest(worldName);
             });
-            return builder.buildFuture();
-        }
-    }
-
-    public static class PlayerSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
-        @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-            Arrays.stream(context.getSource().getServer().getPlayerNames()).forEach(builder::suggest);
             return builder.buildFuture();
         }
     }

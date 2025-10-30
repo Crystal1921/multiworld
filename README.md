@@ -7,15 +7,15 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 <a href="https://modrinth.com/mod/multiworld/versions?l=neoforge"><img src="https://cdn.modrinth.com/data/cached_images/a073c4dc33587010c5b7f0386d3df9e1b0eee3ed.png" width="160"></a>
 
 ## 指令用法:
-| 指令         | 说明                                         | 示例 |
-|--------------|----------------------------------------------|------|
-| /mv          | 查看帮助                                     |      |
-| /mv list     | 列出所有世界                                 |      |
-| /mv tp       | 传送到某个世界                               | /mv tp minecraft:overworld |
-| /mv spawn    | 传送到当前世界的出生点                       |      |
-| /mv setspawn | 设置当前世界的出生点                         |      |
-| /mv create   | 创建一个新世界                               | /mv create myLovelyWorld NORMAL -g=FLAT -s=1234 |
-| /mv delete   | 删除一个世界（仅限控制台）                   | /mv delete myWorld |
+| 指令         | 说明             | 示例 |
+|--------------|----------------|------|
+| /mv          | 查看帮助：模组版本，当前世界 |      |
+| /mv list     | 列出所有世界         |      |
+| /mv tp       | 传送到某个世界        | /mv tp minecraft:overworld |
+| /mv spawn    | 传送到当前世界的出生点    |      |
+| /mv setspawn | 设置当前世界的出生点     |      |
+| /mv create   | 创建一个新世界        | /mv create myLovelyWorld NORMAL -g=FLAT -s=1234 |
+| /mv delete   | 删除一个世界（仅限控制台）  | /mv delete myWorld |
 
 #### 创建世界
 /mv create myid:myvalue NORMAL -g=VOID
@@ -71,12 +71,14 @@ Multiworld 模组 - 增加了创建和传送到多个世界的支持。
 
 
 ### 其他指令
-| 指令                  | 说明             | 示例            |
-|---------------------|----------------|---------------|
-| /setwarp name [pos] | 设置传送点          | /setwarp test |
-| /warp name [player] | 传送到目标传送点       | /warp test    |
-| /delwarp            | 删除传送点          | /delwarp test |
-| /back               | 返回上次传送位置       |               |
+| 指令                  | 说明       | 示例            |
+|---------------------|----------|---------------|
+| /setwarp name [pos] | 设置传送点    | /setwarp test |
+| /warp name [player] | 传送到目标传送点 | /warp test    |
+| /delwarp            | 删除传送点    | /delwarp test |
+| /back               | 返回上次传送位置 |               |
+| /sethome            | 设置家      |               |
+| /home               | 回到家      |               |
 
 需要注意的是，传送点名称是特殊匹配的，如果名字中没有空格，则<name>会直接匹配中间的内容
 
