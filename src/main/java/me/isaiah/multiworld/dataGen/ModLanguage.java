@@ -29,6 +29,8 @@ public class ModLanguage implements DataProvider {
     private void addTranslations() {
         this.add(MultiworldMod.MOD_ID, "Multiworld", "Multiworld");
         this.add("itemGroup.multiworld", "Multiworld", "多世界");
+        this.add("key.multiworld.map_open.desc", "Open Map", "打开地图");
+        this.add("key.category.multiworld", "Multiworld", "多世界");
 
         this.add(ItemRegistry.PortalBlock.asItem(), "Portal Block", "传送门方块");
         this.add(ItemRegistry.PortalFinder.asItem(), "Portal Finder", "传送门探测器");

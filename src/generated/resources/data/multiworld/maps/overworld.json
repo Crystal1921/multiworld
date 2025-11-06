@@ -1,0 +1,8 @@
+{
+  "mapName": "overworld",
+  "maxX": 3200,
+  "maxZ": 3200,
+  "minX": -3200,
+  "minZ": -3200,
+  "worldID": "minecraft:overworld"
+}

@@ -2,5 +2,7 @@
   "block.multiworld.portal_block": "Portal Block",
   "item.multiworld.portal_finder": "Portal Finder",
   "itemGroup.multiworld": "Multiworld",
+  "key.category.multiworld": "Multiworld",
+  "key.multiworld.map_open.desc": "Open Map",
   "multiworld": "Multiworld"
 }

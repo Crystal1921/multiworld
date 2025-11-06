@@ -23,40 +23,40 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 @Mod(MultiworldMod.MOD_ID)
 public class MultiworldModNeoForge {
 
-	public MultiworldModNeoForge(IEventBus modEventBus, ModContainer modContainer) {
-		modEventBus.addListener(this::commonSetup);
+    public MultiworldModNeoForge(IEventBus modEventBus, ModContainer modContainer) {
+        modEventBus.addListener(this::commonSetup);
 
-		NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
 
-		new xyz.nucleoid.fantasy.FantasyInitializer(modEventBus);
-		NeoForgeWorldCreator.init();
-		PermForge.init();
-		MultiworldMod.init();
+        new xyz.nucleoid.fantasy.FantasyInitializer(modEventBus);
+        NeoForgeWorldCreator.init();
+        PermForge.init();
+        MultiworldMod.init();
 
-		BlockRegistry.BLOCKS.register(modEventBus);
-		ItemRegistry.ITEMS.register(modEventBus);
-		GroupRegistry.TABS.register(modEventBus);
-		ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
-		DataAttachmentsRegistry.ATTACHMENT_TYPES.register(modEventBus);
-	}
+        BlockRegistry.BLOCKS.register(modEventBus);
+        ItemRegistry.ITEMS.register(modEventBus);
+        GroupRegistry.TABS.register(modEventBus);
+        ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
+        DataAttachmentsRegistry.ATTACHMENT_TYPES.register(modEventBus);
+    }
 
-	public void commonSetup(final FMLCommonSetupEvent event) {
-	}
+    public void commonSetup(final FMLCommonSetupEvent event) {
+    }
 
-	@SubscribeEvent
-	public void onServerStarting(ServerStartingEvent event) {
-		MultiworldMod.onServerStarted(event.getServer());
-	}
+    @SubscribeEvent
+    public void onServerStarting(ServerStartingEvent event) {
+        MultiworldMod.onServerStarted(event.getServer());
+    }
 
-	@SubscribeEvent
-	public void onCommandsRegister(RegisterCommandsEvent event) {
-		MultiworldCommand.register_commands(event.getDispatcher());
-		WarpCommand.register_commands(event.getDispatcher());
+    @SubscribeEvent
+    public void onCommandsRegister(RegisterCommandsEvent event) {
+        MultiworldCommand.register_commands(event.getDispatcher());
+        WarpCommand.register_commands(event.getDispatcher());
         SpawnCommand.register_commands(event.getDispatcher());
         HomeCommand.register_commands(event.getDispatcher());
-	}
-	
-	@SubscribeEvent
+    }
+
+    @SubscribeEvent
     public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         WandEventHandler.leftClickBlock(event.getEntity(), event.getLevel(), event.getPos());
     }
