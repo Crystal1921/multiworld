@@ -1,8 +1,11 @@
 {
   "block.multiworld.portal_block": "传送门方块",
+  "gui.multiworld.map.portal_list": "传送门列表",
+  "gui.multiworld.map.world_list": "世界列表",
   "item.multiworld.portal_finder": "传送门探测器",
   "itemGroup.multiworld": "多世界",
   "key.category.multiworld": "多世界",
   "key.multiworld.map_open.desc": "打开地图",
-  "multiworld": "Multiworld"
+  "multiworld": "Multiworld",
+  "multiworld.map.settings.title": "地图设置"
 }

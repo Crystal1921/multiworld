@@ -1,0 +1,8 @@
+{
+  "mapName": "lily_white",
+  "maxX": 200,
+  "maxZ": 200,
+  "minX": -200,
+  "minZ": -200,
+  "worldID": "myid:myvalue"
+}

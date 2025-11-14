@@ -1,6 +1,7 @@
-package me.isaiah.multiworld.gui;
+package me.isaiah.multiworld.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.map.MapInstance;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static me.isaiah.multiworld.gui.MapScreen.*;
+
 public class MapWidget extends AbstractWidget {
     // 常量/风格设置
     static final int MARKER_COLOR = 0xFFFF0000;
@@ -24,7 +27,10 @@ public class MapWidget extends AbstractWidget {
     private static double posX = 0;
     private static double posY = 0;
     private static double scale = 2;
+    public boolean showPortalList = true;
+    @Setter
     private MapInstance.MapConfig mapConfig;
+    @Setter
     private List<Vec2> portals;
 
     public MapWidget(int x, int y, int width, int height, MapInstance.MapConfig mapConfig, List<Vec2> portals) {
@@ -42,7 +48,7 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        guiGraphics.enableScissor(0, 0, mapWidget.getWidth(), mapWidget.getHeight());
+        guiGraphics.enableScissor(MAP_PADDING, 0, mapWidget.getWidth(), mapWidget.getHeight());
 
         // 玩家世界坐标
         Vec3 position = player.position();
@@ -126,38 +132,40 @@ public class MapWidget extends AbstractWidget {
         final int markerSize = 4;
         final int half = markerSize / 2;
 
-        // 绘制所有传送点（将世界坐标 -> 纹理像素 -> 屏幕像素）
-        for (Vec2 worldPoint : portals) {
-            float worldPointX = worldPoint.x;
-            float worldPointZ = worldPoint.y;
+        if (mapWidget.showPortalList) {
+            // 绘制所有传送点（将世界坐标 -> 纹理像素 -> 屏幕像素）
+            for (Vec2 worldPoint : portals) {
+                float worldPointX = worldPoint.x;
+                float worldPointZ = worldPoint.y;
 
-            // 世界 -> 纹理（像素）空间
-            float texturePointX = (worldPointX - minX) * texPerWorldX;
-            float texturePointY = (worldPointZ - minZ) * texPerWorldY;
+                // 世界 -> 纹理（像素）空间
+                float texturePointX = (worldPointX - minX) * texPerWorldX;
+                float texturePointY = (worldPointZ - minZ) * texPerWorldY;
 
-            // 相对于玩家在纹理上的偏移（像素）
-            float dxTexture = texturePointX - texturePlayerX;
-            float dyTexture = texturePointY - texturePlayerY;
+                // 相对于玩家在纹理上的偏移（像素）
+                float dxTexture = texturePointX - texturePlayerX;
+                float dyTexture = texturePointY - texturePlayerY;
 
-            // 如果该点在地图可视范围之外就跳过（快速剔除）
-            if (Math.abs(dxTexture) > visibleRadiusX || Math.abs(dyTexture) > visibleRadiusY) {
-                continue;
+                // 如果该点在地图可视范围之外就跳过（快速剔除）
+                if (Math.abs(dxTexture) > visibleRadiusX || Math.abs(dyTexture) > visibleRadiusY) {
+                    continue;
+                }
+
+                // 纹理像素偏移 -> 屏幕像素偏移（考虑缩放）
+                float dxScreen = dxTexture * fMapScale;
+                float dyScreen = dyTexture * fMapScale;
+
+                // 最终屏幕坐标
+                int pointScreenX = Math.round(mapCenterScreenX + dxScreen);
+                int pointScreenY = Math.round(mapCenterScreenY + dyScreen);
+
+                // 以中心对齐绘制标志（避免频繁 new 对象）
+                guiGraphics.drawString(font, PORTAL_MARKER,
+                        pointScreenX - half,
+                        pointScreenY - half,
+                        MARKER_COLOR
+                );
             }
-
-            // 纹理像素偏移 -> 屏幕像素偏移（考虑缩放）
-            float dxScreen = dxTexture * fMapScale;
-            float dyScreen = dyTexture * fMapScale;
-
-            // 最终屏幕坐标
-            int pointScreenX = Math.round(mapCenterScreenX + dxScreen);
-            int pointScreenY = Math.round(mapCenterScreenY + dyScreen);
-
-            // 以中心对齐绘制标志（避免频繁 new 对象）
-            guiGraphics.drawString(font, PORTAL_MARKER,
-                    pointScreenX - half,
-                    pointScreenY - half,
-                    MARKER_COLOR
-            );
         }
 
         // 绘制玩家中心点（保留原来的红点）

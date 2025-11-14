@@ -1,0 +1,70 @@
+package me.isaiah.multiworld.gui.widget;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.portal.Portal;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+
+public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
+
+    private final MapScreen mapScreen;
+
+    public PortalList(MapScreen mapScreen, int listWidth, int top, int bottom) {
+        super(mapScreen.getMinecraftInstance(), listWidth, bottom, top, mapScreen.getFontRenderer().lineHeight * 2 + 8);
+        this.mapScreen = mapScreen;
+        this.refreshList();
+    }
+
+    private void refreshList() {
+        this.clearEntries();
+        mapScreen.buildPortalList(this::addEntry, item -> new PortalEntry(item, this.mapScreen));
+    }
+
+    public int getRowWidth() {
+        return this.width;
+    }
+
+    public static class PortalEntry extends Entry<PortalEntry> {
+        private final Portal portal;
+        private final MapScreen mapScreen;
+
+        public PortalEntry(Portal portal, MapScreen mapScreen) {
+            this.portal = portal;
+            this.mapScreen = mapScreen;
+        }
+
+        @Override
+        public @NotNull Component getNarration() {
+            return Component.empty();
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            MapWidget mapWidget = mapScreen.getMapWidget();
+
+            return true;
+        }
+
+        @Override
+        public void render(@NotNull GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
+            PoseStack pose = guiGraphics.pose();
+            pose.pushPose();
+            pose.translate(left + 5, top + 5, 0.0D);
+            pose.scale(0.7F, 0.7F, 0.7F);
+            pose.translate(-(left + 5), -(top + 5), 0.0D);
+            guiGraphics.drawString(
+                    mapScreen.getFontRenderer(),
+                    portal.getName(),
+                    left + 5,
+                    top + 5,
+                    0xFFFFFF,
+                    false
+            );
+
+            pose.popPose();
+        }
+    }
+}

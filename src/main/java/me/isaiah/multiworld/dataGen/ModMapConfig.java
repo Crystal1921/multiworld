@@ -10,6 +10,9 @@ public class ModMapConfig extends MapConfigProvider {
 
     @Override
     protected void registerMaps() {
-        MapBuilder.map().add("minecraft:overworld", "overworld", -3200,-3200,3200,3200).build();
+        MapBuilder.map()
+                .add("minecraft:overworld", "overworld", -3200,-3200,3200,3200)
+                .add("myid:myvalue", "lily_white", -200,-200,200,200)
+                .build();
     }
 }
