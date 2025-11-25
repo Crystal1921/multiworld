@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static me.isaiah.multiworld.gui.MapScreen.*;
+import static me.isaiah.multiworld.gui.MapScreen.MAP_PADDING;
 
 public class MapWidget extends AbstractWidget {
     // 常量/风格设置
@@ -256,6 +257,11 @@ public class MapWidget extends AbstractWidget {
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         posX -= dragX;
         posY += dragY;
+    }
+
+    @Override
+    public void playDownSound(SoundManager handler) {
+        return;
     }
 
     @Override

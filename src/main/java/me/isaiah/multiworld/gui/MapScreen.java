@@ -12,6 +12,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
@@ -73,12 +74,8 @@ public class MapScreen extends Screen {
                 .create(0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10, Component.empty(),
                 (button, mapMode) -> {
                     switch (mapMode) {
-                        case PORTAL_LIST -> {
-                            setListsVisibility(true,false);
-                        }
-                        case WORLD_LIST -> {
-                            setListsVisibility(false,true);
-                        }
+                        case PORTAL_LIST -> setListsVisibility(true,false);
+                        case WORLD_LIST -> setListsVisibility(false,true);
                     }
                 });
 
@@ -86,8 +83,15 @@ public class MapScreen extends Screen {
         worldList = new WorldList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
         portalList = new PortalList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
 
+        Button mapSettingsButton = Button
+                .builder(Component.translatable("multiworld.map.settings.title"), button -> instance.setScreen(new MapSettingsScreen(this)))
+                .bounds(BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
+
+        setListsVisibility(false,true);
+        
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
+        this.addRenderableWidget(mapSettingsButton);
         this.addRenderableWidget(worldList);
         this.addRenderableWidget(portalList);
     }
@@ -96,6 +100,14 @@ public class MapScreen extends Screen {
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.fill(0, 0, this.width, this.height, 0xFF000000);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public void resize(@NotNull Minecraft minecraft, int width, int height) {
+        boolean portalVisible = portalList.visible;
+        boolean worldVisible = worldList.visible;
+        super.resize(minecraft, width, height);
+        setListsVisibility(portalVisible, worldVisible);
     }
 
     public Font getFontRenderer() {

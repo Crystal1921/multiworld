@@ -34,6 +34,9 @@ public class ModLanguage implements DataProvider {
         this.add("gui.multiworld.map.portal_list", "Portal List", "传送门列表");
         this.add("gui.multiworld.map.world_list", "World List", "世界列表");
         this.add("multiworld.map.settings.title", "Map Settings", "地图设置");
+        this.add("multiworld.map.settings.little_map", "Little Map", "小地图");
+        this.add("multiworld.map.settings.little_map_on", "Show Little Map", "显示小地图");
+        this.add("multiworld.map.settings.little_map_off", "Hide Little Map", "隐藏小地图");
 
         this.add(ItemRegistry.PortalBlock.asItem(), "Portal Block", "传送门方块");
         this.add(ItemRegistry.PortalFinder.asItem(), "Portal Finder", "传送门探测器");
