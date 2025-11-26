@@ -6,6 +6,7 @@ import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,13 @@ public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
                     if (mapConfig.worldID().equals(originWorldId.toString())) {
                         setMapData(originWorldId, mapConfig, mapWidget);
 
+                        // Center the map on the portal position
+                        BlockPos minPos = portal.getMinPos();
+                        BlockPos maxPos = portal.getMaxPos();
+                        // Calculate portal center position
+                        double portalCenterX = (minPos.getX() + maxPos.getX()) / 2.0;
+                        double portalCenterZ = (minPos.getZ() + maxPos.getZ()) / 2.0;
+                        mapWidget.centerOnPosition(portalCenterX, portalCenterZ);
                     }
                 });
             }
