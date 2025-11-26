@@ -2,6 +2,7 @@ package me.isaiah.multiworld.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Getter;
+import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.gui.widget.PortalList;
 import me.isaiah.multiworld.gui.widget.WorldList;
@@ -21,6 +22,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.phys.Vec2;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
 import org.jetbrains.annotations.NotNull;
@@ -84,7 +87,20 @@ public class MapScreen extends Screen {
         portalList = new PortalList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
 
         Button mapSettingsButton = Button
-                .builder(Component.translatable("multiworld.map.settings.title"), button -> instance.setScreen(new MapSettingsScreen(this)))
+                .builder(Component.translatable("multiworld.map.settings.title"), button -> {
+                    if (this.minecraft == null) {
+                        return;
+                    }
+
+                    ModList.get().getModContainerById(MultiworldMod.MOD_ID)
+                            .flatMap(modContainer -> modContainer.getCustomExtension(IConfigScreenFactory.class))
+                            .map(factory -> factory.createScreen(
+                                    ModList.get().getModContainerById(MultiworldMod.MOD_ID).get(),
+                                    this // "this" 是当前的屏幕实例
+                            ))
+                            // 如果屏幕成功创建, 就显示它
+                            .ifPresent(newScreen -> this.minecraft.setScreen(newScreen));
+                })
                 .bounds(BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
 
         setListsVisibility(false,true);

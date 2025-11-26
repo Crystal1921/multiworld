@@ -260,8 +260,8 @@ public class MapWidget extends AbstractWidget {
     }
 
     @Override
-    public void playDownSound(SoundManager handler) {
-        return;
+    public void playDownSound(@NotNull SoundManager handler) {
+
     }
 
     @Override

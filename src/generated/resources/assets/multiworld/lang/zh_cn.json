@@ -7,6 +7,7 @@
   "key.category.multiworld": "多世界",
   "key.multiworld.map_open.desc": "打开地图",
   "multiworld": "Multiworld",
+  "multiworld.configuration.enableLittleMap": "启用小地图",
   "multiworld.map.settings.little_map": "小地图",
   "multiworld.map.settings.little_map_off": "隐藏小地图",
   "multiworld.map.settings.little_map_on": "显示小地图",

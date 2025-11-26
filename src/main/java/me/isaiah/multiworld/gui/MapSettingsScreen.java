@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class MapSettingsScreen extends Screen {
     private final MapScreen parent;
     public final static int BUTTON_WIDTH = 100;

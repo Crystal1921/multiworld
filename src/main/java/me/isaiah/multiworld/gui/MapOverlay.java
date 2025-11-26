@@ -2,11 +2,11 @@ package me.isaiah.multiworld.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.config.ClientConfig;
 import me.isaiah.multiworld.map.MapInstance;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -124,7 +124,11 @@ public class MapOverlay implements LayeredDraw.Layer {
             return;
         }
 
-        ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map/" + mapConfig.mapName() + ".png");
-        drawMap(guiGraphics, player, BACKGROUND, mapConfig);
+        if (!ClientConfig.ENABLE_LITTLE_MAP.get()) {
+            return;
+        }
+
+        ResourceLocation map = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map/" + mapConfig.mapName() + ".png");
+        drawMap(guiGraphics, player, map, mapConfig);
     }
 }
