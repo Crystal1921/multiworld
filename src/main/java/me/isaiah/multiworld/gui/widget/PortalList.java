@@ -2,11 +2,15 @@ package me.isaiah.multiworld.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+
+import static me.isaiah.multiworld.gui.widget.WorldList.WorldEntry.setMapData;
 
 public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
 
@@ -44,7 +48,15 @@ public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             MapWidget mapWidget = mapScreen.getMapWidget();
+            if (mapWidget != null) {
+                ResourceLocation originWorldId = portal.getOriginWorldId();
+                MapInstance.INSTANCE.mapConfigs.forEach(mapConfig -> {
+                    if (mapConfig.worldID().equals(originWorldId.toString())) {
+                        setMapData(originWorldId, mapConfig, mapWidget);
 
+                    }
+                });
+            }
             return true;
         }
 
@@ -55,14 +67,8 @@ public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
             pose.translate(left + 5, top + 5, 0.0D);
             pose.scale(0.7F, 0.7F, 0.7F);
             pose.translate(-(left + 5), -(top + 5), 0.0D);
-            guiGraphics.drawString(
-                    mapScreen.getFontRenderer(),
-                    portal.getName(),
-                    left + 5,
-                    top + 5,
-                    0xFFFFFF,
-                    false
-            );
+            guiGraphics.drawString(mapScreen.getFontRenderer(), portal.getName(), left + 5, top + 5, 0xFFFFFF, false);
+            guiGraphics.drawString(mapScreen.getFontRenderer(), portal.getDestWorldName(), left + 5, top + 15, 0xFFFFFF, false);
 
             pose.popPose();
         }

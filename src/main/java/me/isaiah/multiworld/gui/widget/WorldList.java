@@ -4,10 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.gui.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -27,15 +25,6 @@ public class WorldList extends ObjectSelectionList<WorldList.WorldEntry> {
         this.refreshList();
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.active && this.visible) {
-            return super.mouseClicked(mouseX, mouseY, button);
-        } else {
-            return false;
-        }
-    }
-
     public static void getPortalList(List<Vec2> portals, ResourceLocation resourceLocation) {
         PortalCommand.KNOWN_PORTALS.forEach((s, portal) -> {
             if (portal.getOriginWorld().dimension().location().equals(resourceLocation)) {
@@ -44,6 +33,15 @@ public class WorldList extends ObjectSelectionList<WorldList.WorldEntry> {
                 portals.add(new Vec2((minPos.getX() + maxPos.getX()) / 2f, (minPos.getZ() + maxPos.getZ()) / 2f));
             }
         });
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.active && this.visible) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        } else {
+            return false;
+        }
     }
 
     private void refreshList() {
@@ -64,6 +62,14 @@ public class WorldList extends ObjectSelectionList<WorldList.WorldEntry> {
             this.mapScreen = mapScreen;
         }
 
+        public static void setMapData(ResourceLocation resourceLocation, MapInstance.MapConfig mapConfig, MapWidget mapWidget) {
+            List<Vec2> portals = new ArrayList<>();
+            getPortalList(portals, resourceLocation);
+
+            mapWidget.setMapConfig(mapConfig);
+            mapWidget.setPortals(portals);
+        }
+
         @Override
         public @NotNull Component getNarration() {
             return Component.empty();
@@ -72,16 +78,8 @@ public class WorldList extends ObjectSelectionList<WorldList.WorldEntry> {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             MapWidget mapWidget = mapScreen.getMapWidget();
-            Minecraft instance = Minecraft.getInstance();
-            LocalPlayer player = instance.player;
-            List<Vec2> portals = new ArrayList<>();
-            if (player != null) {
-                ResourceLocation resourceLocation = ResourceLocation.parse(mapConfig.worldID());
-                getPortalList(portals, resourceLocation);
-            }
-
-            mapWidget.setMapConfig(this.mapConfig);
-            mapWidget.setPortals(portals);
+            ResourceLocation resourceLocation = ResourceLocation.parse(mapConfig.worldID());
+            setMapData(resourceLocation, this.mapConfig, mapWidget);
 
             return true;
         }

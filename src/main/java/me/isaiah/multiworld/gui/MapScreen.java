@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static me.isaiah.multiworld.gui.widget.WorldList.WorldEntry.setMapData;
+
 public class MapScreen extends Screen {
     public static final KeyMapping MAP_OPEN_KEY = new KeyMapping("key.multiworld.map_open.desc",
             KeyConflictContext.IN_GAME,
@@ -49,6 +51,7 @@ public class MapScreen extends Screen {
     PortalList portalList;
     @Getter
     MapWidget mapWidget;
+    private CycleButton<MapMode> listSwitchButton;
 
     public MapScreen() {
         super(Component.literal("Map"));
@@ -70,7 +73,7 @@ public class MapScreen extends Screen {
             WorldList.getPortalList(portals, resourceLocation);
         }
 
-        CycleButton<MapMode> listSwitchButton = CycleButton.<MapMode>builder((mapMode) -> Component.translatable(mapMode.getSerializedName()))
+        listSwitchButton = CycleButton.<MapMode>builder((mapMode) -> Component.translatable(mapMode.getSerializedName()))
                 .withValues(MapMode.values())
                 .displayOnlyValue()
                 .withInitialValue(MapMode.WORLD_LIST)
@@ -91,7 +94,6 @@ public class MapScreen extends Screen {
                     if (this.minecraft == null) {
                         return;
                     }
-
                     ModList.get().getModContainerById(MultiworldMod.MOD_ID)
                             .flatMap(modContainer -> modContainer.getCustomExtension(IConfigScreenFactory.class))
                             .map(factory -> factory.createScreen(
@@ -122,8 +124,12 @@ public class MapScreen extends Screen {
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         boolean portalVisible = portalList.visible;
         boolean worldVisible = worldList.visible;
+        MapMode mapMode = listSwitchButton.getValue();
+        MapInstance.MapConfig mapConfig = mapWidget.getMapConfig();
         super.resize(minecraft, width, height);
         setListsVisibility(portalVisible, worldVisible);
+        listSwitchButton.setValue(mapMode);
+        setMapData(ResourceLocation.parse(mapConfig.worldID()), mapConfig, mapWidget);
     }
 
     public Font getFontRenderer() {

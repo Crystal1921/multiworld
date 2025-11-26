@@ -1,6 +1,7 @@
 package me.isaiah.multiworld.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import lombok.Getter;
 import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.map.MapInstance;
@@ -30,6 +31,7 @@ public class MapWidget extends AbstractWidget {
     private static double scale = 2;
     public boolean showPortalList = true;
     @Setter
+    @Getter
     private MapInstance.MapConfig mapConfig;
     @Setter
     private List<Vec2> portals;
