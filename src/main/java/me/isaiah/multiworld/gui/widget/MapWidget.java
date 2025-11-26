@@ -26,6 +26,9 @@ public class MapWidget extends AbstractWidget {
     private static double posY = 0;
     @Getter
     private static double scale = 2;
+    // Target center coordinates (in world space), null means use player position
+    private static Double targetCenterX = null;
+    private static Double targetCenterZ = null;
     public boolean showPortalList = true;
     @Setter
     @Getter
@@ -41,6 +44,7 @@ public class MapWidget extends AbstractWidget {
 
     /**
      * Set the map position and scale to center on a specific world coordinate.
+     * This offsets the map so that the target point appears at the center of the screen.
      *
      * @param worldX World X coordinate to center on
      * @param worldZ World Z coordinate to center on
@@ -50,35 +54,38 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        // Map boundaries
-        final int minX = mapConfig.minX();
-        final int minZ = mapConfig.minZ();
-        final int maxX = mapConfig.maxX();
-        final int maxZ = mapConfig.maxZ();
+        // Store the target center coordinates
+        targetCenterX = worldX;
+        targetCenterZ = worldZ;
 
-        final float worldWidth  = Math.max(1.0f, maxX - minX);
-        final float worldHeight = Math.max(1.0f, maxZ - minZ);
+        // Reset position offset since we're now centering on a new target
+        // User can still drag/zoom from this position
+        posX = 0;
+        posY = 0;
+    }
 
-        // Display size of the map (pixels)
-        int mapDisplayWidth  = Math.max(1, MapInstance.INSTANCE.mapSize);
-        int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
+    /**
+     * Reset to center on player position.
+     */
+    public static void resetToPlayerCenter() {
+        targetCenterX = null;
+        targetCenterZ = null;
+        posX = 0;
+        posY = 0;
+    }
 
-        // World → texture ratio
-        final float texPerWorldX = mapDisplayWidth  / worldWidth;
-        final float texPerWorldY = mapDisplayHeight / worldHeight;
+    /**
+     * Get the current target center X coordinate (world space), or null if centered on player.
+     */
+    public static Double getTargetCenterX() {
+        return targetCenterX;
+    }
 
-        // Convert target world coordinate to pixel coordinate in texture space
-        // WORLD → TEXTURE
-        double pixelX = (worldX - minX) * texPerWorldX;
-        double pixelY = (worldZ - minZ) * texPerWorldY;
-
-        // Desired pixel center (screen center)
-        double centerX = mapDisplayWidth  / 2.0;
-        double centerY = mapDisplayHeight / 2.0;
-
-        // Offset so the target pixel lies at screen center
-        posX = (centerX - pixelX) * scale;
-        posY = (centerY - pixelY) * scale;
+    /**
+     * Get the current target center Z coordinate (world space), or null if centered on player.
+     */
+    public static Double getTargetCenterZ() {
+        return targetCenterZ;
     }
 
     @Override
@@ -118,8 +125,8 @@ public class MapWidget extends AbstractWidget {
                 getWidth(),
                 getHeight(),
                 showPortalList,
-                null,  // use player position for center
-                null   // use player position for center
+                targetCenterX,  // use target position or null for player position
+                targetCenterZ   // use target position or null for player position
         );
     }
 
