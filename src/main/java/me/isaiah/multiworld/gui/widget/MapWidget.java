@@ -85,7 +85,9 @@ public class MapWidget extends AbstractWidget {
 
         // Apply scale to get screen offset
         // posX and posY offset the map in screen space
-        // Positive posX moves the map left, positive posY moves the map up
+        // The sign convention follows the original code:
+        // - Positive posX moves the map content left (so positive deltaWorldX needs negative posX)
+        // - Positive posY moves the map content down (so positive deltaWorldZ needs positive posY)
         posX = -deltaPixelX * scale;
         posY = deltaPixelY * scale;
     }
@@ -93,10 +95,12 @@ public class MapWidget extends AbstractWidget {
     /**
      * Set the map scale.
      *
-     * @param newScale The new scale value
+     * @param newScale The new scale value (must be positive)
      */
     public static void setScale(double newScale) {
-        scale = newScale;
+        if (newScale > 0) {
+            scale = newScale;
+        }
     }
 
     /**
