@@ -20,8 +20,11 @@ import java.util.List;
 import static me.isaiah.multiworld.gui.MapScreen.MAP_PADDING;
 
 public class MapWidget extends AbstractWidget {
+    @Getter
     private static double posX = 0;
+    @Getter
     private static double posY = 0;
+    @Getter
     private static double scale = 2;
     public boolean showPortalList = true;
     @Setter
@@ -47,98 +50,35 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        Minecraft instance = Minecraft.getInstance();
-        if (instance.player == null) {
-            return;
-        }
-
-        // Get player position
-        double playerX = instance.player.position().x;
-        double playerZ = instance.player.position().z;
-
-        // Map world boundaries
+        // Map boundaries
         final int minX = mapConfig.minX();
         final int minZ = mapConfig.minZ();
         final int maxX = mapConfig.maxX();
         final int maxZ = mapConfig.maxZ();
 
-        // Protection against division by 0
-        final float worldWidth = Math.max(1.0f, (float) (maxX - minX));
-        final float worldHeight = Math.max(1.0f, (float) (maxZ - minZ));
+        final float worldWidth  = Math.max(1.0f, maxX - minX);
+        final float worldHeight = Math.max(1.0f, maxZ - minZ);
 
-        // Map display size
-        int mapDisplayWidth = Math.max(1, MapInstance.INSTANCE.mapSize);
+        // Display size of the map (pixels)
+        int mapDisplayWidth  = Math.max(1, MapInstance.INSTANCE.mapSize);
         int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
 
-        // Texture to world units ratio
-        final float texPerWorldX = (float) mapDisplayWidth / worldWidth;
-        final float texPerWorldY = (float) mapDisplayHeight / worldHeight;
+        // World → texture ratio
+        final float texPerWorldX = mapDisplayWidth  / worldWidth;
+        final float texPerWorldY = mapDisplayHeight / worldHeight;
 
-        // Calculate pixel offset between player and target position
-        // The map is centered on player, so we need to offset by the difference
-        double deltaWorldX = worldX - playerX;
-        double deltaWorldZ = worldZ - playerZ;
+        // Convert target world coordinate to pixel coordinate in texture space
+        // WORLD → TEXTURE
+        double pixelX = (worldX - minX) * texPerWorldX;
+        double pixelY = (worldZ - minZ) * texPerWorldY;
 
-        // Convert world offset to texture/pixel offset
-        double deltaPixelX = deltaWorldX * texPerWorldX;
-        double deltaPixelY = deltaWorldZ * texPerWorldY;
+        // Desired pixel center (screen center)
+        double centerX = mapDisplayWidth  / 2.0;
+        double centerY = mapDisplayHeight / 2.0;
 
-        // Apply scale to get screen offset
-        // posX and posY offset the map in screen space
-        // The sign convention follows the original code:
-        // - Positive posX moves the map content left (so positive deltaWorldX needs negative posX)
-        // - Positive posY moves the map content down (so positive deltaWorldZ needs positive posY)
-        posX = -deltaPixelX * scale;
-        posY = deltaPixelY * scale;
-    }
-
-    /**
-     * Set the map scale.
-     *
-     * @param newScale The new scale value (must be positive)
-     */
-    public static void setScale(double newScale) {
-        if (newScale > 0) {
-            scale = newScale;
-        }
-    }
-
-    /**
-     * Get the current map scale.
-     *
-     * @return The current scale value
-     */
-    public static double getScale() {
-        return scale;
-    }
-
-    /**
-     * Set the map position offset.
-     *
-     * @param x X offset
-     * @param y Y offset
-     */
-    public static void setPosition(double x, double y) {
-        posX = x;
-        posY = y;
-    }
-
-    /**
-     * Get the current X position offset.
-     *
-     * @return The current X offset
-     */
-    public static double getPosX() {
-        return posX;
-    }
-
-    /**
-     * Get the current Y position offset.
-     *
-     * @return The current Y offset
-     */
-    public static double getPosY() {
-        return posY;
+        // Offset so the target pixel lies at screen center
+        posX = (centerX - pixelX) * scale;
+        posY = (centerY - pixelY) * scale;
     }
 
     @Override
