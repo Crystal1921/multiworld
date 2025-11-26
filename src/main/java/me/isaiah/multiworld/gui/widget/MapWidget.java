@@ -50,35 +50,39 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        // Map boundaries
-        final int minX = mapConfig.minX();
-        final int minZ = mapConfig.minZ();
-        final int maxX = mapConfig.maxX();
-        final int maxZ = mapConfig.maxZ();
+        Minecraft instance = Minecraft.getInstance();
+        if (instance.player == null) {
+            return;
+        }
+        var player = instance.player;
 
-        final float worldWidth  = Math.max(1.0f, maxX - minX);
-        final float worldHeight = Math.max(1.0f, maxZ - minZ);
+        // --- 1. 获取屏幕和地图尺寸 ---
+        final int guiWidth = instance.getWindow().getGuiScaledWidth();
+        final int guiHeight = instance.getWindow().getGuiScaledHeight();
+        final int mapDisplayWidth = Math.max(1, MapInstance.INSTANCE.mapSize);
+        final int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
 
-        // Display size of the map (pixels)
-        int mapDisplayWidth  = Math.max(1, MapInstance.INSTANCE.mapSize);
-        int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
+        // --- 2. 计算世界坐标到屏幕像素的转换 ---
+        // 世界坐标差值 (目标点 - 玩家位置)
+        final double worldDeltaX = worldX - player.position().x;
+        final double worldDeltaZ = worldZ - player.position().z;
 
-        // World → texture ratio
-        final float texPerWorldX = mapDisplayWidth  / worldWidth;
-        final float texPerWorldY = mapDisplayHeight / worldHeight;
+        // 世界尺寸
+        final float worldWidth = Math.max(1.0f, (float) (mapConfig.maxX() - mapConfig.minX()));
+        final float worldHeight = Math.max(1.0f, (float) (mapConfig.maxZ() - mapConfig.minZ()));
 
-        // Convert target world coordinate to pixel coordinate in texture space
-        // WORLD → TEXTURE
-        double pixelX = (worldX - minX) * texPerWorldX;
-        double pixelY = (worldZ - minZ) * texPerWorldY;
+        // 世界单位 -> 纹理像素单位 的比率
+        final float texPerWorldX = (float) mapDisplayWidth / worldWidth;
+        final float texPerWorldY = (float) mapDisplayHeight / worldHeight;
 
-        // Desired pixel center (screen center)
-        double centerX = mapDisplayWidth  / 2.0;
-        double centerY = mapDisplayHeight / 2.0;
+        // 将世界坐标差值转换为应用了缩放的屏幕像素差值
+        final double screenDeltaX = worldDeltaX * texPerWorldX * scale;
+        final double screenDeltaY = worldDeltaZ * texPerWorldY * scale;
 
-        // Offset so the target pixel lies at screen center
-        posX = (centerX - pixelX) * scale;
-        posY = (centerY - pixelY) * scale;
+        // --- 3. 计算 posX 和 posY ---
+        // 目标：将目标点移动到屏幕中心 (guiWidth / 2, guiHeight / 2)
+        posX = (guiWidth / 2.0) - (mapDisplayWidth / 2.0) - screenDeltaX;
+        posY = (guiHeight / 2.0) - (mapDisplayHeight / 2.0) - screenDeltaY;
     }
 
     @Override
