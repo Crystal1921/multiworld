@@ -8,7 +8,7 @@ public class ClientConfig {
     public static ModConfigSpec init() {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         ENABLE_LITTLE_MAP = builder
-                .comment("Enable the little map feature")
+                .comment("启用小地图")
                 .define("enableLittleMap", true);
 
         return builder.build();
