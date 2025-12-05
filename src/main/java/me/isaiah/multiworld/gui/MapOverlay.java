@@ -54,7 +54,7 @@ public class MapOverlay implements LayeredDraw.Layer {
         int maxZ = mapConfig.maxZ();
         float worldWidth = Math.max(1, (float) (maxX - minX));
         float worldHeight = Math.max(1, (float) (maxZ - minZ));
-        double mapScale = (double) Math.max(worldWidth, worldHeight) / 32;
+        double mapScale = (double) Math.max(worldWidth, worldHeight) / (32 * ClientConfig.MAP_SCALE.getAsDouble());
 
         MapRenderer.drawMap(
                 guiGraphics,

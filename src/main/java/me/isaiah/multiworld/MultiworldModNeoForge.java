@@ -8,6 +8,7 @@ import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.WarpCommand;
 import me.isaiah.multiworld.config.ClientConfig;
+import me.isaiah.multiworld.gui.MapConfigScreen;
 import me.isaiah.multiworld.portal.WandEventHandler;
 import me.isaiah.multiworld.registry.*;
 import net.neoforged.bus.api.IEventBus;
@@ -29,7 +30,8 @@ public class MultiworldModNeoForge {
 
     public MultiworldModNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.init());
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        modContainer.registerExtensionPoint(IConfigScreenFactory.class, (mc, parent) ->
+                new ConfigurationScreen(modContainer, parent, MapConfigScreen::create));
 
         modEventBus.addListener(this::commonSetup);
 
