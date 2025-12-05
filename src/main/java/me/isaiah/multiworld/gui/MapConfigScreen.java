@@ -1,5 +1,6 @@
 package me.isaiah.multiworld.gui;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,7 +35,7 @@ public class MapConfigScreen extends ConfigurationScreen.ConfigurationSectionScr
     }
 
     @Override
-    protected @Nullable Element createDoubleValue(String key, ModConfigSpec.ValueSpec spec, Supplier<Double> source, Consumer<Double> target) {
+    protected @Nullable Element createDoubleValue(@NotNull String key, ModConfigSpec.ValueSpec spec, @NotNull Supplier<Double> source, @NotNull Consumer<Double> target) {
         ModConfigSpec.Range<Double> range = spec.getRange();
 
         // 只有定义了范围（Range）才能创建滑块组合
@@ -61,79 +62,93 @@ public class MapConfigScreen extends ConfigurationScreen.ConfigurationSectionScr
         private final MapConfigScreen mapConfigScreen;
         private final AbstractWidget slider;
         private final EditBox editBox;
+        private final OptionInstance<Double> option;
+        private final ModConfigSpec.Range<Double> range;
+        private double currentValue;
         private boolean isSyncing = false; // 防止循环更新
 
         public DoubleControlWidget(MapConfigScreen mapConfigScreen, int x, int y, int width, int height, Component message,
                                    ModConfigSpec.Range<Double> range, Supplier<Double> source, Consumer<Double> target, String key) {
             super(x, y, width, height, message);
             this.mapConfigScreen = mapConfigScreen;
+            this.range = range;
 
             double min = range.getMin();
             double max = range.getMax();
 
+            // 初始化本地基准值
+            this.currentValue = source.get();
+
             this.editBox = new EditBox(Minecraft.getInstance().font, x, y, width, height, message);
             this.editBox.setMaxLength(18);
-            this.editBox.setValue(String.format("%.2f", source.get()));
+            this.editBox.setValue(String.format("%.2f", currentValue));
 
             OptionInstance.SliderableValueSet<Double> doubleRange = new OptionInstance.SliderableValueSet<>() {
                 @Override
-                public double toSliderValue(Double value) {
+                public double toSliderValue(@NotNull Double value) {
                     return (value - min) / (max - min);
                 }
 
                 @Override
-                public Double fromSliderValue(double sliderValue) {
+                public @NotNull Double fromSliderValue(double sliderValue) {
                     return min + sliderValue * (max - min);
                 }
 
                 @Override
-                public Optional<Double> validateValue(Double value) {
+                public @NotNull Optional<Double> validateValue(@NotNull Double value) {
                     return (value >= min && value <= max) ? Optional.of(value) : Optional.empty();
                 }
 
                 @Override
-                public com.mojang.serialization.Codec<Double> codec() {
-                    return com.mojang.serialization.Codec.DOUBLE;
+                public @NotNull Codec<Double> codec() {
+                    return Codec.DOUBLE;
                 }
             };
 
-            OptionInstance<Double> option = new OptionInstance<>(
+            option = new OptionInstance<>(
                     mapConfigScreen.getTranslationKey(key),
-                    OptionInstance.noTooltip(), // Tooltip 交给外层 Element
-                    (caption, val) -> Component.empty(), // 滑块上不显示文字，或者只显示简略信息
+                    OptionInstance.noTooltip(),
+                    (caption, val) -> Component.empty(),
                     doubleRange,
-                    source.get(),
+                    this.currentValue, // 使用本地基准值
                     newValue -> {
-                        // Slider 改变 -> 更新 Config 和 EditBox
-                        if (!isSyncing && !newValue.equals(source.get())) {
-                            isSyncing = true;
-                            updateValue(newValue, target, key, source.get());
-                            editBox.setValue(String.format("%.2f", newValue)); // 同步文字
-                            isSyncing = false;
+                        // OptionInstance 回调 (通常由拖动滑块触发)
+                        // 关键逻辑: 只有在非 Sync 状态且值确实改变时才执行
+                        if (!isSyncing && newValue != this.currentValue) {
+                            this.currentValue = newValue; // 更新基准
+
+                            // 同步到 Config
+                            updateValue(newValue, target, key, source.get()); // 这里 source.get() 仅作 undo 参考
+
+                            // 同步到 EditBox (防止死循环)
+                            this.isSyncing = true;
+                            this.editBox.setValue(String.format("%.2f", newValue));
+                            this.isSyncing = false;
                         }
                     }
             );
+
             this.slider = option.createButton(Minecraft.getInstance().options, x, y, width, option::set);
 
             this.editBox.setResponder(text -> {
-                // EditBox 改变 -> 更新 Config 和 Slider
                 if (!isSyncing) {
                     try {
                         double val = Double.parseDouble(text);
-                        if (range.test(val) && !Double.valueOf(val).equals(source.get())) {
-                            isSyncing = true;
-                            updateValue(val, target, key, source.get());
-                            option.set(val); // 同步滑块位置 (这会触发 Slider 的 callback，所以需要 isSyncing 锁)
+                        // 关键逻辑: 只有在值范围合法且与当前基准不同步时才执行
+                        if (range.test(val) && val != this.currentValue) {
+                            this.currentValue = val; // 更新基准
 
-                            // 重新获取 slider widget (因为 set 可能导致内部状态变化，不过通常 widget 引用不变)
-                            // 这里主要是为了让 OptionInstance 内部刷新显示
-                            isSyncing = false;
-                            editBox.setTextColor(0xE0E0E0); // 正常颜色
-                        } else {
-                            // 值在范围外，但不报错，只是不应用
+                            // 同步到 Config
+                            updateValue(val, target, key, source.get());
+
+                            // 同步到 Slider
+                            this.isSyncing = true;
+                            option.set(val); // 这会触发上面的 callback，但 isSyncing 会拦截 EditBox 的更新
+                            this.isSyncing = false;
+                            this.editBox.setTextColor(0xE0E0E0);
                         }
                     } catch (NumberFormatException e) {
-                        editBox.setTextColor(0xFF0000); // 格式错误变红
+                        this.editBox.setTextColor(0xFF0000);
                     }
                 }
             });
@@ -141,21 +156,25 @@ public class MapConfigScreen extends ConfigurationScreen.ConfigurationSectionScr
 
         // 统一的更新逻辑（包含撤销支持）
         private void updateValue(Double newValue, Consumer<Double> target, String key, Double oldValue) {
-            mapConfigScreen.undoManager.add(v -> {
-                target.accept(v);
-                mapConfigScreen.onChanged(key);
-                // 撤销时也要刷新 UI
-                isSyncing = true;
-                editBox.setValue(String.format("%.2f", v));
-                // slider.set(v) 比较难直接调，因为 slider 是 widget，但数据源 source.get() 会由父类重绘时处理
-                isSyncing = false;
-            }, newValue, v -> {
-                target.accept(v);
-                mapConfigScreen.onChanged(key);
-                isSyncing = true;
-                editBox.setValue(String.format("%.2f", v));
-                isSyncing = false;
-            }, oldValue);
+            mapConfigScreen.undoManager.add(
+                    v -> setValue(target, key, v), newValue,
+                    v -> setValue(target, key, v), oldValue
+            );
+        }
+
+        private void setValue(Consumer<Double> target, String key, Double v) {
+            target.accept(v);
+            mapConfigScreen.onChanged(key);
+            isSyncing = true;
+            if (v == (long) v.doubleValue()) {
+                editBox.setValue(String.valueOf((long) v.doubleValue())); // 输出 "6"
+            } else {
+                editBox.setValue(String.valueOf(v));        // 输出 "6.5"
+            }
+            if (slider instanceof OptionInstance.OptionInstanceSliderButton<?> sliderButton) {
+                sliderButton.setValue(v / (range.getMax() - range.getMin()));
+            }
+            isSyncing = false;
         }
 
         // --- 3. 布局与渲染代理 ---
@@ -205,7 +224,7 @@ public class MapConfigScreen extends ConfigurationScreen.ConfigurationSectionScr
         }
 
         @Override
-        public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
             this.slider.render(guiGraphics, mouseX, mouseY, partialTick);
             this.editBox.render(guiGraphics, mouseX, mouseY, partialTick);
         }
@@ -248,6 +267,7 @@ public class MapConfigScreen extends ConfigurationScreen.ConfigurationSectionScr
 
         @Override
         public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+            if (editBox.isMouseOver(mouseX, mouseY)) {return false;}
             return slider.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         }
 
