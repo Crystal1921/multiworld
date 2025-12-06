@@ -17,5 +17,6 @@
   "multiworld.map.waypoint": "Waypoints",
   "multiworld.map.waypoint.cancel": "Cancel",
   "multiworld.map.waypoint.create": "Create",
+  "multiworld.map.waypoint.default_name": "Waypoint",
   "multiworld.map.waypoint.name": "Waypoint Name"
 }

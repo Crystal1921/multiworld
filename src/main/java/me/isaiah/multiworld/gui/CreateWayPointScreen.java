@@ -63,6 +63,7 @@ public class CreateWayPointScreen extends Screen {
         this.xField.setMaxLength(10);
         this.xField.setValue(String.valueOf(this.posX));
         this.xField.setHint(Component.literal("X"));
+        this.xField.setResponder(text -> validateNumericField(this.xField, text));
         this.addRenderableWidget(this.xField);
         
         // Y coordinate field
@@ -71,6 +72,7 @@ public class CreateWayPointScreen extends Screen {
         this.yField.setMaxLength(10);
         this.yField.setValue(String.valueOf(playerY));
         this.yField.setHint(Component.literal("Y"));
+        this.yField.setResponder(text -> validateNumericField(this.yField, text));
         this.addRenderableWidget(this.yField);
         
         // Z coordinate field
@@ -79,6 +81,7 @@ public class CreateWayPointScreen extends Screen {
         this.zField.setMaxLength(10);
         this.zField.setValue(String.valueOf(this.posZ));
         this.zField.setHint(Component.literal("Z"));
+        this.zField.setResponder(text -> validateNumericField(this.zField, text));
         this.addRenderableWidget(this.zField);
         
         // Create button
@@ -124,6 +127,19 @@ public class CreateWayPointScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
     
+    private void validateNumericField(EditBox field, String text) {
+        if (text.isEmpty()) {
+            field.setTextColor(0xE0E0E0);
+            return;
+        }
+        try {
+            Double.parseDouble(text);
+            field.setTextColor(0xE0E0E0);
+        } catch (NumberFormatException e) {
+            field.setTextColor(0xFF5555);
+        }
+    }
+    
     private void createWaypoint() {
         if (this.minecraft == null || this.minecraft.player == null) {
             return;
@@ -132,8 +148,8 @@ public class CreateWayPointScreen extends Screen {
         // Get name
         String name = this.nameField.getValue().trim();
         if (name.isEmpty()) {
-            // Show error or use default name
-            name = "Waypoint";
+            // Use default name
+            name = Component.translatable("multiworld.map.waypoint.default_name").getString();
         }
         
         // Parse coordinates
@@ -158,8 +174,22 @@ public class CreateWayPointScreen extends Screen {
             // Close screen
             onClose();
         } catch (NumberFormatException e) {
-            // Invalid coordinate format - could show error message
-            // For now, just don't create the waypoint
+            // Mark invalid fields with red text color
+            try {
+                Double.parseDouble(this.xField.getValue());
+            } catch (NumberFormatException ex) {
+                this.xField.setTextColor(0xFF5555);
+            }
+            try {
+                Double.parseDouble(this.yField.getValue());
+            } catch (NumberFormatException ex) {
+                this.yField.setTextColor(0xFF5555);
+            }
+            try {
+                Double.parseDouble(this.zField.getValue());
+            } catch (NumberFormatException ex) {
+                this.zField.setTextColor(0xFF5555);
+            }
         }
     }
 

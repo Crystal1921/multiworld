@@ -17,5 +17,6 @@
   "multiworld.map.waypoint": "路径点",
   "multiworld.map.waypoint.cancel": "取消",
   "multiworld.map.waypoint.create": "创建",
+  "multiworld.map.waypoint.default_name": "路径点",
   "multiworld.map.waypoint.name": "路径点名称"
 }
