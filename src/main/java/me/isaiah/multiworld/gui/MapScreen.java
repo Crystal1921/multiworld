@@ -138,9 +138,9 @@ public class MapScreen extends Screen {
         final int buttonWidth = 120;
         final int buttonHeight = 20;
         
-        // Ensure button stays within screen bounds
-        int buttonX = (int) Math.min(mouseX, this.width - buttonWidth);
-        int buttonY = (int) Math.min(mouseY, this.height - buttonHeight);
+        // Ensure button stays within screen bounds (both upper and lower limits)
+        int buttonX = (int) Math.max(0, Math.min(mouseX, this.width - buttonWidth));
+        int buttonY = (int) Math.max(0, Math.min(mouseY, this.height - buttonHeight));
         
         createWaypointButton = Button
                 .builder(Component.translatable("multiworld.map.create_waypoint"), button -> {
