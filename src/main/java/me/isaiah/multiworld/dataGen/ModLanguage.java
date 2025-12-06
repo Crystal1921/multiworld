@@ -37,6 +37,7 @@ public class ModLanguage implements DataProvider {
         this.add("multiworld.map.settings.little_map", "Little Map", "小地图");
         this.add("multiworld.map.settings.little_map_on", "Show Little Map", "显示小地图");
         this.add("multiworld.map.settings.little_map_off", "Hide Little Map", "隐藏小地图");
+        this.add("multiworld.map.waypoint", "Waypoints", "路径点");
 
         this.add("multiworld.configuration.enableLittleMap", "Enable Little Map", "启用小地图");
         this.add("multiworld.configuration.mapScale", "Map Scale", "小地图缩放比例");

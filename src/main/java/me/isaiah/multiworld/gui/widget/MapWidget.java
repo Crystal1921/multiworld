@@ -25,7 +25,7 @@ public class MapWidget extends AbstractWidget {
     @Getter
     private static double posY = 0;
     @Getter
-    private static double scale = 2;
+    private static double scale = 3;
     public boolean showPortalList = true;
     @Setter
     @Getter
@@ -37,6 +37,10 @@ public class MapWidget extends AbstractWidget {
         super(x, y, width, height, Component.literal("map_open"));
         this.mapConfig = mapConfig;
         this.portals = portals;
+
+        int posX = (mapConfig.maxX() + mapConfig.minX()) / 2;
+        int posZ = (mapConfig.maxZ() + mapConfig.minZ()) / 2;
+        centerOnPosition(posX, posZ);
     }
 
     /**
@@ -125,6 +129,14 @@ public class MapWidget extends AbstractWidget {
                 null,  // use player position for center
                 null   // use player position for center
         );
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 1) {
+
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     /**

@@ -12,5 +12,6 @@
   "multiworld.map.settings.little_map": "Little Map",
   "multiworld.map.settings.little_map_off": "Hide Little Map",
   "multiworld.map.settings.little_map_on": "Show Little Map",
-  "multiworld.map.settings.title": "Map Settings"
+  "multiworld.map.settings.title": "Map Settings",
+  "multiworld.map.waypoint": "Waypoints"
 }

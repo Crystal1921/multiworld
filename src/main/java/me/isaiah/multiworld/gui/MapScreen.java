@@ -98,18 +98,26 @@ public class MapScreen extends Screen {
                             .flatMap(modContainer -> modContainer.getCustomExtension(IConfigScreenFactory.class))
                             .map(factory -> factory.createScreen(
                                     ModList.get().getModContainerById(MultiworldMod.MOD_ID).get(),
-                                    this // "this" 是当前的屏幕实例
+                                    this
                             ))
-                            // 如果屏幕成功创建, 就显示它
                             .ifPresent(newScreen -> this.minecraft.setScreen(newScreen));
                 })
                 .bounds(BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
+
+        Button wayPointButton = Button
+                .builder(Component.translatable("multiworld.map.waypoint"), button -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.setScreen(new WayPointManagerScreen(this));
+                    }
+                })
+                .bounds(2 * BUTTON_WIDTH + 10, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
 
         setListsVisibility(false,true);
         
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
         this.addRenderableWidget(mapSettingsButton);
+        this.addRenderableWidget(wayPointButton);
         this.addRenderableWidget(worldList);
         this.addRenderableWidget(portalList);
     }
