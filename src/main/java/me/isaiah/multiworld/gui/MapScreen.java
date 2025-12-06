@@ -55,6 +55,7 @@ public class MapScreen extends Screen {
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
     private Button createWaypointButton;
+    // Store click position for future waypoint creation (world coordinate conversion needed)
     private double waypointClickX;
     private double waypointClickY;
 
@@ -182,19 +183,23 @@ public class MapScreen extends Screen {
         this.waypointClickX = mouseX;
         this.waypointClickY = mouseY;
         
+        // Clamp button position to ensure it stays within screen bounds
+        int buttonX = (int) Math.max(0, Math.min(mouseX, this.width - WAYPOINT_BUTTON_WIDTH));
+        int buttonY = (int) Math.max(0, Math.min(mouseY, this.height - WAYPOINT_BUTTON_HEIGHT));
+        
         if (createWaypointButton == null) {
             createWaypointButton = Button
                     .builder(Component.translatable("multiworld.map.create_waypoint"), button -> {
-                        // TODO: Create waypoint at clicked position
-                        // For now, just hide the button
+                        // TODO: Create waypoint at clicked position (waypointClickX, waypointClickY)
+                        // Need to convert screen coordinates to world coordinates using map transformation
                         hideWaypointButton();
                     })
-                    .bounds((int) mouseX, (int) mouseY, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT)
+                    .bounds(buttonX, buttonY, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT)
                     .build();
             this.addRenderableWidget(createWaypointButton);
         } else {
-            createWaypointButton.setX((int) mouseX);
-            createWaypointButton.setY((int) mouseY);
+            createWaypointButton.setX(buttonX);
+            createWaypointButton.setY(buttonY);
         }
         createWaypointButton.visible = true;
     }
