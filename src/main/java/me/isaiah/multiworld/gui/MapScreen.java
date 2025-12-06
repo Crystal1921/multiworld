@@ -4,9 +4,10 @@ import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Getter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.commands.PortalCommand;
-import me.isaiah.multiworld.gui.widget.PortalList;
-import me.isaiah.multiworld.gui.widget.WorldList;
 import me.isaiah.multiworld.gui.widget.MapWidget;
+import me.isaiah.multiworld.gui.widget.PortalList;
+import me.isaiah.multiworld.gui.widget.WayPointButton;
+import me.isaiah.multiworld.gui.widget.WorldList;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.client.KeyMapping;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static me.isaiah.multiworld.gui.widget.WorldList.WorldEntry.setMapData;
 
@@ -47,6 +49,7 @@ public class MapScreen extends Screen {
     public final static int BUTTON_PADDING = 30;
     public final static int BUTTON_WIDTH = 100;
     public final static int MAP_PADDING = 80;
+    protected static final Button.CreateNarration DEFAULT_NARRATION = Supplier::get;
     private final static int WAYPOINT_BUTTON_WIDTH = 120;
     private final static int WAYPOINT_BUTTON_HEIGHT = 20;
     WorldList worldList;
@@ -55,10 +58,6 @@ public class MapScreen extends Screen {
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
     private Button createWaypointButton;
-    // Store original click position (unclamped) for accurate world coordinate conversion
-    // Button position may be clamped to screen bounds, but waypoint should use actual click location
-    private double waypointClickX;
-    private double waypointClickY;
 
 
     public MapScreen() {
@@ -86,13 +85,13 @@ public class MapScreen extends Screen {
                 .displayOnlyValue()
                 .withInitialValue(MapMode.WORLD_LIST)
                 .create(0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10, Component.empty(),
-                (button, mapMode) -> {
-                    switch (mapMode) {
-                        case PORTAL_LIST -> setListsVisibility(true,false);
-                        case WORLD_LIST -> setListsVisibility(false,true);
-                    }
-                    hideWaypointButton();
-                });
+                        (button, mapMode) -> {
+                            switch (mapMode) {
+                                case PORTAL_LIST -> setListsVisibility(true, false);
+                                case WORLD_LIST -> setListsVisibility(false, true);
+                            }
+                            hideWaypointButton();
+                        });
 
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
         worldList = new WorldList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
@@ -113,22 +112,21 @@ public class MapScreen extends Screen {
                 })
                 .bounds(BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
 
-        Button wayPointButton = Button
-                .builder(Component.translatable("multiworld.map.waypoint"), button -> {
-                    if (this.minecraft != null) {
-                        this.minecraft.setScreen(new WayPointManagerScreen(this));
-                    }
-                })
-                .bounds(2 * BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
+        setListsVisibility(false, true);
 
-        setListsVisibility(false,true);
-        
+        createWaypointButton = new WayPointButton(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.create_waypoint"), button -> {
+            // TODO: Create waypoint at clicked position (waypointClickX, waypointClickY)
+            // Need to convert screen coordinates to world coordinates using map transformation
+            hideWaypointButton();
+        }, DEFAULT_NARRATION);
+        createWaypointButton.visible = false;
+
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
         this.addRenderableWidget(mapSettingsButton);
-        this.addRenderableWidget(wayPointButton);
         this.addRenderableWidget(worldList);
         this.addRenderableWidget(portalList);
+        this.addRenderableWidget(createWaypointButton);
     }
 
     @Override
@@ -195,26 +193,11 @@ public class MapScreen extends Screen {
      * Show the waypoint creation button at the specified mouse position
      */
     public void showWaypointButton(double mouseX, double mouseY) {
-        this.waypointClickX = mouseX;
-        this.waypointClickY = mouseY;
-        
         int buttonX = clampButtonX(mouseX);
         int buttonY = clampButtonY(mouseY);
-        
-        if (createWaypointButton == null) {
-            createWaypointButton = Button
-                    .builder(Component.translatable("multiworld.map.create_waypoint"), button -> {
-                        // TODO: Create waypoint at clicked position (waypointClickX, waypointClickY)
-                        // Need to convert screen coordinates to world coordinates using map transformation
-                        hideWaypointButton();
-                    })
-                    .bounds(buttonX, buttonY, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT)
-                    .build();
-            this.addRenderableWidget(createWaypointButton);
-        } else {
-            createWaypointButton.setX(buttonX);
-            createWaypointButton.setY(buttonY);
-        }
+
+        createWaypointButton.setX(buttonX);
+        createWaypointButton.setY(buttonY);
         createWaypointButton.visible = true;
     }
 
@@ -222,18 +205,14 @@ public class MapScreen extends Screen {
      * Hide the waypoint creation button
      */
     public void hideWaypointButton() {
-        if (createWaypointButton != null) {
-            createWaypointButton.visible = false;
-        }
+        createWaypointButton.visible = false;
     }
 
     /**
      * Check if waypoint button should be hidden based on click position
      */
     private boolean shouldHideWaypointButton(double mouseX, double mouseY) {
-        return createWaypointButton != null 
-                && createWaypointButton.visible 
-                && !createWaypointButton.isMouseOver(mouseX, mouseY);
+        return createWaypointButton.visible && !createWaypointButton.isMouseOver(mouseX, mouseY);
     }
 
     @Override
@@ -252,6 +231,12 @@ public class MapScreen extends Screen {
             hideWaypointButton();
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    public void pressButton(double mouseX, double mouseY) {
+        if (createWaypointButton.isMouseOver(mouseX, mouseY)) {
+            createWaypointButton.onPress();
+        }
     }
 
     public enum MapMode implements StringRepresentable {

@@ -136,9 +136,17 @@ public class MapWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX, mouseY)) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
         if (button == 1) {
             // Right-click: notify parent MapScreen to show waypoint creation button
             mapScreen.showWaypointButton(mouseX, mouseY);
+            return true;
+        }
+        if (button == 0) {
+            // Left-click: notify parent MapScreen to handle button press
+            mapScreen.pressButton(mouseX, mouseY);
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
