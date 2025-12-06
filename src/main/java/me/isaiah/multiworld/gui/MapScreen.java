@@ -52,6 +52,9 @@ public class MapScreen extends Screen {
     @Getter
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
+    private Button createWaypointButton;
+    private double waypointClickX;
+    private double waypointClickY;
 
 
     public MapScreen() {
@@ -139,6 +142,7 @@ public class MapScreen extends Screen {
         setListsVisibility(portalVisible, worldVisible);
         listSwitchButton.setValue(mapMode);
         setMapData(ResourceLocation.parse(mapConfig.worldID()), mapConfig, mapWidget);
+        hideWaypointButton();
     }
 
     public Font getFontRenderer() {
@@ -166,6 +170,59 @@ public class MapScreen extends Screen {
     private void setListsVisibility(boolean portalVisible, boolean worldVisible) {
         portalList.visible = portalVisible;
         worldList.visible = worldVisible;
+    }
+
+    /**
+     * Show the waypoint creation button at the specified mouse position
+     */
+    public void showWaypointButton(double mouseX, double mouseY) {
+        this.waypointClickX = mouseX;
+        this.waypointClickY = mouseY;
+        
+        if (createWaypointButton == null) {
+            createWaypointButton = Button
+                    .builder(Component.translatable("multiworld.map.create_waypoint"), button -> {
+                        // TODO: Create waypoint at clicked position
+                        // For now, just hide the button
+                        hideWaypointButton();
+                    })
+                    .bounds((int) mouseX, (int) mouseY, 120, 20)
+                    .build();
+            this.addRenderableWidget(createWaypointButton);
+        } else {
+            createWaypointButton.setX((int) mouseX);
+            createWaypointButton.setY((int) mouseY);
+            createWaypointButton.visible = true;
+        }
+    }
+
+    /**
+     * Hide the waypoint creation button
+     */
+    public void hideWaypointButton() {
+        if (createWaypointButton != null) {
+            createWaypointButton.visible = false;
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Hide waypoint button if clicking outside of it
+        if (createWaypointButton != null && createWaypointButton.visible) {
+            if (!createWaypointButton.isMouseOver(mouseX, mouseY)) {
+                hideWaypointButton();
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Hide waypoint button when pressing ESC or other keys
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            hideWaypointButton();
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public enum MapMode implements StringRepresentable {

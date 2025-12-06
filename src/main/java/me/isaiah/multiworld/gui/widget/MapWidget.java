@@ -137,7 +137,9 @@ public class MapWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 1) {
-
+            // Right-click: notify parent MapScreen to show waypoint creation button
+            mapScreen.showWaypointButton(mouseX, mouseY);
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -195,6 +197,8 @@ public class MapWidget extends AbstractWidget {
     protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
         posX -= dragX;
         posY += dragY;
+        // Hide waypoint button when dragging
+        mapScreen.hideWaypointButton();
     }
 
     @Override
