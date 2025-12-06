@@ -55,7 +55,8 @@ public class MapScreen extends Screen {
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
     private Button createWaypointButton;
-    // Store click position for future waypoint creation (world coordinate conversion needed)
+    // Store original click position (unclamped) for accurate world coordinate conversion
+    // Button position may be clamped to screen bounds, but waypoint should use actual click location
     private double waypointClickX;
     private double waypointClickY;
 
@@ -177,15 +178,28 @@ public class MapScreen extends Screen {
     }
 
     /**
+     * Clamp button X position to ensure it stays within screen bounds
+     */
+    private int clampButtonX(double x) {
+        return (int) Math.max(0, Math.min(x, this.width - WAYPOINT_BUTTON_WIDTH));
+    }
+
+    /**
+     * Clamp button Y position to ensure it stays within screen bounds
+     */
+    private int clampButtonY(double y) {
+        return (int) Math.max(0, Math.min(y, this.height - WAYPOINT_BUTTON_HEIGHT));
+    }
+
+    /**
      * Show the waypoint creation button at the specified mouse position
      */
     public void showWaypointButton(double mouseX, double mouseY) {
         this.waypointClickX = mouseX;
         this.waypointClickY = mouseY;
         
-        // Clamp button position to ensure it stays within screen bounds
-        int buttonX = (int) Math.max(0, Math.min(mouseX, this.width - WAYPOINT_BUTTON_WIDTH));
-        int buttonY = (int) Math.max(0, Math.min(mouseY, this.height - WAYPOINT_BUTTON_HEIGHT));
+        int buttonX = clampButtonX(mouseX);
+        int buttonY = clampButtonY(mouseY);
         
         if (createWaypointButton == null) {
             createWaypointButton = Button
@@ -213,10 +227,19 @@ public class MapScreen extends Screen {
         }
     }
 
+    /**
+     * Check if waypoint button should be hidden based on click position
+     */
+    private boolean shouldHideWaypointButton(double mouseX, double mouseY) {
+        return createWaypointButton != null 
+                && createWaypointButton.visible 
+                && !createWaypointButton.isMouseOver(mouseX, mouseY);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Hide waypoint button if clicking outside of it
-        if (createWaypointButton != null && createWaypointButton.visible && !createWaypointButton.isMouseOver(mouseX, mouseY)) {
+        if (shouldHideWaypointButton(mouseX, mouseY)) {
             hideWaypointButton();
         }
         return super.mouseClicked(mouseX, mouseY, button);
