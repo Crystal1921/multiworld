@@ -211,10 +211,8 @@ public class MapScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Hide waypoint button if clicking outside of it
-        if (createWaypointButton != null && createWaypointButton.visible) {
-            if (!createWaypointButton.isMouseOver(mouseX, mouseY)) {
-                hideWaypointButton();
-            }
+        if (createWaypointButton != null && createWaypointButton.visible && !createWaypointButton.isMouseOver(mouseX, mouseY)) {
+            hideWaypointButton();
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
