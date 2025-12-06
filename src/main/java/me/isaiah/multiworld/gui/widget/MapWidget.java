@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.gui.MapRenderer;
+import me.isaiah.multiworld.gui.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,6 +27,7 @@ public class MapWidget extends AbstractWidget {
     private static double posY = 0;
     @Getter
     private static double scale = 3;
+    private final MapScreen mapScreen;
     public boolean showPortalList = true;
     @Setter
     @Getter
@@ -33,10 +35,11 @@ public class MapWidget extends AbstractWidget {
     @Setter
     private List<Vec2> portals;
 
-    public MapWidget(int x, int y, int width, int height, MapInstance.MapConfig mapConfig, List<Vec2> portals) {
+    public MapWidget(int x, int y, int width, int height, MapInstance.MapConfig mapConfig, List<Vec2> portals, MapScreen mapScreen) {
         super(x, y, width, height, Component.literal("map_open"));
         this.mapConfig = mapConfig;
         this.portals = portals;
+        this.mapScreen = mapScreen;
 
         int posX = (mapConfig.maxX() + mapConfig.minX()) / 2;
         int posZ = (mapConfig.maxZ() + mapConfig.minZ()) / 2;

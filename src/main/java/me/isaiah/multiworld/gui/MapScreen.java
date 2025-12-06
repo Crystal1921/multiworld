@@ -53,6 +53,7 @@ public class MapScreen extends Screen {
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
 
+
     public MapScreen() {
         super(Component.literal("Map"));
     }
@@ -85,7 +86,7 @@ public class MapScreen extends Screen {
                     }
                 });
 
-        mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals);
+        mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
         worldList = new WorldList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
         portalList = new PortalList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
 
@@ -110,7 +111,7 @@ public class MapScreen extends Screen {
                         this.minecraft.setScreen(new WayPointManagerScreen(this));
                     }
                 })
-                .bounds(2 * BUTTON_WIDTH + 10, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
+                .bounds(2 * BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
 
         setListsVisibility(false,true);
         
