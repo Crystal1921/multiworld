@@ -5,8 +5,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,15 +140,25 @@ public enum WayPointManager {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> waypointList = (List<Map<String, Object>>) data.get("waypoints");
             
+            if (waypointList == null) {
+                return;
+            }
+            
             for (Map<String, Object> waypointData : waypointList) {
-                String name = (String) waypointData.get("name");
-                double x = ((Number) waypointData.get("x")).doubleValue();
-                double y = ((Number) waypointData.get("y")).doubleValue();
-                double z = ((Number) waypointData.get("z")).doubleValue();
-                String dimensionId = (String) waypointData.get("dimensionId");
-                int color = ((Number) waypointData.get("color")).intValue();
-                
-                waypoints.add(new WayPoint(name, x, y, z, dimensionId, color));
+                try {
+                    String name = (String) waypointData.get("name");
+                    double x = ((Number) waypointData.get("x")).doubleValue();
+                    double y = ((Number) waypointData.get("y")).doubleValue();
+                    double z = ((Number) waypointData.get("z")).doubleValue();
+                    String dimensionId = (String) waypointData.get("dimensionId");
+                    int color = ((Number) waypointData.get("color")).intValue();
+                    
+                    if (name != null && dimensionId != null) {
+                        waypoints.add(new WayPoint(name, x, y, z, dimensionId, color));
+                    }
+                } catch (NullPointerException | ClassCastException e) {
+                    MultiworldMod.LOGGER.warn("Failed to load waypoint: " + e.getMessage());
+                }
             }
         }
     }

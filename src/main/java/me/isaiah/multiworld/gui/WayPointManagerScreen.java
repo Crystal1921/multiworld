@@ -23,6 +23,7 @@ public class WayPointManagerScreen extends Screen {
     private EditBox nameField;
     private static final int BUTTON_WIDTH = 100;
     private static final int BUTTON_HEIGHT = 20;
+    // Using Random for non-security-sensitive color generation (SecureRandom would be unnecessarily slow)
     private static final Random RANDOM = new Random();
 
     public WayPointManagerScreen(MapScreen parentScreen) {
