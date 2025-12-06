@@ -118,8 +118,7 @@ public class MapScreen extends Screen {
         setListsVisibility(false, true);
 
         createWaypointButton = new WayPointButton(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.create_waypoint"), button -> {
-            // TODO: Create waypoint at clicked position (waypointClickX, waypointClickY)
-            // Need to convert screen coordinates to world coordinates using map transformation
+            openWaypointScreen();
             hideWaypointButton();
         }, DEFAULT_NARRATION);
         createWaypointButton.visible = false;
