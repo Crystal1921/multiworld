@@ -42,7 +42,6 @@ public class WayPointManagerScreen extends Screen {
                 this.width - 40,
                 this.height - 80,
                 40,
-                this.height - 40,
                 25
         );
         this.addWidget(wayPointList);
@@ -137,7 +136,7 @@ public class WayPointManagerScreen extends Screen {
 
     public class WayPointSelectionList extends ObjectSelectionList<WayPointSelectionList.WayPointEntry> {
 
-        public WayPointSelectionList(Minecraft minecraft, int width, int height, int y, int bottom, int itemHeight) {
+        public WayPointSelectionList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
             super(minecraft, width, height, y, itemHeight);
         }
 
@@ -170,7 +169,12 @@ public class WayPointManagerScreen extends Screen {
                 );
 
                 // Draw dimension and coordinates
-                String dimensionName = ResourceLocation.parse(waypoint.dimensionId()).getPath();
+                String dimensionName;
+                try {
+                    dimensionName = ResourceLocation.parse(waypoint.dimensionId()).getPath();
+                } catch (IllegalArgumentException e) {
+                    dimensionName = waypoint.dimensionId();
+                }
                 String info = String.format("%s: %.1f, %.1f, %.1f", dimensionName, waypoint.x(), waypoint.y(), waypoint.z());
                 guiGraphics.drawString(
                         WayPointManagerScreen.this.font,

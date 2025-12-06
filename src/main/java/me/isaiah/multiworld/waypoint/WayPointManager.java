@@ -83,6 +83,17 @@ public enum WayPointManager {
     }
 
     /**
+     * Create YAML configuration for consistent formatting
+     */
+    private Yaml createYaml() {
+        DumperOptions options = new DumperOptions();
+        options.setIndent(2);
+        options.setPrettyFlow(true);
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        return new Yaml(options);
+    }
+
+    /**
      * Save waypoints to YAML file
      */
     private void save() throws Exception {
@@ -102,14 +113,11 @@ public enum WayPointManager {
         Map<String, Object> data = new HashMap<>();
         data.put("waypoints", waypointList);
 
-        DumperOptions options = new DumperOptions();
-        options.setIndent(2);
-        options.setPrettyFlow(true);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = createYaml();
 
-        Yaml yaml = new Yaml(options);
-
-        try (FileWriter writer = new FileWriter(CONFIG_PATH)) {
+        try (var writer = java.nio.file.Files.newBufferedWriter(
+                java.nio.file.Paths.get(CONFIG_PATH),
+                java.nio.charset.StandardCharsets.UTF_8)) {
             yaml.dump(data, writer);
         }
     }
@@ -120,14 +128,11 @@ public enum WayPointManager {
     private void load() throws Exception {
         waypoints.clear();
 
-        DumperOptions options = new DumperOptions();
-        options.setIndent(2);
-        options.setPrettyFlow(true);
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = createYaml();
 
-        Yaml yaml = new Yaml(options);
-
-        try (FileReader reader = new FileReader(CONFIG_PATH)) {
+        try (var reader = java.nio.file.Files.newBufferedReader(
+                java.nio.file.Paths.get(CONFIG_PATH),
+                java.nio.charset.StandardCharsets.UTF_8)) {
             Map<String, Object> data = yaml.load(reader);
             
             if (data == null || !data.containsKey("waypoints")) {

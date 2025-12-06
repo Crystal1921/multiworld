@@ -62,17 +62,21 @@ public class WayPointList extends ObjectSelectionList<WayPointList.WayPointEntry
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             MapWidget mapWidget = mapScreen.getMapWidget();
             if (mapWidget != null) {
-                ResourceLocation dimensionId = ResourceLocation.parse(waypoint.dimensionId());
-                
-                // Find the matching map config for this dimension
-                MapInstance.INSTANCE.mapConfigs.forEach(mapConfig -> {
-                    if (mapConfig.worldID().equals(dimensionId.toString())) {
-                        setMapData(dimensionId, mapConfig, mapWidget);
-                        
-                        // Center the map on the waypoint position
-                        mapWidget.centerOnPosition(waypoint.x(), waypoint.z());
-                    }
-                });
+                try {
+                    ResourceLocation dimensionId = ResourceLocation.parse(waypoint.dimensionId());
+                    
+                    // Find the matching map config for this dimension
+                    MapInstance.INSTANCE.mapConfigs.forEach(mapConfig -> {
+                        if (mapConfig.worldID().equals(dimensionId.toString())) {
+                            setMapData(dimensionId, mapConfig, mapWidget);
+                            
+                            // Center the map on the waypoint position
+                            mapWidget.centerOnPosition(waypoint.x(), waypoint.z());
+                        }
+                    });
+                } catch (IllegalArgumentException e) {
+                    // Handle invalid dimension ID format
+                }
             }
             return true;
         }
