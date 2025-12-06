@@ -13,5 +13,6 @@
   "multiworld.map.settings.little_map_off": "隐藏小地图",
   "multiworld.map.settings.little_map_on": "显示小地图",
   "multiworld.map.settings.title": "地图设置",
-  "multiworld.map.waypoint": "路径点"
+  "multiworld.map.waypoint": "路径点",
+  "multiworld.map.create_waypoint": "新建路径点"
 }

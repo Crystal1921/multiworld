@@ -52,6 +52,7 @@ public class MapScreen extends Screen {
     @Getter
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
+    private Button createWaypointButton;
 
 
     public MapScreen() {
@@ -123,10 +124,57 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(portalList);
     }
 
+    /**
+     * Show the "Create Waypoint" button at the specified mouse position.
+     * The button will be hidden when dragging or clicking elsewhere.
+     *
+     * @param mouseX Mouse X coordinate
+     * @param mouseY Mouse Y coordinate
+     */
+    public void showCreateWaypointButton(double mouseX, double mouseY) {
+        hideCreateWaypointButton();
+        
+        createWaypointButton = Button
+                .builder(Component.translatable("multiworld.map.create_waypoint"), button -> {
+                    // TODO: Implement waypoint creation logic
+                    hideCreateWaypointButton();
+                })
+                .bounds((int) mouseX, (int) mouseY, 120, 20)
+                .build();
+        
+        this.addRenderableWidget(createWaypointButton);
+    }
+
+    /**
+     * Hide the "Create Waypoint" button if it exists.
+     */
+    public void hideCreateWaypointButton() {
+        if (createWaypointButton != null) {
+            this.removeWidget(createWaypointButton);
+            createWaypointButton = null;
+        }
+    }
+
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.fill(0, 0, this.width, this.height, 0xFF000000);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Hide the create waypoint button when clicking anywhere except on the button itself
+        if (createWaypointButton != null && !createWaypointButton.isMouseOver(mouseX, mouseY)) {
+            hideCreateWaypointButton();
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        // Hide the create waypoint button when dragging
+        hideCreateWaypointButton();
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
