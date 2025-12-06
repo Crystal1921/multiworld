@@ -1,6 +1,7 @@
 {
   "block.multiworld.portal_block": "传送门方块",
   "gui.multiworld.map.portal_list": "传送门列表",
+  "gui.multiworld.map.waypoint_list": "路径点列表",
   "gui.multiworld.map.world_list": "世界列表",
   "item.multiworld.portal_finder": "传送门探测器",
   "itemGroup.multiworld": "多世界",
@@ -13,5 +14,9 @@
   "multiworld.map.settings.little_map_off": "隐藏小地图",
   "multiworld.map.settings.little_map_on": "显示小地图",
   "multiworld.map.settings.title": "地图设置",
-  "multiworld.map.waypoint": "路径点"
+  "multiworld.map.waypoint": "路径点",
+  "multiworld.map.waypoint.add": "添加",
+  "multiworld.map.waypoint.delete": "删除",
+  "multiworld.map.waypoint.manager": "路径点管理",
+  "multiworld.map.waypoint.name.hint": "输入路径点名称"
 }

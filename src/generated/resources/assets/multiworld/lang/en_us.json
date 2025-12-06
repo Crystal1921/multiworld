@@ -1,6 +1,7 @@
 {
   "block.multiworld.portal_block": "Portal Block",
   "gui.multiworld.map.portal_list": "Portal List",
+  "gui.multiworld.map.waypoint_list": "Waypoint List",
   "gui.multiworld.map.world_list": "World List",
   "item.multiworld.portal_finder": "Portal Finder",
   "itemGroup.multiworld": "Multiworld",
@@ -13,5 +14,9 @@
   "multiworld.map.settings.little_map_off": "Hide Little Map",
   "multiworld.map.settings.little_map_on": "Show Little Map",
   "multiworld.map.settings.title": "Map Settings",
-  "multiworld.map.waypoint": "Waypoints"
+  "multiworld.map.waypoint": "Waypoints",
+  "multiworld.map.waypoint.add": "Add",
+  "multiworld.map.waypoint.delete": "Delete",
+  "multiworld.map.waypoint.manager": "Waypoint Manager",
+  "multiworld.map.waypoint.name.hint": "Enter waypoint name"
 }
