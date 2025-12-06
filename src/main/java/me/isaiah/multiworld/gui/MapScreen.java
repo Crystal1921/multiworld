@@ -47,6 +47,8 @@ public class MapScreen extends Screen {
     public final static int BUTTON_PADDING = 30;
     public final static int BUTTON_WIDTH = 100;
     public final static int MAP_PADDING = 80;
+    private final static int WAYPOINT_BUTTON_WIDTH = 120;
+    private final static int WAYPOINT_BUTTON_HEIGHT = 20;
     WorldList worldList;
     PortalList portalList;
     @Getter
@@ -187,7 +189,7 @@ public class MapScreen extends Screen {
                         // For now, just hide the button
                         hideWaypointButton();
                     })
-                    .bounds((int) mouseX, (int) mouseY, 120, 20)
+                    .bounds((int) mouseX, (int) mouseY, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT)
                     .build();
             this.addRenderableWidget(createWaypointButton);
         } else {
@@ -219,7 +221,7 @@ public class MapScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Hide waypoint button when pressing ESC or other keys
+        // Hide waypoint button when pressing ESC
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             hideWaypointButton();
         }
