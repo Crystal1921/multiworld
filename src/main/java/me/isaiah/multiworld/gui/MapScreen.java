@@ -87,6 +87,7 @@ public class MapScreen extends Screen {
                         case PORTAL_LIST -> setListsVisibility(true,false);
                         case WORLD_LIST -> setListsVisibility(false,true);
                     }
+                    hideWaypointButton();
                 });
 
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
