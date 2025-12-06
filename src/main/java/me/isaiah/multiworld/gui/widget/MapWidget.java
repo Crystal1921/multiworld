@@ -190,6 +190,9 @@ public class MapWidget extends AbstractWidget {
             scale = newScale;
         }
 
+        // Hide waypoint button when scrolling
+        mapScreen.hideWaypointButton();
+
         return true;
     }
 

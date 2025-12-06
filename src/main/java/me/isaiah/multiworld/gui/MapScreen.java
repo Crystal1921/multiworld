@@ -192,8 +192,8 @@ public class MapScreen extends Screen {
         } else {
             createWaypointButton.setX((int) mouseX);
             createWaypointButton.setY((int) mouseY);
-            createWaypointButton.visible = true;
         }
+        createWaypointButton.visible = true;
     }
 
     /**
