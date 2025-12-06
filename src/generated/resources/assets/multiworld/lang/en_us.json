@@ -9,6 +9,7 @@
   "multiworld": "Multiworld",
   "multiworld.configuration.enableLittleMap": "Enable Little Map",
   "multiworld.configuration.mapScale": "Map Scale",
+  "multiworld.map.create_waypoint": "Create Waypoint",
   "multiworld.map.settings.little_map": "Little Map",
   "multiworld.map.settings.little_map_off": "Hide Little Map",
   "multiworld.map.settings.little_map_on": "Show Little Map",
