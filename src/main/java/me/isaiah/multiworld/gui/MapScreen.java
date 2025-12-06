@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static me.isaiah.multiworld.gui.widget.MapWidget.getWorldPosition;
 import static me.isaiah.multiworld.gui.widget.WorldList.WorldEntry.setMapData;
 
 public class MapScreen extends Screen {
@@ -59,6 +60,8 @@ public class MapScreen extends Screen {
     private CycleButton<MapMode> listSwitchButton;
     private Button createWaypointButton;
 
+    private double mouseClickX;
+    private double mouseClickY;
 
     public MapScreen() {
         super(Component.literal("Map"));
@@ -90,7 +93,7 @@ public class MapScreen extends Screen {
                                 case PORTAL_LIST -> setListsVisibility(true, false);
                                 case WORLD_LIST -> setListsVisibility(false, true);
                             }
-                            hideWaypointButton();
+                            openWaypointScreen();
                         });
 
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
@@ -176,25 +179,14 @@ public class MapScreen extends Screen {
     }
 
     /**
-     * Clamp button X position to ensure it stays within screen bounds
-     */
-    private int clampButtonX(double x) {
-        return (int) Math.max(0, Math.min(x, this.width - WAYPOINT_BUTTON_WIDTH));
-    }
-
-    /**
-     * Clamp button Y position to ensure it stays within screen bounds
-     */
-    private int clampButtonY(double y) {
-        return (int) Math.max(0, Math.min(y, this.height - WAYPOINT_BUTTON_HEIGHT));
-    }
-
-    /**
      * Show the waypoint creation button at the specified mouse position
      */
     public void showWaypointButton(double mouseX, double mouseY) {
-        int buttonX = clampButtonX(mouseX);
-        int buttonY = clampButtonY(mouseY);
+        this.mouseClickX = mouseX;
+        this.mouseClickY = mouseY;
+
+        int buttonX = (int) Math.max(0, Math.min(mouseX, this.width - WAYPOINT_BUTTON_WIDTH));
+        int buttonY = (int) Math.max(0, Math.min(mouseY, this.height - WAYPOINT_BUTTON_HEIGHT));
 
         createWaypointButton.setX(buttonX);
         createWaypointButton.setY(buttonY);
@@ -206,6 +198,16 @@ public class MapScreen extends Screen {
      */
     public void hideWaypointButton() {
         createWaypointButton.visible = false;
+    }
+
+    /**
+     * Add a waypoint at the specified mouse position
+     */
+    private void openWaypointScreen() {
+        Vec2 worldPosition = getWorldPosition(mapWidget.getMapConfig(), mouseClickX, mouseClickY);
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(new CreateWayPointScreen((int) worldPosition.x, (int) worldPosition.y, this));
+        }
     }
 
     /**
@@ -222,15 +224,6 @@ public class MapScreen extends Screen {
             hideWaypointButton();
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Hide waypoint button when pressing ESC
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            hideWaypointButton();
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public void pressButton(double mouseX, double mouseY) {

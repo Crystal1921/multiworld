@@ -61,7 +61,7 @@ public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
                         // Calculate portal center position
                         double portalCenterX = (minPos.getX() + maxPos.getX()) / 2.0;
                         double portalCenterZ = (minPos.getZ() + maxPos.getZ()) / 2.0;
-                        mapWidget.centerOnPosition(portalCenterX, portalCenterZ);
+                        MapWidget.centerOnPosition(mapWidget.getMapConfig(),portalCenterX, portalCenterZ);
                     }
                 });
             }

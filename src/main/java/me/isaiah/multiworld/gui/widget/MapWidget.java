@@ -43,7 +43,7 @@ public class MapWidget extends AbstractWidget {
 
         int posX = (mapConfig.maxX() + mapConfig.minX()) / 2;
         int posZ = (mapConfig.maxZ() + mapConfig.minZ()) / 2;
-        centerOnPosition(posX, posZ);
+        centerOnPosition(this.mapConfig,posX, posZ);
     }
 
     /**
@@ -52,7 +52,7 @@ public class MapWidget extends AbstractWidget {
      * @param worldX World X coordinate to center on
      * @param worldZ World Z coordinate to center on
      */
-    public void centerOnPosition(double worldX, double worldZ) {
+    public static void centerOnPosition(MapInstance.MapConfig mapConfig, double worldX, double worldZ) {
         if (mapConfig == null) {
             return;
         }
@@ -90,6 +90,64 @@ public class MapWidget extends AbstractWidget {
         // 目标：将目标点移动到屏幕中心 (guiWidth / 2, guiHeight / 2)
         posX = (guiWidth / 2.0) - (mapDisplayWidth / 2.0) - screenDeltaX;
         posY = (guiHeight / 2.0) - (mapDisplayHeight / 2.0) - screenDeltaY;
+    }
+
+    /**
+     * Get world coordinates from screen coordinates.
+     * <br>
+     * Inverse of logic used in renderWidget.
+     *
+     * @param screenX Screen X coordinate (e.g. mouse X)
+     * @param screenY Screen Y coordinate (e.g. mouse Y)
+     * @return World position as Vec2, or null if map is not valid
+     */
+    public static Vec2 getWorldPosition(MapInstance.MapConfig mapConfig, double screenX, double screenY) {
+        if (mapConfig == null) {
+            return null;
+        }
+
+        Minecraft instance = Minecraft.getInstance();
+        if (instance.player == null) {
+            return null;
+        }
+        var player = instance.player;
+
+        // 1. 获取屏幕和地图尺寸 (与 renderWidget 中一致)
+        final int guiWidth = instance.getWindow().getGuiScaledWidth();
+        final int mapDisplayWidth = Math.max(1, MapInstance.INSTANCE.mapSize);
+        final int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
+
+        // 2. 计算地图在屏幕上的位置 (参考 renderWidget 中的 mapScreenX/Y 计算)
+        // 注意：这里使用 double 以保持精度
+        double mapScreenX = (guiWidth - mapDisplayWidth - posX);
+        double mapScreenY = posY;
+
+        // 3. 计算地图在屏幕上的中心坐标
+        double mapCenterX = mapScreenX + mapDisplayWidth / 2.0;
+        double mapCenterY = mapScreenY + mapDisplayHeight / 2.0;
+
+        // 4. 计算鼠标/屏幕点距离地图中心的像素偏移
+        double dx = screenX - mapCenterX;
+        double dy = screenY - mapCenterY;
+
+        // 5. 计算世界坐标到像素的转换比率 (与 centerOnPosition 中一致)
+        final float worldWidth = Math.max(1.0f, (float) (mapConfig.maxX() - mapConfig.minX()));
+        final float worldHeight = Math.max(1.0f, (float) (mapConfig.maxZ() - mapConfig.minZ()));
+
+        final float texPerWorldX = (float) mapDisplayWidth / worldWidth;
+        final float texPerWorldY = (float) mapDisplayHeight / worldHeight;
+
+        // 6. 反向计算世界坐标偏移
+        // 正向公式: screenDelta = worldDelta * texPerWorld * scale
+        // 逆向公式: worldDelta = screenDelta / (texPerWorld * scale)
+        double worldDeltaX = dx / (texPerWorldX * scale);
+        double worldDeltaZ = dy / (texPerWorldY * scale);
+
+        // 7. 加上参考点坐标 (地图渲染中心默认是玩家位置)
+        return new Vec2(
+                (float) (player.position().x + worldDeltaX),
+                (float) (player.position().z + worldDeltaZ)
+        );
     }
 
     @Override
