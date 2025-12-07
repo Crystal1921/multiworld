@@ -1,15 +1,18 @@
 package me.isaiah.multiworld.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPoint;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -181,7 +184,7 @@ public class MapRenderer {
 
         // Draw waypoint markers if enabled
         if (showWaypoints && waypoints != null) {
-            final int waypointSize = 6;
+            final int waypointSize = 10;
             
             for (WayPoint waypoint : waypoints) {
                 // Only draw waypoints for current dimension
@@ -243,87 +246,37 @@ public class MapRenderer {
      * @param size        Size of the square (distance from center to vertex)
      * @param color       Color in ARGB format
      */
+    @SuppressWarnings("deprecation")
     private static void drawRotatedSquare(GuiGraphics guiGraphics, int centerX, int centerY, int size, int color) {
-        // Ensure alpha channel is set (if not provided, default to fully opaque)
+        // 1. 颜色处理保持不变
         int colorWithAlpha = (color & 0xFF000000) != 0 ? color : (0xFF000000 | color);
-        
-        // Calculate the four vertices of a diamond (square rotated 45°)
-        int halfSize = size / 2;
-        
-        // Top vertex
-        int topX = centerX;
-        int topY = centerY - halfSize;
-        
-        // Right vertex
-        int rightX = centerX + halfSize;
-        int rightY = centerY;
-        
-        // Bottom vertex
-        int bottomX = centerX;
-        int bottomY = centerY + halfSize;
-        
-        // Left vertex
-        int leftX = centerX - halfSize;
-        int leftY = centerY;
-        
-        // Draw filled diamond by drawing two triangles
-        // Triangle 1: top-right-bottom
-        fillTriangle(guiGraphics, topX, topY, rightX, rightY, bottomX, bottomY, colorWithAlpha);
-        
-        // Triangle 2: top-left-bottom
-        fillTriangle(guiGraphics, topX, topY, leftX, leftY, bottomX, bottomY, colorWithAlpha);
-    }
 
-    /**
-     * Fill a triangle with three vertices
-     */
-    private static void fillTriangle(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
-        // Sort vertices by Y coordinate
-        if (y1 > y2) {
-            int tx = x1, ty = y1;
-            x1 = x2; y1 = y2;
-            x2 = tx; y2 = ty;
-        }
-        if (y1 > y3) {
-            int tx = x1, ty = y1;
-            x1 = x3; y1 = y3;
-            x3 = tx; y3 = ty;
-        }
-        if (y2 > y3) {
-            int tx = x2, ty = y2;
-            x2 = x3; y2 = y3;
-            x3 = tx; y3 = ty;
-        }
-        
-        // Draw horizontal lines to fill the triangle
-        for (int y = y1; y <= y3; y++) {
-            int xStart, xEnd;
-            
-            if (y <= y2) {
-                // Upper part of triangle
-                xStart = interpolate(y1, x1, y2, x2, y);
-                xEnd = interpolate(y1, x1, y3, x3, y);
-            } else {
-                // Lower part of triangle
-                xStart = interpolate(y2, x2, y3, x3, y);
-                xEnd = interpolate(y1, x1, y3, x3, y);
-            }
-            
-            if (xStart > xEnd) {
-                int temp = xStart;
-                xStart = xEnd;
-                xEnd = temp;
-            }
-            
-            guiGraphics.fill(xStart, y, xEnd + 1, y + 1, color);
-        }
-    }
+        float half = size / 2f;
 
-    /**
-     * Linear interpolation to find X coordinate at given Y
-     */
-    private static int interpolate(int y1, int x1, int y2, int x2, int y) {
-        if (y1 == y2) return x1;
-        return x1 + (x2 - x1) * (y - y1) / (y2 - y1);
+        // 2. 顶点计算
+        float topX = centerX;
+        float topY = centerY - half;
+
+        float rightX = centerX + half;
+        float rightY = centerY;
+
+        float bottomX = centerX;
+        float bottomY = centerY + half;
+
+        float leftX = centerX - half;
+        float leftY = centerY;
+
+        Matrix4f matrix = guiGraphics.pose().last().pose();
+        VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+
+        // 3. 修改绘制顺序为逆时针 (Top -> Left -> Bottom -> Right) 以符合标准
+        // 注意：Z值这里暂时还是0，如果需要层级控制，建议给方法加一个 int z 参数
+        vertexConsumer.addVertex(matrix, topX,    topY,    0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, leftX,   leftY,   0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, bottomX, bottomY, 0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, rightX,  rightY,  0).setColor(colorWithAlpha);
+
+        // 4. 重要：刷新缓冲区，确保立即渲染
+        guiGraphics.flushIfUnmanaged();
     }
 }
