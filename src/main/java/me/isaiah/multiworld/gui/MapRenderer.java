@@ -1,14 +1,18 @@
 package me.isaiah.multiworld.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import me.isaiah.multiworld.map.MapInstance;
+import me.isaiah.multiworld.map.waypoint.WayPoint;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -29,6 +33,7 @@ public class MapRenderer {
      * @param background     Map texture resource
      * @param mapConfig      Map configuration
      * @param portals        List of portal positions
+     * @param waypoints      List of waypoints to draw
      * @param font           Font for drawing markers
      * @param mapScreenX     X position of map on screen
      * @param mapScreenY     Y position of map on screen
@@ -40,6 +45,7 @@ public class MapRenderer {
      * @param scissorMaxX    Scissor region max X
      * @param scissorMaxY    Scissor region max Y
      * @param showPortals    Whether to show portal markers
+     * @param showWaypoints  Whether to show waypoint markers
      * @param centerX        X coordinate to center on (in world space), or null to use player position
      * @param centerZ        Z coordinate to center on (in world space), or null to use player position
      */
@@ -48,6 +54,7 @@ public class MapRenderer {
                                ResourceLocation background,
                                MapInstance.MapConfig mapConfig,
                                List<Vec2> portals,
+                               List<WayPoint> waypoints,
                                Font font,
                                int mapScreenX,
                                int mapScreenY,
@@ -59,6 +66,7 @@ public class MapRenderer {
                                int scissorMaxX,
                                int scissorMaxY,
                                boolean showPortals,
+                               boolean showWaypoints,
                                Double centerX,
                                Double centerZ) {
 
@@ -174,6 +182,45 @@ public class MapRenderer {
             }
         }
 
+        // Draw waypoint markers if enabled
+        if (showWaypoints && waypoints != null) {
+            final int waypointSize = 10;
+            
+            for (WayPoint waypoint : waypoints) {
+                // Only draw waypoints for current dimension
+                if (!waypoint.dimensionId().equals(mapConfig.worldID())) {
+                    continue;
+                }
+                
+                float worldPointX = (float) waypoint.x();
+                float worldPointZ = (float) waypoint.z();
+
+                // World -> texture (pixel) space
+                float texturePointX = (worldPointX - minX) * texPerWorldX;
+                float texturePointY = (worldPointZ - minZ) * texPerWorldY;
+
+                // Offset relative to center in texture
+                float dxTexture = texturePointX - textureCenterX;
+                float dyTexture = texturePointY - textureCenterY;
+
+                // Skip if outside visible range
+                if (Math.abs(dxTexture) > visibleRadiusX || Math.abs(dyTexture) > visibleRadiusY) {
+                    continue;
+                }
+
+                // Texture pixel offset -> screen pixel offset (with scale)
+                float dxScreen = dxTexture * fMapScale;
+                float dyScreen = dyTexture * fMapScale;
+
+                // Final screen coordinates
+                int pointScreenX = Math.round(mapCenterScreenX + dxScreen);
+                int pointScreenY = Math.round(mapCenterScreenY + dyScreen);
+
+                // Draw a 45° rotated square (diamond shape)
+                drawRotatedSquare(guiGraphics, pointScreenX, pointScreenY, waypointSize, waypoint.color());
+            }
+        }
+
         // Draw center marker (red dot at center)
         final int playerMarkerSize = 3;
         final int halfP = playerMarkerSize / 2;
@@ -188,5 +235,48 @@ public class MapRenderer {
         );
 
         guiGraphics.disableScissor();
+    }
+
+    /**
+     * Draw a 45° rotated square (diamond shape) at the specified position
+     *
+     * @param guiGraphics Graphics context
+     * @param centerX     Center X coordinate
+     * @param centerY     Center Y coordinate
+     * @param size        Size of the square (distance from center to vertex)
+     * @param color       Color in ARGB format
+     */
+    @SuppressWarnings("deprecation")
+    private static void drawRotatedSquare(GuiGraphics guiGraphics, int centerX, int centerY, int size, int color) {
+        // 1. 颜色处理保持不变
+        int colorWithAlpha = (color & 0xFF000000) != 0 ? color : (0xFF000000 | color);
+
+        float half = size / 2f;
+
+        // 2. 顶点计算
+        float topX = centerX;
+        float topY = centerY - half;
+
+        float rightX = centerX + half;
+        float rightY = centerY;
+
+        float bottomX = centerX;
+        float bottomY = centerY + half;
+
+        float leftX = centerX - half;
+        float leftY = centerY;
+
+        Matrix4f matrix = guiGraphics.pose().last().pose();
+        VertexConsumer vertexConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
+
+        // 3. 修改绘制顺序为逆时针 (Top -> Left -> Bottom -> Right) 以符合标准
+        // 注意：Z值这里暂时还是0，如果需要层级控制，建议给方法加一个 int z 参数
+        vertexConsumer.addVertex(matrix, topX,    topY,    0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, leftX,   leftY,   0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, bottomX, bottomY, 0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, rightX,  rightY,  0).setColor(colorWithAlpha);
+
+        // 4. 重要：刷新缓冲区，确保立即渲染
+        guiGraphics.flushIfUnmanaged();
     }
 }

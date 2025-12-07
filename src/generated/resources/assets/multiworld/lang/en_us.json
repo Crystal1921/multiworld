@@ -1,6 +1,7 @@
 {
   "block.multiworld.portal_block": "Portal Block",
   "gui.multiworld.map.portal_list": "Portal List",
+  "gui.multiworld.map.waypoint_list": "Waypoint List",
   "gui.multiworld.map.world_list": "World List",
   "item.multiworld.portal_finder": "Portal Finder",
   "itemGroup.multiworld": "Multiworld",
