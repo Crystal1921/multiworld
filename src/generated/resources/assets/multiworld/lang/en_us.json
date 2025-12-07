@@ -8,6 +8,8 @@
   "key.multiworld.map_open.desc": "Open Map",
   "multiworld": "Multiworld",
   "multiworld.configuration.enableLittleMap": "Enable Little Map",
+  "multiworld.configuration.enablePortals": "Enable Portals",
+  "multiworld.configuration.enableWaypoints": "Enable Waypoints",
   "multiworld.configuration.mapScale": "Map Scale",
   "multiworld.map.create_waypoint": "Create Waypoint",
   "multiworld.map.settings.little_map": "Little Map",

@@ -55,6 +55,8 @@ public class ModLanguage implements DataProvider {
         this.add("multiworld.map.warn.dimension_not_exist", "This dimension does not exist!", "该维度不存在！");
 
         this.add("multiworld.configuration.enableLittleMap", "Enable Little Map", "启用小地图");
+        this.add("multiworld.configuration.enablePortals", "Enable Portals", "启用传送门显示");
+        this.add("multiworld.configuration.enableWaypoints", "Enable Waypoints", "启用路径点显示");
         this.add("multiworld.configuration.mapScale", "Map Scale", "小地图缩放比例");
 
         this.add(ItemRegistry.PortalBlock.asItem(), "Portal Block", "传送门方块");

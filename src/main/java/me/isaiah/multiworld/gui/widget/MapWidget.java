@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static me.isaiah.multiworld.config.ClientConfig.ENABLE_PORTALS;
 import static me.isaiah.multiworld.gui.MapScreen.MAP_PADDING;
 
 public class MapWidget extends AbstractWidget {
@@ -28,7 +29,6 @@ public class MapWidget extends AbstractWidget {
     @Getter
     private static double scale = 3;
     private final MapScreen mapScreen;
-    public boolean showPortalList = true;
     @Setter
     @Getter
     private MapInstance.MapConfig mapConfig;
@@ -186,7 +186,7 @@ public class MapWidget extends AbstractWidget {
                 0,
                 getWidth(),
                 getHeight(),
-                showPortalList,
+                ENABLE_PORTALS.get(),
                 null,  // use player position for center
                 null   // use player position for center
         );
