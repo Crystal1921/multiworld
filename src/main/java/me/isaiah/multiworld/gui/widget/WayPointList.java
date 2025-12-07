@@ -50,14 +50,15 @@ public class WayPointList extends ObjectSelectionList<WayPointList.WayPointEntry
             MapWidget mapWidget = mapScreen.getMapWidget();
             if (mapWidget != null) {
                 ResourceLocation wayPointWorldId = ResourceLocation.parse(wayPoint.dimensionId());
-                MapInstance.INSTANCE.mapConfigs.forEach(mapConfig -> {
-                    if (mapConfig.worldID().equals(wayPointWorldId.toString())) {
-                        setMapData(wayPointWorldId, mapConfig, mapWidget);
+                MapInstance.INSTANCE.mapConfigs.stream()
+                        .filter(mapConfig -> mapConfig.worldID().equals(wayPointWorldId.toString()))
+                        .findFirst()
+                        .ifPresent(mapConfig -> {
+                            setMapData(wayPointWorldId, mapConfig, mapWidget);
 
-                        // Center the map on the waypoint position
-                        MapWidget.centerOnPosition(mapWidget.getMapConfig(), wayPoint.x(), wayPoint.z());
-                    }
-                });
+                            // Center the map on the waypoint position
+                            MapWidget.centerOnPosition(mapWidget.getMapConfig(), wayPoint.x(), wayPoint.z());
+                        });
             }
             return true;
         }
