@@ -23,6 +23,15 @@ public class PortalList extends ObjectSelectionList<PortalList.PortalEntry> {
         this.refreshList();
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.active && this.visible) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        } else {
+            return false;
+        }
+    }
+
     private void refreshList() {
         this.clearEntries();
         mapScreen.buildPortalList(this::addEntry, item -> new PortalEntry(item, this.mapScreen));

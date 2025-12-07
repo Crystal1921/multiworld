@@ -22,6 +22,15 @@ public class WayPointList extends ObjectSelectionList<WayPointList.WayPointEntry
         this.refreshList();
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.active && this.visible) {
+            return super.mouseClicked(mouseX, mouseY, button);
+        } else {
+            return false;
+        }
+    }
+
     private void refreshList() {
         this.clearEntries();
         mapScreen.buildWayPointList(this::addEntry, item -> new WayPointEntry(item, this.mapScreen));
