@@ -94,6 +94,14 @@ public enum MapInstance {
         save("config/multiworld/map.yml");
     }
 
+    public static List<String> getWorldIdList() {
+        List<String> names = new ArrayList<>();
+        for (MapConfig config : MapInstance.INSTANCE.mapConfigs) {
+            names.add(config.worldID);
+        }
+        return names;
+    }
+
     public record MapConfig(String worldID, String mapName, int minX, int minZ, int maxX, int maxZ) {
     }
 }

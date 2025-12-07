@@ -14,9 +14,17 @@
   "multiworld.map.settings.little_map_off": "Hide Little Map",
   "multiworld.map.settings.little_map_on": "Show Little Map",
   "multiworld.map.settings.title": "Map Settings",
+  "multiworld.map.warn.dimension_not_exist": "This dimension does not exist!",
+  "multiworld.map.warn.name_empty": "Waypoint name cannot be empty!",
+  "multiworld.map.warn.waypoint_exists": "A waypoint with this name already exists!",
   "multiworld.map.waypoint": "Waypoints",
   "multiworld.map.waypoint.cancel": "Cancel",
   "multiworld.map.waypoint.create": "Create",
   "multiworld.map.waypoint.default_name": "Waypoint",
-  "multiworld.map.waypoint.name": "Waypoint Name"
+  "multiworld.map.waypoint.label.color": "Color:",
+  "multiworld.map.waypoint.label.dimension": "Dimension:",
+  "multiworld.map.waypoint.label.x": "X:",
+  "multiworld.map.waypoint.label.y": "Y:",
+  "multiworld.map.waypoint.label.z": "Z:",
+  "multiworld.map.waypoint.name": "Name:"
 }

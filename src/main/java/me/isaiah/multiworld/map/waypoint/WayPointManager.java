@@ -37,7 +37,7 @@ public enum WayPointManager {
                 INSTANCE.save();
             }
         } catch (Exception e) {
-            MultiworldMod.LOGGER.warn("Failed to load waypoint config: " + e.getMessage());
+            MultiworldMod.LOGGER.warn("Failed to load waypoint config: {}", e.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public enum WayPointManager {
         try {
             save();
         } catch (Exception e) {
-            MultiworldMod.LOGGER.error("Failed to save waypoint: " + e.getMessage());
+            MultiworldMod.LOGGER.error("Failed to save waypoint: {}", e.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public enum WayPointManager {
         try {
             save();
         } catch (Exception e) {
-            MultiworldMod.LOGGER.error("Failed to save after removing waypoint: " + e.getMessage());
+            MultiworldMod.LOGGER.error("Failed to save after removing waypoint: {}", e.getMessage());
         }
     }
 
@@ -163,7 +163,7 @@ public enum WayPointManager {
                         waypoints.add(new WayPoint(name, x, y, z, dimensionId, color));
                     }
                 } catch (NullPointerException | ClassCastException e) {
-                    MultiworldMod.LOGGER.warn("Failed to load waypoint: " + e.getMessage());
+                    MultiworldMod.LOGGER.warn("Failed to load waypoint: {}", e.getMessage());
                 }
             }
         }
@@ -177,7 +177,11 @@ public enum WayPointManager {
         try {
             save();
         } catch (Exception e) {
-            MultiworldMod.LOGGER.error("Failed to save after clearing waypoints: " + e.getMessage());
+            MultiworldMod.LOGGER.error("Failed to save after clearing waypoints: {}", e.getMessage());
         }
+    }
+
+    public boolean contains(String name) {
+        return waypoints.stream().anyMatch(wp -> wp.name().equals(name));
     }
 }

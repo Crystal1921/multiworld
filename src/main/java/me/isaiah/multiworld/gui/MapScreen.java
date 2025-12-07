@@ -93,7 +93,7 @@ public class MapScreen extends Screen {
                                 case PORTAL_LIST -> setListsVisibility(true, false);
                                 case WORLD_LIST -> setListsVisibility(false, true);
                             }
-                            openWaypointScreen();
+                            hideWaypointButton();
                         });
 
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
@@ -205,7 +205,7 @@ public class MapScreen extends Screen {
     private void openWaypointScreen() {
         Vec2 worldPosition = getWorldPosition(mapWidget.getMapConfig(), mouseClickX, mouseClickY);
         if (this.minecraft != null) {
-            this.minecraft.setScreen(new CreateWayPointScreen((int) worldPosition.x, (int) worldPosition.y, this));
+            this.minecraft.setScreen(new CreateWayPointScreen((int) worldPosition.x, (int) worldPosition.y, this.mapWidget.getMapConfig(), this));
         }
     }
 
