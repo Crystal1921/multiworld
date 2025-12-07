@@ -7,8 +7,11 @@ import me.isaiah.multiworld.command.commands.PortalCommand;
 import me.isaiah.multiworld.gui.widget.MapWidget;
 import me.isaiah.multiworld.gui.widget.PortalList;
 import me.isaiah.multiworld.gui.widget.WayPointButton;
+import me.isaiah.multiworld.gui.widget.WayPointList;
 import me.isaiah.multiworld.gui.widget.WorldList;
 import me.isaiah.multiworld.map.MapInstance;
+import me.isaiah.multiworld.map.waypoint.WayPoint;
+import me.isaiah.multiworld.map.waypoint.WayPointManager;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -55,6 +58,7 @@ public class MapScreen extends Screen {
     private final static int WAYPOINT_BUTTON_HEIGHT = 20;
     WorldList worldList;
     PortalList portalList;
+    WayPointList wayPointList;
     @Getter
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
@@ -90,8 +94,9 @@ public class MapScreen extends Screen {
                 .create(0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10, Component.empty(),
                         (button, mapMode) -> {
                             switch (mapMode) {
-                                case PORTAL_LIST -> setListsVisibility(true, false);
-                                case WORLD_LIST -> setListsVisibility(false, true);
+                                case PORTAL_LIST -> setListsVisibility(true, false, false);
+                                case WORLD_LIST -> setListsVisibility(false, true, false);
+                                case WAYPOINT_LIST -> setListsVisibility(false, false, true);
                             }
                             hideWaypointButton();
                         });
@@ -99,6 +104,7 @@ public class MapScreen extends Screen {
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
         worldList = new WorldList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
         portalList = new PortalList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
+        wayPointList = new WayPointList(this, MAP_PADDING, 0, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING);
 
         Button mapSettingsButton = Button
                 .builder(Component.translatable("multiworld.map.settings.title"), button -> {
@@ -115,7 +121,7 @@ public class MapScreen extends Screen {
                 })
                 .bounds(BUTTON_WIDTH, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH, BUTTON_PADDING - 10).build();
 
-        setListsVisibility(false, true);
+        setListsVisibility(false, true, false);
 
         createWaypointButton = new WayPointButton(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.create_waypoint"), button -> {
             openWaypointScreen();
@@ -128,6 +134,7 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(mapSettingsButton);
         this.addRenderableWidget(worldList);
         this.addRenderableWidget(portalList);
+        this.addRenderableWidget(wayPointList);
         this.addRenderableWidget(createWaypointButton);
     }
 
@@ -141,10 +148,11 @@ public class MapScreen extends Screen {
     public void resize(@NotNull Minecraft minecraft, int width, int height) {
         boolean portalVisible = portalList.visible;
         boolean worldVisible = worldList.visible;
+        boolean wayPointVisible = wayPointList.visible;
         MapMode mapMode = listSwitchButton.getValue();
         MapInstance.MapConfig mapConfig = mapWidget.getMapConfig();
         super.resize(minecraft, width, height);
-        setListsVisibility(portalVisible, worldVisible);
+        setListsVisibility(portalVisible, worldVisible, wayPointVisible);
         listSwitchButton.setValue(mapMode);
         setMapData(ResourceLocation.parse(mapConfig.worldID()), mapConfig, mapWidget);
         hideWaypointButton();
@@ -172,9 +180,17 @@ public class MapScreen extends Screen {
         });
     }
 
-    private void setListsVisibility(boolean portalVisible, boolean worldVisible) {
+    public <T extends ObjectSelectionList.Entry<T>> void buildWayPointList(Consumer<T> modListViewConsumer, Function<WayPoint, T> newEntry) {
+        WayPointManager.INSTANCE.getWaypoints().forEach(wayPoint -> {
+            T entry = newEntry.apply(wayPoint);
+            modListViewConsumer.accept(entry);
+        });
+    }
+
+    private void setListsVisibility(boolean portalVisible, boolean worldVisible, boolean wayPointVisible) {
         portalList.visible = portalVisible;
         worldList.visible = worldVisible;
+        wayPointList.visible = wayPointVisible;
     }
 
     /**
@@ -233,7 +249,8 @@ public class MapScreen extends Screen {
 
     public enum MapMode implements StringRepresentable {
         WORLD_LIST,
-        PORTAL_LIST;
+        PORTAL_LIST,
+        WAYPOINT_LIST;
 
         @Override
         public @NotNull String getSerializedName() {
