@@ -14,5 +14,17 @@
   "multiworld.map.settings.little_map_off": "隐藏小地图",
   "multiworld.map.settings.little_map_on": "显示小地图",
   "multiworld.map.settings.title": "地图设置",
-  "multiworld.map.waypoint": "路径点"
+  "multiworld.map.warn.dimension_not_exist": "该维度不存在！",
+  "multiworld.map.warn.name_empty": "路径点名称不能为空！",
+  "multiworld.map.warn.waypoint_exists": "已存在同名路径点！",
+  "multiworld.map.waypoint": "路径点",
+  "multiworld.map.waypoint.cancel": "取消",
+  "multiworld.map.waypoint.create": "创建",
+  "multiworld.map.waypoint.default_name": "路径点",
+  "multiworld.map.waypoint.label.color": "颜色：",
+  "multiworld.map.waypoint.label.dimension": "维度：",
+  "multiworld.map.waypoint.label.x": "X：",
+  "multiworld.map.waypoint.label.y": "Y：",
+  "multiworld.map.waypoint.label.z": "Z：",
+  "multiworld.map.waypoint.name": "名称："
 }

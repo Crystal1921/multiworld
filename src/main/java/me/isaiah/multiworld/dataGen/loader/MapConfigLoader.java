@@ -29,6 +29,7 @@ public class MapConfigLoader extends SimplePreparableReloadListener<Map<Resource
 
     @Override
     protected void apply(Map<ResourceLocation, Resource> resourceLocationJsonElementMap, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
+        MapInstance.INSTANCE.mapConfigs.clear();
         resourceLocationJsonElementMap.forEach((resourceLocation, resource) -> {
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(resource.open(), StandardCharsets.UTF_8))) {

@@ -40,6 +40,20 @@ public class ModLanguage implements DataProvider {
         this.add("multiworld.map.waypoint", "Waypoints", "路径点");
         this.add("multiworld.map.create_waypoint", "Create Waypoint", "创建路径点");
 
+        // Waypoint UI specific labels (localizable)
+        this.add("multiworld.map.waypoint.cancel", "Cancel", "取消");
+        this.add("multiworld.map.waypoint.create", "Create", "创建");
+        this.add("multiworld.map.waypoint.name", "Name:", "名称：");
+        this.add("multiworld.map.waypoint.default_name", "Waypoint", "路径点");
+        this.add("multiworld.map.waypoint.label.x", "X:", "X：");
+        this.add("multiworld.map.waypoint.label.y", "Y:", "Y：");
+        this.add("multiworld.map.waypoint.label.z", "Z:", "Z：");
+        this.add("multiworld.map.waypoint.label.dimension", "Dimension:", "维度：");
+        this.add("multiworld.map.waypoint.label.color", "Color:", "颜色：");
+        this.add("multiworld.map.warn.name_empty", "Waypoint name cannot be empty!", "路径点名称不能为空！");
+        this.add("multiworld.map.warn.waypoint_exists", "A waypoint with this name already exists!", "已存在同名路径点！");
+        this.add("multiworld.map.warn.dimension_not_exist", "This dimension does not exist!", "该维度不存在！");
+
         this.add("multiworld.configuration.enableLittleMap", "Enable Little Map", "启用小地图");
         this.add("multiworld.configuration.mapScale", "Map Scale", "小地图缩放比例");
 
