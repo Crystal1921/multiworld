@@ -3,6 +3,7 @@ package me.isaiah.multiworld.gui;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.config.ClientConfig;
 import me.isaiah.multiworld.map.MapInstance;
+import me.isaiah.multiworld.map.waypoint.WayPointManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -62,6 +63,7 @@ public class MapOverlay implements LayeredDraw.Layer {
                 map,
                 mapConfig,
                 Collections.emptyList(),  // No portals in overlay
+                WayPointManager.INSTANCE.getWaypoints(),
                 minecraft.font,
                 mapScreenX,
                 mapScreenY,
@@ -73,6 +75,7 @@ public class MapOverlay implements LayeredDraw.Layer {
                 mapScreenX + mapDisplayWidth,
                 mapScreenY + mapDisplayHeight,
                 false,  // Don't show portals
+                ClientConfig.ENABLE_WAYPOINTS.get(),  // Show waypoints in overlay
                 null,   // Use player position for center
                 null    // Use player position for center
         );

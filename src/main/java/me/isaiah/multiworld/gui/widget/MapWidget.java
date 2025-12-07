@@ -6,6 +6,7 @@ import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.gui.MapRenderer;
 import me.isaiah.multiworld.gui.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
+import me.isaiah.multiworld.map.waypoint.WayPointManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import static me.isaiah.multiworld.config.ClientConfig.ENABLE_PORTALS;
+import static me.isaiah.multiworld.config.ClientConfig.ENABLE_WAYPOINTS;
 import static me.isaiah.multiworld.gui.MapScreen.MAP_PADDING;
 
 public class MapWidget extends AbstractWidget {
@@ -176,6 +178,7 @@ public class MapWidget extends AbstractWidget {
                 background,
                 mapConfig,
                 portals,
+                WayPointManager.INSTANCE.getWaypoints(),
                 instance.font,
                 mapScreenX,
                 mapScreenY,
@@ -187,6 +190,7 @@ public class MapWidget extends AbstractWidget {
                 getWidth(),
                 getHeight(),
                 ENABLE_PORTALS.get(),
+                ENABLE_WAYPOINTS.get(),
                 null,  // use player position for center
                 null   // use player position for center
         );
