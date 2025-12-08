@@ -1,6 +1,6 @@
 package me.isaiah.multiworld.event;
 
-import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.gui.screen.MapScreen;
 import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

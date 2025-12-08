@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.gui.MapRenderer;
-import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static me.isaiah.multiworld.config.ClientConfig.ENABLE_PORTALS;
 import static me.isaiah.multiworld.config.ClientConfig.ENABLE_WAYPOINTS;
-import static me.isaiah.multiworld.gui.MapScreen.MAP_PADDING;
+import static me.isaiah.multiworld.gui.screen.MapScreen.MAP_PADDING;
 
 public class MapWidget extends AbstractWidget {
     @Getter
@@ -254,24 +254,6 @@ public class MapWidget extends AbstractWidget {
         );
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!isMouseOver(mouseX, mouseY)) {
-            return super.mouseClicked(mouseX, mouseY, button);
-        }
-        if (button == 1) {
-            // Right-click: notify parent MapScreen to show waypoint creation button
-            mapScreen.showWaypointButton(mouseX, mouseY);
-            return true;
-        }
-        if (button == 0) {
-            // Left-click: notify parent MapScreen to handle button press
-            mapScreen.pressButton(mouseX, mouseY);
-            return true;
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
     /**
      * 处理鼠标滚轮：以鼠标为中心缩放地图。
      * <br>
@@ -319,7 +301,7 @@ public class MapWidget extends AbstractWidget {
         }
 
         // Hide waypoint button when scrolling
-        mapScreen.hideWaypointButton();
+        mapScreen.hideAllWaypointButton();
 
         return true;
     }
@@ -329,7 +311,7 @@ public class MapWidget extends AbstractWidget {
         posX -= dragX;
         posY += dragY;
         // Hide waypoint button when dragging
-        mapScreen.hideWaypointButton();
+        mapScreen.hideAllWaypointButton();
     }
 
     @Override

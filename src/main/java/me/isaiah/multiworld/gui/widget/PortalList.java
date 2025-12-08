@@ -1,7 +1,7 @@
 package me.isaiah.multiworld.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.portal.Portal;
 import net.minecraft.client.gui.GuiGraphics;

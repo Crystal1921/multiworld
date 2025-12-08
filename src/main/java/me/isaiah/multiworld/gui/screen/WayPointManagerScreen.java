@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.gui;
+package me.isaiah.multiworld.gui.screen;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;

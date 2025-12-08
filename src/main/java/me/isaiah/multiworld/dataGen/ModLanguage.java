@@ -51,6 +51,7 @@ public class ModLanguage implements DataProvider {
         this.add("multiworld.map.waypoint.label.dimension", "Dimension:", "维度：");
         this.add("multiworld.map.waypoint.label.color", "Color:", "颜色：");
         this.add("multiworld.map.waypoint.label.delete", "Delete Waypoint", "删除路径点");
+        this.add("multiworld.map.waypoint.label.edit", "Edit Waypoint", "编辑路径点");
         this.add("multiworld.map.waypoint.label.confirm_delete", "Confirm to delete this Waypoint", "确定要删除此路径点");
 
         this.add("multiworld.map.warn.name_empty", "Waypoint name cannot be empty!", "路径点名称不能为空！");

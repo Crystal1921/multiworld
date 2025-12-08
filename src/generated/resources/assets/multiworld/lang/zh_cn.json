@@ -27,6 +27,7 @@
   "multiworld.map.waypoint.label.confirm_delete": "确定要删除此路径点",
   "multiworld.map.waypoint.label.delete": "删除路径点",
   "multiworld.map.waypoint.label.dimension": "维度：",
+  "multiworld.map.waypoint.label.edit": "编辑路径点",
   "multiworld.map.waypoint.label.x": "X：",
   "multiworld.map.waypoint.label.y": "Y：",
   "multiworld.map.waypoint.label.z": "Z：",

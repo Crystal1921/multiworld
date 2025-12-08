@@ -8,7 +8,7 @@ import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.WarpCommand;
 import me.isaiah.multiworld.config.ClientConfig;
-import me.isaiah.multiworld.gui.MapConfigScreen;
+import me.isaiah.multiworld.gui.screen.MapConfigScreen;
 import me.isaiah.multiworld.portal.WandEventHandler;
 import me.isaiah.multiworld.registry.*;
 import net.neoforged.bus.api.IEventBus;

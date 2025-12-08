@@ -1,8 +1,9 @@
-package me.isaiah.multiworld.gui;
+package me.isaiah.multiworld.gui.screen;
 
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPoint;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;
+import me.isaiah.multiworld.util.UtilsMethod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -12,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
+
+import static me.isaiah.multiworld.util.UtilsMethod.*;
 
 public class CreateWayPointScreen extends Screen {
     private static final int BUTTON_WIDTH = 100;
@@ -37,21 +40,6 @@ public class CreateWayPointScreen extends Screen {
         this.mapConfig = mapConfig;
         this.posX = posX;
         this.posZ = posZ;
-    }
-
-    // 解析并验证颜色字符串，返回 ARGB 整数（alpha=0xFF）或返回 null 表示无效
-    private static Integer parseColorHexToArgb(String text) {
-        if (text == null) return null;
-        String s = text.trim();
-        if (s.isEmpty()) return null;
-        if (s.startsWith("#")) s = s.substring(1);
-        if (s.length() != 6) return null;
-        try {
-            int rgb = Integer.parseInt(s, 16) & 0xFFFFFF;
-            return rgb | 0xFF000000; // 确保 alpha 为 255
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     @Override
@@ -188,41 +176,8 @@ public class CreateWayPointScreen extends Screen {
                     startY + 5 * (FIELD_HEIGHT + SPACING),
                     centerX - FIELD_WIDTH / 2 - 30,
                     startY + 5 * (FIELD_HEIGHT + SPACING) + FIELD_HEIGHT,
-                    parseColorHexToArgb(this.colorField.getValue()));
+                    UtilsMethod.parseColorHexToArgb(this.colorField.getValue()));
         }
-    }
-
-    private void validateNumericField(EditBox field, String text) {
-        if (text.isEmpty()) {
-            field.setTextColor(0xE0E0E0);
-            return;
-        }
-        try {
-            Double.parseDouble(text);
-            field.setTextColor(0xE0E0E0);
-        } catch (NumberFormatException e) {
-            field.setTextColor(0xFF5555);
-        }
-    }
-
-    // 原用于响应器的校验方法，使用静态解析方法设置输入框颜色（灰色=正常，红色=错误）
-    private void validateColorField(EditBox field, String text) {
-        if (text == null || text.isEmpty()) {
-            field.setTextColor(0xE0E0E0);
-            return;
-        }
-        Integer argb = parseColorHexToArgb(text);
-        if (argb == null) {
-            field.setTextColor(0xFF5555);
-        } else {
-            field.setTextColor(0xE0E0E0);
-        }
-    }
-
-    // 在 render 中调用的便捷方法，返回是否为合法颜色
-    private boolean validateColorField(EditBox field) {
-        Integer argb = parseColorHexToArgb(field == null ? null : field.getValue());
-        return argb != null;
     }
 
     private void createWaypoint() {

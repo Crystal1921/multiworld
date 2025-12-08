@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Manages waypoints on the client side
@@ -86,12 +87,11 @@ public enum WayPointManager {
                 .toList();
     }
 
-    public List<Vec2> getScreenWaypointForDimension(MapInstance.MapConfig mapConfig, float scale, LocalPlayer player) {
+    public Map<WayPoint,Vec2> getScreenWaypointForDimension(MapInstance.MapConfig mapConfig, float scale, LocalPlayer player) {
         String dimensionId = mapConfig.worldID();
         return waypoints.stream()
                 .filter(wp -> wp.dimensionId().equals(dimensionId))
-                .map(wp -> MapWidget.getScreenPosition(mapConfig, wp.x(), wp.z(), scale, player))
-                .toList();
+                .collect(Collectors.toMap(wp -> wp, wp -> MapWidget.getScreenPosition(mapConfig, wp.x(), wp.z(), scale, player)));
     }
 
     /**

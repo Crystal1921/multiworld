@@ -1,11 +1,8 @@
 package me.isaiah.multiworld.gui.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 
 public class WayPointButton extends Button {
     public WayPointButton(int x, int y, int width, int height, Component message, OnPress onPress, CreateNarration createNarration) {
@@ -14,14 +11,16 @@ public class WayPointButton extends Button {
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), 0xFFFFFFFF);
-//        guiGraphics.blitSprite(SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        int i = getFGColor();
-        this.renderString(guiGraphics, minecraft.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
+        int color = this.isHoveredOrFocused() ? 0xFFFFFFFF : 0xFF000000;
+        guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x80000000);
+        guiGraphics.renderOutline(this.getX(), this.getY(), this.width, this.height, color);
+
+        // 绘制文字
+        int textColor = this.active ? 16777215 : 10526880;
+        guiGraphics.drawCenteredString(net.minecraft.client.Minecraft.getInstance().font,
+                this.getMessage(),
+                this.getX() + this.width / 2,
+                this.getY() + (this.height - 8) / 2,
+                textColor);
     }
 }

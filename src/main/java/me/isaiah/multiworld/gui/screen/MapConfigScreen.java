@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.gui;
+package me.isaiah.multiworld.gui.screen;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;

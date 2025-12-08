@@ -1,4 +1,4 @@
-package me.isaiah.multiworld.gui;
+package me.isaiah.multiworld.gui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Getter;
@@ -31,6 +31,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,10 +60,13 @@ public class MapScreen extends Screen {
     MapWidget mapWidget;
     private CycleButton<MapMode> listSwitchButton;
     private Button createWaypointButton;
+    private Button editWaypointButton;
     private DeleteCycleButton<Boolean> deleteWaypointButton;
 
     private double mouseClickX;
     private double mouseClickY;
+
+    private WayPoint selectedWayPoint;
 
     public MapScreen() {
         super(Component.literal("Map"));
@@ -95,7 +99,7 @@ public class MapScreen extends Screen {
                                 case WORLD_LIST -> setListsVisibility(false, true, false);
                                 case WAYPOINT_LIST -> setListsVisibility(false, false, true);
                             }
-                            hideWaypointButton();
+                            hideAllWaypointButton();
                         });
 
         mapWidget = new MapWidget(MAP_PADDING, 0, instance.getWindow().getGuiScaledWidth(), instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING, config.get(), portals, this);
@@ -122,15 +126,30 @@ public class MapScreen extends Screen {
 
         createWaypointButton = new WayPointButton(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.create_waypoint"), button -> {
             openWaypointScreen();
-            hideWaypointButton();
+            hideAllWaypointButton();
         }, DEFAULT_NARRATION);
+
         createWaypointButton.visible = false;
+
+        editWaypointButton = new WayPointButton(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.waypoint.label.edit"), button -> {
+            if (selectedWayPoint != null) {
+                openEditWaypointScreen(selectedWayPoint);
+            }
+            hideAllWaypointButton();
+        }, DEFAULT_NARRATION);
+        editWaypointButton.visible = false;
 
         deleteWaypointButton = DeleteCycleButton.Builder.booleanBuilder(Component.translatable("multiworld.map.waypoint.label.delete"), Component.translatable("multiworld.map.waypoint.label.confirm_delete"))
                 .displayOnlyValue()
-                .create(0,0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.waypoint.label.delete"),
+                .create(0, 0, WAYPOINT_BUTTON_WIDTH, WAYPOINT_BUTTON_HEIGHT, Component.translatable("multiworld.map.waypoint.label.delete"),
                         (cycleButton, value) -> {
-
+                            if (value) {
+                                if (selectedWayPoint != null) {
+                                    WayPointManager.INSTANCE.removeWaypoint(selectedWayPoint);
+                                    wayPointList.refreshList();
+                                }
+                                hideAllWaypointButton();
+                            }
                         });
         deleteWaypointButton.visible = false;
 
@@ -141,6 +160,7 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(portalList);
         this.addRenderableWidget(wayPointList);
         this.addRenderableWidget(createWaypointButton);
+        this.addRenderableWidget(editWaypointButton);
         this.addRenderableWidget(deleteWaypointButton);
     }
 
@@ -161,7 +181,7 @@ public class MapScreen extends Screen {
         setListsVisibility(portalVisible, worldVisible, wayPointVisible);
         listSwitchButton.setValue(mapMode);
         setMapData(ResourceLocation.parse(mapConfig.worldID()), mapConfig, mapWidget);
-        hideWaypointButton();
+        hideAllWaypointButton();
     }
 
     public Font getFontRenderer() {
@@ -209,17 +229,29 @@ public class MapScreen extends Screen {
         int buttonX = (int) Math.max(0, Math.min(mouseX, this.width - WAYPOINT_BUTTON_WIDTH));
         int buttonY = (int) Math.max(0, Math.min(mouseY, this.height - WAYPOINT_BUTTON_HEIGHT));
 
-        List<Vec2> screenWaypointForDimension = WayPointManager.INSTANCE.getScreenWaypointForDimension(mapWidget.getMapConfig(), (float) MapWidget.getScale(), Minecraft.getInstance().player);
-        boolean hasWaypoint = screenWaypointForDimension.stream().anyMatch(vec2 -> {
+        Map<WayPoint, Vec2> screenWaypointForDimension = WayPointManager.INSTANCE.getScreenWaypointForDimension(mapWidget.getMapConfig(), (float) MapWidget.getScale(), Minecraft.getInstance().player);
+        boolean hasWaypoint = screenWaypointForDimension.entrySet().stream().anyMatch(entry -> {
+            Vec2 vec2 = entry.getValue();
             double dx = vec2.x - mouseX;
             double dy = vec2.y - mouseY;
             double distanceSquared = dx * dx + dy * dy;
-            return distanceSquared < 100; // 10 pixels radius
+
+            // 判断是否在点击范围内（半径10像素 -> 距离平方100）
+            boolean matched = distanceSquared < 100;
+
+            if (matched) {
+                selectedWayPoint = entry.getKey();
+            }
+            return matched;
         });
 
         if (hasWaypoint) {
+            editWaypointButton.setX(buttonX);
+            editWaypointButton.setY(buttonY);
+            editWaypointButton.visible = true;
+
             deleteWaypointButton.setX(buttonX);
-            deleteWaypointButton.setY(buttonY);
+            deleteWaypointButton.setY(buttonY + WAYPOINT_BUTTON_HEIGHT);
             deleteWaypointButton.visible = true;
             return;
         }
@@ -232,8 +264,9 @@ public class MapScreen extends Screen {
     /**
      * Hide the waypoint creation button
      */
-    public void hideWaypointButton() {
+    public void hideAllWaypointButton() {
         createWaypointButton.visible = false;
+        editWaypointButton.visible = false;
         deleteWaypointButton.visible = false;
     }
 
@@ -247,25 +280,49 @@ public class MapScreen extends Screen {
         }
     }
 
+    private void openEditWaypointScreen(WayPoint wayPoint) {
+        if (this.minecraft != null && wayPoint != null) {
+            this.minecraft.setScreen(new EditWayPointScreen(wayPoint, this.mapWidget.getMapConfig(), this));
+        }
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Hide waypoint button if clicking outside of it
-        if (createWaypointButton.visible && !createWaypointButton.isMouseOver(mouseX, mouseY)) {
-            hideWaypointButton();
-        }
-        if (deleteWaypointButton.visible && !deleteWaypointButton.isMouseOver(mouseX, mouseY)) {
-            hideWaypointButton();
+        if (mapWidget.isMouseOver(mouseX, mouseY)) {
+            if (button == 0) { // 左键
+                boolean handled = pressButton(mouseX, mouseY);
+                if (handled) return true;
+                // 若未被 waypoint 按钮处理，继续让父类处理（例如其他控件或默认行为）
+                return super.mouseClicked(mouseX, mouseY, button);
+            } else if (button == 1) { // 右键
+                hideAllWaypointButton();
+                showWaypointButton(mouseX, mouseY);
+                return true; // 已处理右键用于显示菜单
+            }
+        } else {
+            hideAllWaypointButton();
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    public void pressButton(double mouseX, double mouseY) {
-        if (createWaypointButton.isMouseOver(mouseX, mouseY)) {
-            createWaypointButton.onPress();
+    public boolean pressButton(double mouseX, double mouseY) {
+        // 优先检查编辑与删除（当它们可见时），再检查创建
+        if (editWaypointButton.isMouseOver(mouseX, mouseY)) {
+            editWaypointButton.onPress();
+            return true;
         }
         if (deleteWaypointButton.isMouseOver(mouseX, mouseY)) {
             deleteWaypointButton.onPress();
+            return true;
         }
+        if (createWaypointButton.isMouseOver(mouseX, mouseY)) {
+            createWaypointButton.onPress();
+            return true;
+        }
+
+        // 未点击到任何 waypoint 按钮，隐藏它们
+        hideAllWaypointButton();
+        return false;
     }
 
     public enum MapMode implements StringRepresentable {

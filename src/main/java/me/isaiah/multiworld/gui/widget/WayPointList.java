@@ -1,7 +1,7 @@
 package me.isaiah.multiworld.gui.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPoint;
 import net.minecraft.client.gui.GuiGraphics;
@@ -31,7 +31,7 @@ public class WayPointList extends ObjectSelectionList<WayPointList.WayPointEntry
         }
     }
 
-    private void refreshList() {
+    public void refreshList() {
         this.clearEntries();
         mapScreen.buildWayPointList(this::addEntry, item -> new WayPointEntry(item, this.mapScreen));
     }

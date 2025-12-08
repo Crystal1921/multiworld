@@ -66,10 +66,6 @@ public class DeleteCycleButton<T> extends AbstractButton {
     // --- 3. 核心：自定义渲染逻辑 ---
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        // 在这里写你的自定义渲染逻辑
-        // 比如绘制自定义纹理、边框、背景等
-
-        // 示例：绘制一个简单的矩形背景（实际开发请使用 texture）
         int color = this.isHoveredOrFocused() ? 0xFFFFFFFF : 0xFF000000;
         guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0x80000000);
         guiGraphics.renderOutline(this.getX(), this.getY(), this.width, this.height, color);

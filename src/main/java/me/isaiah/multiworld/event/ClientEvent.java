@@ -1,6 +1,6 @@
 package me.isaiah.multiworld.event;
 
-import me.isaiah.multiworld.gui.MapScreen;
+import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;
 import net.neoforged.bus.api.SubscribeEvent;

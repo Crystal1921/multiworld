@@ -27,6 +27,7 @@
   "multiworld.map.waypoint.label.confirm_delete": "Confirm to delete this Waypoint",
   "multiworld.map.waypoint.label.delete": "Delete Waypoint",
   "multiworld.map.waypoint.label.dimension": "Dimension:",
+  "multiworld.map.waypoint.label.edit": "Edit Waypoint",
   "multiworld.map.waypoint.label.x": "X:",
   "multiworld.map.waypoint.label.y": "Y:",
   "multiworld.map.waypoint.label.z": "Z:",
