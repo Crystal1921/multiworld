@@ -1,7 +1,6 @@
 {
   "block.multiworld.portal_block": "Portal Block",
   "gui.multiworld.map.portal_list": "Portal List",
-  "gui.multiworld.map.waypoint_list": "Waypoint List",
   "gui.multiworld.map.world_list": "World List",
   "item.multiworld.portal_finder": "Portal Finder",
   "itemGroup.multiworld": "Multiworld",
@@ -25,6 +24,8 @@
   "multiworld.map.waypoint.create": "Create",
   "multiworld.map.waypoint.default_name": "Waypoint",
   "multiworld.map.waypoint.label.color": "Color:",
+  "multiworld.map.waypoint.label.confirm_delete": "Confirm to delete this Waypoint",
+  "multiworld.map.waypoint.label.delete": "Delete Waypoint",
   "multiworld.map.waypoint.label.dimension": "Dimension:",
   "multiworld.map.waypoint.label.x": "X:",
   "multiworld.map.waypoint.label.y": "Y:",

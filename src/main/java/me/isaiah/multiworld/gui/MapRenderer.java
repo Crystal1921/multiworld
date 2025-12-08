@@ -203,11 +203,6 @@ public class MapRenderer {
                 float dxTexture = texturePointX - textureCenterX;
                 float dyTexture = texturePointY - textureCenterY;
 
-                // Skip if outside visible range
-                if (Math.abs(dxTexture) > visibleRadiusX || Math.abs(dyTexture) > visibleRadiusY) {
-                    continue;
-                }
-
                 // Texture pixel offset -> screen pixel offset (with scale)
                 float dxScreen = dxTexture * fMapScale;
                 float dyScreen = dyTexture * fMapScale;

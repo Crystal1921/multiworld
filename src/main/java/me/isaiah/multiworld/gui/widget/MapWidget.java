@@ -11,11 +11,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class MapWidget extends AbstractWidget {
 
         int posX = (mapConfig.maxX() + mapConfig.minX()) / 2;
         int posZ = (mapConfig.maxZ() + mapConfig.minZ()) / 2;
-        centerOnPosition(this.mapConfig,posX, posZ);
+        centerOnPosition(this.mapConfig, posX, posZ);
     }
 
     /**
@@ -93,6 +95,61 @@ public class MapWidget extends AbstractWidget {
         posX = (guiWidth / 2.0) - (mapDisplayWidth / 2.0) - screenDeltaX;
         posY = (guiHeight / 2.0) - (mapDisplayHeight / 2.0) - screenDeltaY;
     }
+    /**
+     * 将世界坐标转换为屏幕坐标 (用于在地图上渲染图标/航点等)
+     *
+     * @param mapConfig 地图配置 (用于获取世界边界计算比例)
+     * @param worldX    目标点的世界 X 坐标
+     * @param worldZ    目标点的世界 Z 坐标
+     * @param scale     当前地图的缩放倍率
+     * @param player    本地玩家对象 (作为地图的中心参考点)
+     * @return 屏幕上的绝对坐标 (Vec2)，如果参数无效则返回 null
+     */
+    public static Vec2 getScreenPosition(MapInstance.MapConfig mapConfig,
+                                         double worldX, double worldZ,
+                                         float scale, LocalPlayer player) {
+        if (mapConfig == null || player == null) {
+            return null;
+        }
+
+        Minecraft instance = Minecraft.getInstance();
+
+        // 1. 获取基础尺寸 (需与渲染逻辑保持一致)
+        final int guiWidth = instance.getWindow().getGuiScaledWidth();
+        final int mapDisplayWidth = Math.max(1, MapInstance.INSTANCE.mapSize);
+        final int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
+
+        // 2. 计算地图在屏幕上的左上角位置
+        // 注意：posX 和 posY 需要是你类中定义的变量，代表地图UI在屏幕上的位置
+        // 这里的计算公式应与 getWorldPosition 中保持完全一致
+        double mapScreenX = (guiWidth - mapDisplayWidth - posX);
+        double mapScreenY = posY;
+
+        // 3. 计算地图在屏幕上的几何中心 (对应玩家位置)
+        double mapCenterX = mapScreenX + mapDisplayWidth / 2.0;
+        double mapCenterY = mapScreenY + mapDisplayHeight / 2.0;
+
+        // 4. 计算世界坐标与纹理像素的比例 (Tex/World)
+        final float worldWidth = Math.max(1.0f, (float) (mapConfig.maxX() - mapConfig.minX()));
+        final float worldHeight = Math.max(1.0f, (float) (mapConfig.maxZ() - mapConfig.minZ()));
+
+        final float texPerWorldX = (float) mapDisplayWidth / worldWidth;
+        final float texPerWorldY = (float) mapDisplayHeight / worldHeight;
+
+        // 5. 核心逻辑：计算目标点相对于玩家(地图中心)的偏移量
+        // 公式: 像素偏移 = 世界距离 * 基础比例 * 缩放倍率
+        double worldDeltaX = worldX - player.position().x;
+        double worldDeltaZ = worldZ - player.position().z;
+
+        double screenDeltaX = worldDeltaX * texPerWorldX * scale;
+        double screenDeltaZ = worldDeltaZ * texPerWorldY * scale;
+
+        // 6. 将偏移量加到屏幕中心点，得到最终屏幕坐标
+        return new Vec2(
+                (float) (mapCenterX + screenDeltaX),
+                (float) (mapCenterY + screenDeltaZ)
+        );
+    }
 
     /**
      * Get world coordinates from screen coordinates.
@@ -103,6 +160,7 @@ public class MapWidget extends AbstractWidget {
      * @param screenY Screen Y coordinate (e.g. mouse Y)
      * @return World position as Vec2, or null if map is not valid
      */
+    @Nullable
     public static Vec2 getWorldPosition(MapInstance.MapConfig mapConfig, double screenX, double screenY) {
         if (mapConfig == null) {
             return null;

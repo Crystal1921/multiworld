@@ -1,6 +1,10 @@
 package me.isaiah.multiworld.map.waypoint;
 
 import me.isaiah.multiworld.MultiworldMod;
+import me.isaiah.multiworld.gui.widget.MapWidget;
+import me.isaiah.multiworld.map.MapInstance;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -18,8 +22,8 @@ import java.util.Map;
 public enum WayPointManager {
     INSTANCE;
 
-    private final List<WayPoint> waypoints = new ArrayList<>();
     private static final String CONFIG_PATH = "config/multiworld/waypoints.yml";
+    private final List<WayPoint> waypoints = new ArrayList<>();
 
     /**
      * Initialize waypoint configuration
@@ -75,9 +79,18 @@ public enum WayPointManager {
     /**
      * Get waypoints for a specific dimension
      */
-    public List<WayPoint> getWaypointsForDimension(String dimensionId) {
+    public List<WayPoint> getWaypointsForDimension(MapInstance.MapConfig mapConfig) {
+        String dimensionId = mapConfig.worldID();
         return waypoints.stream()
                 .filter(wp -> wp.dimensionId().equals(dimensionId))
+                .toList();
+    }
+
+    public List<Vec2> getScreenWaypointForDimension(MapInstance.MapConfig mapConfig, float scale, LocalPlayer player) {
+        String dimensionId = mapConfig.worldID();
+        return waypoints.stream()
+                .filter(wp -> wp.dimensionId().equals(dimensionId))
+                .map(wp -> MapWidget.getScreenPosition(mapConfig, wp.x(), wp.z(), scale, player))
                 .toList();
     }
 
@@ -138,18 +151,18 @@ public enum WayPointManager {
                 java.nio.file.Paths.get(CONFIG_PATH),
                 java.nio.charset.StandardCharsets.UTF_8)) {
             Map<String, Object> data = yaml.load(reader);
-            
+
             if (data == null || !data.containsKey("waypoints")) {
                 return;
             }
 
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> waypointList = (List<Map<String, Object>>) data.get("waypoints");
-            
+
             if (waypointList == null) {
                 return;
             }
-            
+
             for (Map<String, Object> waypointData : waypointList) {
                 try {
                     String name = (String) waypointData.get("name");
@@ -158,7 +171,7 @@ public enum WayPointManager {
                     double z = ((Number) waypointData.get("z")).doubleValue();
                     String dimensionId = (String) waypointData.get("dimensionId");
                     int color = ((Number) waypointData.get("color")).intValue();
-                    
+
                     if (name != null && dimensionId != null) {
                         waypoints.add(new WayPoint(name, x, y, z, dimensionId, color));
                     }

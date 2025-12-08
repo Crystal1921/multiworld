@@ -1,7 +1,6 @@
 {
   "block.multiworld.portal_block": "传送门方块",
   "gui.multiworld.map.portal_list": "传送门列表",
-  "gui.multiworld.map.waypoint_list": "路径点列表",
   "gui.multiworld.map.world_list": "世界列表",
   "item.multiworld.portal_finder": "传送门探测器",
   "itemGroup.multiworld": "多世界",
@@ -25,6 +24,8 @@
   "multiworld.map.waypoint.create": "创建",
   "multiworld.map.waypoint.default_name": "路径点",
   "multiworld.map.waypoint.label.color": "颜色：",
+  "multiworld.map.waypoint.label.confirm_delete": "确定要删除此路径点",
+  "multiworld.map.waypoint.label.delete": "删除路径点",
   "multiworld.map.waypoint.label.dimension": "维度：",
   "multiworld.map.waypoint.label.x": "X：",
   "multiworld.map.waypoint.label.y": "Y：",
