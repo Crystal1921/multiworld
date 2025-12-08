@@ -88,9 +88,10 @@ public enum WayPointManager {
 
     public List<Vec2> getScreenWaypointForDimension(MapInstance.MapConfig mapConfig, float scale, LocalPlayer player) {
         String dimensionId = mapConfig.worldID();
+        Vec2 viewerPosition = MapWidget.getViewerPosition(player, mapConfig);
         return waypoints.stream()
                 .filter(wp -> wp.dimensionId().equals(dimensionId))
-                .map(wp -> MapWidget.getScreenPosition(mapConfig, wp.x(), wp.z(), scale, player))
+                .map(wp -> MapWidget.getScreenPosition(mapConfig, wp.x(), wp.z(), scale, viewerPosition))
                 .toList();
     }
 

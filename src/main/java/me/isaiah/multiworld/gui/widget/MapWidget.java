@@ -51,6 +51,29 @@ public class MapWidget extends AbstractWidget {
     }
 
     /**
+     * Get the viewer position for map calculations.
+     * If the player is in the same dimension as the map, returns the player's position.
+     * Otherwise, returns the center of the map.
+     *
+     * @param player    The local player (can be null)
+     * @param mapConfig The map configuration
+     * @return The viewer position as Vec2 (x, z coordinates)
+     */
+    public static Vec2 getViewerPosition(LocalPlayer player, MapInstance.MapConfig mapConfig) {
+        if (player != null && mapConfig != null) {
+            String playerDimension = player.level().dimension().location().toString();
+            if (playerDimension.equals(mapConfig.worldID())) {
+                return new Vec2((float) player.position().x, (float) player.position().z);
+            }
+        }
+        // Fallback to map center
+        if (mapConfig != null) {
+            return new Vec2((mapConfig.minX() + mapConfig.maxX()) / 2f, (mapConfig.minZ() + mapConfig.maxZ()) / 2f);
+        }
+        return new Vec2(0, 0);
+    }
+
+    /**
      * Set the map position and scale to center on a specific world coordinate.
      *
      * @param worldX World X coordinate to center on
@@ -62,10 +85,8 @@ public class MapWidget extends AbstractWidget {
         }
 
         Minecraft instance = Minecraft.getInstance();
-        if (instance.player == null) {
-            return;
-        }
         var player = instance.player;
+        Vec2 viewerPosition = getViewerPosition(player, mapConfig);
 
         // --- 1. 获取屏幕和地图尺寸 ---
         final int guiWidth = instance.getWindow().getGuiScaledWidth();
@@ -74,9 +95,9 @@ public class MapWidget extends AbstractWidget {
         final int mapDisplayHeight = Math.max(1, MapInstance.INSTANCE.mapSize);
 
         // --- 2. 计算世界坐标到屏幕像素的转换 ---
-        // 世界坐标差值 (目标点 - 玩家位置)
-        final double worldDeltaX = worldX - player.position().x;
-        final double worldDeltaZ = worldZ - player.position().z;
+        // 世界坐标差值 (目标点 - 观察者位置)
+        final double worldDeltaX = worldX - viewerPosition.x;
+        final double worldDeltaZ = worldZ - viewerPosition.y;
 
         // 世界尺寸
         final float worldWidth = Math.max(1.0f, (float) (mapConfig.maxX() - mapConfig.minX()));
@@ -98,17 +119,17 @@ public class MapWidget extends AbstractWidget {
     /**
      * 将世界坐标转换为屏幕坐标 (用于在地图上渲染图标/航点等)
      *
-     * @param mapConfig 地图配置 (用于获取世界边界计算比例)
-     * @param worldX    目标点的世界 X 坐标
-     * @param worldZ    目标点的世界 Z 坐标
-     * @param scale     当前地图的缩放倍率
-     * @param player    本地玩家对象 (作为地图的中心参考点)
+     * @param mapConfig      地图配置 (用于获取世界边界计算比例)
+     * @param worldX         目标点的世界 X 坐标
+     * @param worldZ         目标点的世界 Z 坐标
+     * @param scale          当前地图的缩放倍率
+     * @param viewerPosition 观察者位置 (作为地图的中心参考点)
      * @return 屏幕上的绝对坐标 (Vec2)，如果参数无效则返回 null
      */
     public static Vec2 getScreenPosition(MapInstance.MapConfig mapConfig,
                                          double worldX, double worldZ,
-                                         float scale, LocalPlayer player) {
-        if (mapConfig == null || player == null) {
+                                         float scale, Vec2 viewerPosition) {
+        if (mapConfig == null || viewerPosition == null) {
             return null;
         }
 
@@ -136,10 +157,10 @@ public class MapWidget extends AbstractWidget {
         final float texPerWorldX = (float) mapDisplayWidth / worldWidth;
         final float texPerWorldY = (float) mapDisplayHeight / worldHeight;
 
-        // 5. 核心逻辑：计算目标点相对于玩家(地图中心)的偏移量
+        // 5. 核心逻辑：计算目标点相对于观察者(地图中心)的偏移量
         // 公式: 像素偏移 = 世界距离 * 基础比例 * 缩放倍率
-        double worldDeltaX = worldX - player.position().x;
-        double worldDeltaZ = worldZ - player.position().z;
+        double worldDeltaX = worldX - viewerPosition.x;
+        double worldDeltaZ = worldZ - viewerPosition.y;
 
         double screenDeltaX = worldDeltaX * texPerWorldX * scale;
         double screenDeltaZ = worldDeltaZ * texPerWorldY * scale;
@@ -167,10 +188,8 @@ public class MapWidget extends AbstractWidget {
         }
 
         Minecraft instance = Minecraft.getInstance();
-        if (instance.player == null) {
-            return null;
-        }
         var player = instance.player;
+        Vec2 viewerPosition = getViewerPosition(player, mapConfig);
 
         // 1. 获取屏幕和地图尺寸 (与 renderWidget 中一致)
         final int guiWidth = instance.getWindow().getGuiScaledWidth();
@@ -203,24 +222,23 @@ public class MapWidget extends AbstractWidget {
         double worldDeltaX = dx / (texPerWorldX * scale);
         double worldDeltaZ = dy / (texPerWorldY * scale);
 
-        // 7. 加上参考点坐标 (地图渲染中心默认是玩家位置)
+        // 7. 加上参考点坐标 (地图渲染中心默认是观察者位置)
         return new Vec2(
-                (float) (player.position().x + worldDeltaX),
-                (float) (player.position().z + worldDeltaZ)
+                (float) (viewerPosition.x + worldDeltaX),
+                (float) (viewerPosition.y + worldDeltaZ)
         );
     }
 
     @Override
     protected void renderWidget(@NotNull GuiGraphics guiGraphics, int i, int i1, float v) {
         Minecraft instance = Minecraft.getInstance();
-        if (instance.player == null) {
-            return;
-        }
         var player = instance.player;
 
         if (mapConfig == null) {
             return;
         }
+
+        Vec2 viewerPosition = getViewerPosition(player, mapConfig);
 
         ResourceLocation background = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map/" + mapConfig.mapName() + ".png");
 
@@ -249,8 +267,8 @@ public class MapWidget extends AbstractWidget {
                 getHeight(),
                 ENABLE_PORTALS.get(),
                 ENABLE_WAYPOINTS.get(),
-                null,  // use player position for center
-                null   // use player position for center
+                (double) viewerPosition.x,
+                (double) viewerPosition.y
         );
     }
 
