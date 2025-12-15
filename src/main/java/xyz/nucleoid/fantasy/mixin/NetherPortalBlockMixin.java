@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetherPortalBlock.class)
-public class MixinNetherPortalBlock {
+public class NetherPortalBlockMixin {
     /**
      * TODO: check: 1.21.5 Changes this.
      */

@@ -3,12 +3,14 @@
   "package": "xyz.nucleoid.fantasy.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "DerivedLevelDataMixin",
     "DimensionOptionsMixin",
     "FlatLevelGeneratorSettingsMixin",
     "MinecraftServerAccess",
-    "MixinMinecraftServer",
-    "MixinNetherPortalBlock",
+    "MinecraftServerMixin",
+    "NetherPortalBlockMixin",
     "ServerChunkManagerMixin",
+    "ServerLevelMixin",
     "ServerWorldMixin",
     "SimpleRegistryMixin",
     "WorldBorderMixin"

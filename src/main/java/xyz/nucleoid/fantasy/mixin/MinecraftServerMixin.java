@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
-public class MixinMinecraftServer implements IMC {
+public class MinecraftServerMixin implements IMC {
 
     @Final
     @Shadow

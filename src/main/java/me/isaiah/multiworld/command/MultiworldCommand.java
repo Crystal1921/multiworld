@@ -17,6 +17,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,6 +31,8 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
+import static me.isaiah.multiworld.command.commands.TimeCommand.addTime;
+import static me.isaiah.multiworld.command.commands.TimeCommand.setTime;
 import static net.minecraft.commands.Commands.literal;
 
 public class MultiworldCommand {
@@ -312,7 +315,25 @@ public class MultiworldCommand {
                         .then(Commands.argument("world", ResourceLocationArgument.id())
                                 .executes(ctx -> ImportCommand.run(ctx.getSource().getServer(), ctx.getSource(), ResourceLocationArgument.getId(ctx, "world"))))
                 )
-                .then(Commands.literal("name")
+                .then(Commands.literal("time")
+                        .then(
+                                Commands.literal("set")
+                                        .then(Commands.literal("day").executes(context -> setTime(context.getSource(), 1000)))
+                                        .then(Commands.literal("noon").executes(context -> setTime(context.getSource(), 6000)))
+                                        .then(Commands.literal("night").executes(context -> setTime(context.getSource(), 13000)))
+                                        .then(Commands.literal("midnight").executes(context -> setTime(context.getSource(), 18000)))
+                                        .then(
+                                                Commands.argument("time", TimeArgument.time())
+                                                        .executes(source -> setTime(source.getSource(), IntegerArgumentType.getInteger(source, "time")))
+                                        )
+                        )
+                        .then(
+                                Commands.literal("add")
+                                        .then(
+                                                Commands.argument("time", TimeArgument.time())
+                                                        .executes(context -> addTime(context.getSource(), IntegerArgumentType.getInteger(context, "time")))
+                                        )
+                        )
                 ));
     }
 

@@ -2,11 +2,12 @@ package me.isaiah.multiworld.event;
 
 import me.isaiah.multiworld.gui.screen.MapScreen;
 import net.minecraft.client.Minecraft;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 
-@EventBusSubscriber
+@EventBusSubscriber(value = Dist.CLIENT)
 public class KeyEvent {
     @SubscribeEvent
     public static void onPressKey(InputEvent.Key event) {

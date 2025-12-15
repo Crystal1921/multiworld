@@ -7,15 +7,12 @@ import me.isaiah.multiworld.command.HomeCommand;
 import me.isaiah.multiworld.command.MultiworldCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.WarpCommand;
-import me.isaiah.multiworld.config.ClientConfig;
 import me.isaiah.multiworld.portal.WandEventHandler;
 import me.isaiah.multiworld.registry.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -26,9 +23,6 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 public class MultiworldModNeoForge {
 
     public MultiworldModNeoForge(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.init());
-
-        modEventBus.addListener(this::commonSetup);
 
         NeoForge.EVENT_BUS.register(this);
 
@@ -42,9 +36,6 @@ public class MultiworldModNeoForge {
         GroupRegistry.TABS.register(modEventBus);
         ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
         DataAttachmentsRegistry.ATTACHMENT_TYPES.register(modEventBus);
-    }
-
-    public void commonSetup(final FMLCommonSetupEvent event) {
     }
 
     @SubscribeEvent

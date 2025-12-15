@@ -3,12 +3,13 @@ package me.isaiah.multiworld.event;
 import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
-@EventBusSubscriber
+@EventBusSubscriber(value = Dist.CLIENT)
 public class ClientEvent {
     @SubscribeEvent
     public static void onClientSetUp(FMLClientSetupEvent event) {

@@ -1,10 +1,12 @@
 package me.isaiah.multiworld;
 
+import me.isaiah.multiworld.config.ClientConfig;
 import me.isaiah.multiworld.gui.screen.MapConfigScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -12,6 +14,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 public class MultiworldModClient {
     public MultiworldModClient(IEventBus modEventBus, ModContainer modContainer) {
         this.registerConfigMenu(modContainer);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.init());
     }
 
     private void registerConfigMenu(ModContainer modContainer) {
