@@ -15,6 +15,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
@@ -37,8 +38,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static me.isaiah.multiworld.gui.widget.MapWidget.centerOnPosition;
 import static me.isaiah.multiworld.gui.widget.MapWidget.getWorldPosition;
 import static me.isaiah.multiworld.gui.widget.WorldList.WorldEntry.setMapData;
+import static org.apache.commons.lang3.math.NumberUtils.isParsable;
 
 public class MapScreen extends Screen {
     public static final KeyMapping MAP_OPEN_KEY = new KeyMapping("key.multiworld.map_open.desc",
@@ -49,6 +52,7 @@ public class MapScreen extends Screen {
             "key.category.multiworld");
     public final static int BUTTON_PADDING = 30;
     public final static int BUTTON_WIDTH = 100;
+    public final static int EDIT_BOX_WIDTH = 30;
     public final static int MAP_PADDING = 80;
     protected static final Button.CreateNarration DEFAULT_NARRATION = Supplier::get;
     private final static int WAYPOINT_BUTTON_WIDTH = 120;
@@ -62,6 +66,10 @@ public class MapScreen extends Screen {
     private Button createWaypointButton;
     private Button editWaypointButton;
     private DeleteCycleButton<Boolean> deleteWaypointButton;
+    private CycleButton<Boolean> teleportButton;
+    private EditBox xEditBox;
+    private EditBox zEditBox;
+    private boolean readyToTeleport = false;
 
     private double mouseClickX;
     private double mouseClickY;
@@ -153,6 +161,33 @@ public class MapScreen extends Screen {
                         });
         deleteWaypointButton.visible = false;
 
+        teleportButton = CycleButton.<Boolean>builder((boolVal) -> Component.translatable(boolVal ? "multiworld.map.waypoint.label.teleport" : "multiworld.map.waypoint.label.teleport_on"))
+                .withValues(true, false)
+                .displayOnlyValue()
+                .withInitialValue(false)
+                .create(BUTTON_WIDTH * 2 + 10, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, BUTTON_WIDTH / 2, BUTTON_PADDING - 10, Component.empty(),
+                        (button, boolVal) -> {
+                            if (boolVal) {
+                                xEditBox.visible = true;
+                                zEditBox.visible = true;
+                                readyToTeleport = true;
+                            } else {
+                                if (isParsable(xEditBox.getValue()) && isParsable(zEditBox.getValue())) {
+                                    int x = Integer.parseInt(xEditBox.getValue());
+                                    int z = Integer.parseInt(zEditBox.getValue());
+                                    centerOnPosition(mapWidget.getMapConfig(), x,z);
+                                }
+                                xEditBox.visible = false;
+                                zEditBox.visible = false;
+                                readyToTeleport = false;
+                            }
+                        });
+
+        xEditBox = new EditBox(this.font, BUTTON_WIDTH * 2 + 70, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, EDIT_BOX_WIDTH, BUTTON_PADDING - 10, Component.translatable("multiworld.map.coordinate.x"));
+        xEditBox.visible = false;
+        zEditBox = new EditBox(this.font, BUTTON_WIDTH * 2 + 110, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, EDIT_BOX_WIDTH, BUTTON_PADDING - 10, Component.translatable("multiworld.map.coordinate.z"));
+        zEditBox.visible = false;
+
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
         this.addRenderableWidget(mapSettingsButton);
@@ -162,12 +197,24 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(createWaypointButton);
         this.addRenderableWidget(editWaypointButton);
         this.addRenderableWidget(deleteWaypointButton);
+        this.addRenderableWidget(teleportButton);
+        this.addRenderableWidget(xEditBox);
+        this.addRenderableWidget(zEditBox);
     }
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.fill(0, 0, this.width, this.height, 0xFF000000);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderCoordinate(guiGraphics, mouseX, mouseY);
+    }
+
+    private void renderCoordinate(GuiGraphics guiGraphics, int x, int y) {
+        Vec2 worldPosition = getWorldPosition(mapWidget.getMapConfig(), x, y);
+        Minecraft instance = Minecraft.getInstance();
+        if (worldPosition != null && !this.readyToTeleport) {
+            guiGraphics.drawString(this.font, Component.literal("X: " + (int) worldPosition.x + "Z: " + (int) worldPosition.y), BUTTON_WIDTH * 2 + 70, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, 0xFFFFFF);
+        }
     }
 
     @Override
