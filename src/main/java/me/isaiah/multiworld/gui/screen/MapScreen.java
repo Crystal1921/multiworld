@@ -96,6 +96,14 @@ public class MapScreen extends Screen {
             WorldList.getPortalList(portals, resourceLocation);
         }
 
+        if (config.get() == null) {
+            if (MapInstance.INSTANCE.mapConfigs.isEmpty()) {
+                config.set(new MapInstance.MapConfig("minecraft:overworld", "Overworld", 100, 10, 10, 2));
+            } else {
+                config.set(MapInstance.INSTANCE.mapConfigs.getFirst());
+            }
+        }
+
         listSwitchButton = CycleButton.<MapMode>builder((mapMode) -> Component.translatable(mapMode.getSerializedName()))
                 .withValues(MapMode.values())
                 .displayOnlyValue()
@@ -175,7 +183,7 @@ public class MapScreen extends Screen {
                                 if (isParsable(xEditBox.getValue()) && isParsable(zEditBox.getValue())) {
                                     int x = Integer.parseInt(xEditBox.getValue());
                                     int z = Integer.parseInt(zEditBox.getValue());
-                                    centerOnPosition(mapWidget.getMapConfig(), x,z);
+                                    centerOnPosition(mapWidget.getMapConfig(), x, z);
                                 }
                                 xEditBox.visible = false;
                                 zEditBox.visible = false;
