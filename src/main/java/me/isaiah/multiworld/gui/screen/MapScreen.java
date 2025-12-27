@@ -66,7 +66,6 @@ public class MapScreen extends Screen {
     private Button createWaypointButton;
     private Button editWaypointButton;
     private DeleteCycleButton<Boolean> deleteWaypointButton;
-    private CycleButton<Boolean> teleportButton;
     private EditBox xEditBox;
     private EditBox zEditBox;
     private boolean readyToTeleport = false;
@@ -98,7 +97,7 @@ public class MapScreen extends Screen {
 
         if (config.get() == null) {
             if (MapInstance.INSTANCE.mapConfigs.isEmpty()) {
-                config.set(new MapInstance.MapConfig("minecraft:overworld", "Overworld", 100, 10, 10, 2));
+                config.set(new MapInstance.MapConfig("minecraft:overworld", "overworld", 100, 10, 10, 2));
             } else {
                 config.set(MapInstance.INSTANCE.mapConfigs.getFirst());
             }
@@ -169,7 +168,7 @@ public class MapScreen extends Screen {
                         });
         deleteWaypointButton.visible = false;
 
-        teleportButton = CycleButton.<Boolean>builder((boolVal) -> Component.translatable(boolVal ? "multiworld.map.waypoint.label.teleport" : "multiworld.map.waypoint.label.teleport_on"))
+        CycleButton<Boolean> teleportButton = CycleButton.<Boolean>builder((boolVal) -> Component.translatable(boolVal ? "multiworld.map.waypoint.label.teleport" : "multiworld.map.waypoint.label.teleport_on"))
                 .withValues(true, false)
                 .displayOnlyValue()
                 .withInitialValue(false)
