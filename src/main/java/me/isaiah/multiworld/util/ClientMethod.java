@@ -7,6 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
+import java.util.Objects;
+
 public class ClientMethod {
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
@@ -17,13 +19,15 @@ public class ClientMethod {
     }
 
     private static void setMapConfig(ResourceLocation location) {
-        boolean anyMatch = MapInstance.INSTANCE.mapConfigs.stream().anyMatch(mapConfig -> {
-            if (mapConfig.worldID().equals(location.toString())) {
-                MapOverlay.mapConfig = mapConfig;
-                return true;
-            }
-            return false;
-        });
+        boolean anyMatch = MapInstance.INSTANCE.mapConfigs.stream()
+                .filter(Objects::nonNull)
+                .anyMatch(mapConfig -> {
+                    if (mapConfig.worldID().equals(location.toString())) {
+                        MapOverlay.mapConfig = mapConfig;
+                        return true;
+                    }
+                    return false;
+                });
         if (!anyMatch) {
             MapOverlay.mapConfig = null;
         }
