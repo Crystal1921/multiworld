@@ -66,6 +66,7 @@ public class ModLanguage implements DataProvider {
         this.add("multiworld.map.coordinate.z", "Coordinate Z", "z坐标");
         this.add("multiworld.map.waypoint.label.teleport_on", "Teleport to", "跳转到");
         this.add("multiworld.map.waypoint.label.teleport", "Teleport", "跳转");
+        this.add("multiworld.map.waypoint.label.follow", "Follow", "跟随");
 
         this.add(ItemRegistry.PortalBlock.asItem(), "Portal Block", "传送门方块");
         this.add(ItemRegistry.PortalFinder.asItem(), "Portal Finder", "传送门探测器");

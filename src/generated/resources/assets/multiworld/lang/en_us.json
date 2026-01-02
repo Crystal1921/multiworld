@@ -30,6 +30,7 @@
   "multiworld.map.waypoint.label.delete": "Delete Waypoint",
   "multiworld.map.waypoint.label.dimension": "Dimension:",
   "multiworld.map.waypoint.label.edit": "Edit Waypoint",
+  "multiworld.map.waypoint.label.follow": "Follow",
   "multiworld.map.waypoint.label.teleport": "Teleport",
   "multiworld.map.waypoint.label.teleport_on": "Teleport to",
   "multiworld.map.waypoint.label.x": "X:",

@@ -181,6 +181,8 @@ public class MapScreen extends Screen {
                                 xEditBox.visible = true;
                                 zEditBox.visible = true;
                                 readyToTeleport = true;
+                                xEditBox.setValue("");
+                                zEditBox.setValue("");
                             } else {
                                 if (isParsable(xEditBox.getValue()) && isParsable(zEditBox.getValue())) {
                                     int x = Integer.parseInt(xEditBox.getValue());
@@ -198,6 +200,12 @@ public class MapScreen extends Screen {
         zEditBox = new EditBox(this.font, BUTTON_WIDTH * 2 + 110, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, EDIT_BOX_WIDTH, BUTTON_PADDING - 10, Component.translatable("multiworld.map.coordinate.z"));
         zEditBox.visible = false;
 
+        Button followButton = Button.builder(Component.translatable("multiworld.map.waypoint.label.follow"), button -> {
+            if (player != null && mapWidget.getMapConfig().worldID().equals(player.level().dimension().location().toString())) {
+                centerOnPosition(mapWidget.getMapConfig(), player.getX(), player.getY());
+            }
+        }).bounds(BUTTON_WIDTH * 2 + 150, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5,EDIT_BOX_WIDTH, BUTTON_PADDING - 10).build();
+
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
         this.addRenderableWidget(mapSettingsButton);
@@ -210,6 +218,7 @@ public class MapScreen extends Screen {
         this.addRenderableWidget(teleportButton);
         this.addRenderableWidget(xEditBox);
         this.addRenderableWidget(zEditBox);
+        this.addRenderableWidget(followButton);
     }
 
     @Override

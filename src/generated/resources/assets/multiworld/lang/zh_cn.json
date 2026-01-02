@@ -30,6 +30,7 @@
   "multiworld.map.waypoint.label.delete": "删除路径点",
   "multiworld.map.waypoint.label.dimension": "维度：",
   "multiworld.map.waypoint.label.edit": "编辑路径点",
+  "multiworld.map.waypoint.label.follow": "跟随",
   "multiworld.map.waypoint.label.teleport": "跳转",
   "multiworld.map.waypoint.label.teleport_on": "跳转到",
   "multiworld.map.waypoint.label.x": "X：",
