@@ -23,9 +23,8 @@ public class JoinServerEvent {
     @SubscribeEvent
     public static void onPlayerJoinServer(ClientPlayerNetworkEvent.LoggingIn event) {
         Minecraft instance = Minecraft.getInstance();
-        Path gameDir = instance.gameDirectory.toPath();
+        Path gameDir = instance.gameDirectory.toPath().resolve("maps");
         loadLocalMapConfigs(gameDir);
-//        MapInstance.INSTANCE.mapConfigs
     }
 
     public static void loadLocalMapConfigs(Path mapsDir) {
@@ -38,13 +37,14 @@ public class JoinServerEvent {
             return;
         }
         try (Stream<Path> paths = Files.walk(mapsDir)) {
+            MapInstance.INSTANCE.mapConfigs.clear();
             paths
                     .filter(Files::isRegularFile)
                     .filter(p -> p.getFileName().toString().endsWith(".json"))
                     .forEach(path -> {
                         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
                             MapInstance.MapConfig mapConfig = GSON.fromJson(reader, MapInstance.MapConfig.class);
-                            if (mapConfig != null) {
+                            if (mapConfig != null && mapConfig.mapName() != null && mapConfig.worldID() != null) {
                                 MapInstance.INSTANCE.mapConfigs.add(mapConfig);
                                 MultiworldMod.LOGGER.info("Loaded map config from {}", path.toAbsolutePath());
                             } else {

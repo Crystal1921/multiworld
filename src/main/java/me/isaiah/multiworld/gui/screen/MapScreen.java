@@ -33,6 +33,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -87,11 +88,13 @@ public class MapScreen extends Screen {
         List<Vec2> portals = new ArrayList<>();
         if (player != null) {
             ResourceLocation resourceLocation = player.level().dimension().location();
-            MapInstance.INSTANCE.mapConfigs.forEach(mapConfig -> {
-                if (mapConfig.worldID().equals(resourceLocation.toString())) {
-                    config.set(mapConfig);
-                }
-            });
+            MapInstance.INSTANCE.mapConfigs.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(mapConfig -> {
+                        if (mapConfig.worldID().equals(resourceLocation.toString())) {
+                            config.set(mapConfig);
+                        }
+                    });
             WorldList.getPortalList(portals, resourceLocation);
         }
 

@@ -18,7 +18,7 @@ public class ClientMethod {
         }
     }
 
-    private static void setMapConfig(ResourceLocation location) {
+    public static void setMapConfig(ResourceLocation location) {
         boolean anyMatch = MapInstance.INSTANCE.mapConfigs.stream()
                 .filter(Objects::nonNull)
                 .anyMatch(mapConfig -> {
