@@ -73,8 +73,8 @@ public abstract class MapConfigProvider implements DataProvider {
 
         private final ArrayList<MapInstance.MapConfig> entries = new ArrayList<>();
 
-        public MapBuilder add(String worldID, String mapName, int minX, int minZ, int maxX, int maxZ) {
-            this.entries.add(new MapInstance.MapConfig(worldID, mapName, minX, minZ, maxX, maxZ));
+        public MapBuilder add(String worldID, String mapName, String mapBgName, int minX, int minZ, int maxX, int maxZ) {
+            this.entries.add(new MapInstance.MapConfig(worldID, mapName, mapBgName, minX, minZ, maxX, maxZ));
             return this;
         }
 

@@ -21,6 +21,8 @@ public enum MapInstance {
     public double mapScale;
     public final List<MapConfig> mapConfigs = new ArrayList<>();
 
+    public static final MapConfig DEFAULT = new MapInstance.MapConfig("minecraft:overworld", "overworld","test", 100, 100, 0, 0);
+
     public static void initMapConfig() {
         File configDir = new File("config/multiworld");
         configDir.mkdirs();
@@ -102,6 +104,6 @@ public enum MapInstance {
         return names;
     }
 
-    public record MapConfig(String worldID, String mapName, int minX, int minZ, int maxX, int maxZ) {
+    public record MapConfig(String worldID, String mapName, String mapBgName, int minX, int minZ, int maxX, int maxZ) {
     }
 }

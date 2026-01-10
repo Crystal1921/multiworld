@@ -61,6 +61,7 @@ public class MapOverlay implements LayeredDraw.Layer {
                 guiGraphics,
                 player,
                 map,
+                null,
                 mapConfig,
                 Collections.emptyList(),  // No portals in overlay
                 WayPointManager.INSTANCE.getWaypoints(),

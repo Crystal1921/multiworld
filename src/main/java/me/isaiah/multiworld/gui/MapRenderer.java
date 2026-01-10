@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.List;
@@ -28,30 +29,32 @@ public class MapRenderer {
     /**
      * Draw the map with all configurable parameters.
      *
-     * @param guiGraphics    Graphics context
-     * @param player         The player (for centering)
-     * @param background     Map texture resource
-     * @param mapConfig      Map configuration
-     * @param portals        List of portal positions
-     * @param waypoints      List of waypoints to draw
-     * @param font           Font for drawing markers
-     * @param mapScreenX     X position of map on screen
-     * @param mapScreenY     Y position of map on screen
+     * @param guiGraphics      Graphics context
+     * @param player           The player (for centering)
+     * @param background       Map texture resource
+     * @param bgLoc            Map background texture resource
+     * @param mapConfig        Map configuration
+     * @param portals          List of portal positions
+     * @param waypoints        List of waypoints to draw
+     * @param font             Font for drawing markers
+     * @param mapScreenX       X position of map on screen
+     * @param mapScreenY       Y position of map on screen
      * @param mapDisplayWidth  Map display width in pixels
      * @param mapDisplayHeight Map display height in pixels
-     * @param mapScale       Scale factor for the map
-     * @param scissorMinX    Scissor region min X
-     * @param scissorMinY    Scissor region min Y
-     * @param scissorMaxX    Scissor region max X
-     * @param scissorMaxY    Scissor region max Y
-     * @param showPortals    Whether to show portal markers
-     * @param showWaypoints  Whether to show waypoint markers
-     * @param centerX        X coordinate to center on (in world space), or null to use player position
-     * @param centerZ        Z coordinate to center on (in world space), or null to use player position
+     * @param mapScale         Scale factor for the map
+     * @param scissorMinX      Scissor region min X
+     * @param scissorMinY      Scissor region min Y
+     * @param scissorMaxX      Scissor region max X
+     * @param scissorMaxY      Scissor region max Y
+     * @param showPortals      Whether to show portal markers
+     * @param showWaypoints    Whether to show waypoint markers
+     * @param centerX          X coordinate to center on (in world space), or null to use player position
+     * @param centerZ          Z coordinate to center on (in world space), or null to use player position
      */
     public static void drawMap(@NotNull GuiGraphics guiGraphics,
                                Player player,
                                ResourceLocation background,
+                               @Nullable ResourceLocation bgLoc,
                                MapInstance.MapConfig mapConfig,
                                List<Vec2> portals,
                                List<WayPoint> waypoints,
@@ -67,14 +70,18 @@ public class MapRenderer {
                                int scissorMaxY,
                                boolean showPortals,
                                boolean showWaypoints,
-                               Double centerX,
-                               Double centerZ) {
+                               @Nullable Double centerX,
+                               @Nullable Double centerZ) {
 
         if (mapConfig == null || background == null || player == null) {
             return;
         }
 
         guiGraphics.enableScissor(scissorMinX, scissorMinY, scissorMaxX, scissorMaxY);
+
+        if (bgLoc != null) {
+            guiGraphics.blit(bgLoc,scissorMinX, scissorMinY,0,0, scissorMaxX - scissorMinX, scissorMaxY - scissorMinY,scissorMaxX - scissorMinX, scissorMaxY - scissorMinY);
+        }
 
         // Map world boundaries
         final int minX = mapConfig.minX();
@@ -185,13 +192,13 @@ public class MapRenderer {
         // Draw waypoint markers if enabled
         if (showWaypoints && waypoints != null) {
             final int waypointSize = 10;
-            
+
             for (WayPoint waypoint : waypoints) {
                 // Only draw waypoints for current dimension
                 if (!waypoint.dimensionId().equals(mapConfig.worldID())) {
                     continue;
                 }
-                
+
                 float worldPointX = (float) waypoint.x();
                 float worldPointZ = (float) waypoint.z();
 
@@ -266,10 +273,10 @@ public class MapRenderer {
 
         // 3. 修改绘制顺序为逆时针 (Top -> Left -> Bottom -> Right) 以符合标准
         // 注意：Z值这里暂时还是0，如果需要层级控制，建议给方法加一个 int z 参数
-        vertexConsumer.addVertex(matrix, topX,    topY,    0).setColor(colorWithAlpha);
-        vertexConsumer.addVertex(matrix, leftX,   leftY,   0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, topX, topY, 0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, leftX, leftY, 0).setColor(colorWithAlpha);
         vertexConsumer.addVertex(matrix, bottomX, bottomY, 0).setColor(colorWithAlpha);
-        vertexConsumer.addVertex(matrix, rightX,  rightY,  0).setColor(colorWithAlpha);
+        vertexConsumer.addVertex(matrix, rightX, rightY, 0).setColor(colorWithAlpha);
 
         // 4. 重要：刷新缓冲区，确保立即渲染
         guiGraphics.flushIfUnmanaged();

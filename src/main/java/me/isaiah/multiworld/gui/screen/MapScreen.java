@@ -100,7 +100,7 @@ public class MapScreen extends Screen {
 
         if (config.get() == null) {
             if (MapInstance.INSTANCE.mapConfigs.isEmpty()) {
-                config.set(new MapInstance.MapConfig("minecraft:overworld", "overworld", 100, 10, 10, 2));
+                config.set(MapInstance.DEFAULT);
             } else {
                 config.set(MapInstance.INSTANCE.mapConfigs.getFirst());
             }

@@ -222,7 +222,11 @@ public class MapWidget extends AbstractWidget {
             return;
         }
 
-        ResourceLocation background = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map/" + mapConfig.mapName() + ".png");
+        ResourceLocation mapLoc = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map/" + mapConfig.mapName() + ".png");
+        ResourceLocation bgLoc = null;
+        if (mapConfig.mapBgName() != null && !mapConfig.mapBgName().isEmpty()) {
+            bgLoc = ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "textures/map_background/" + mapConfig.mapBgName() + ".png");
+        }
 
         int guiWidth = guiGraphics.guiWidth();
         int mapDisplayWidth = Math.max(1, MapInstance.INSTANCE.mapSize);
@@ -233,7 +237,8 @@ public class MapWidget extends AbstractWidget {
         MapRenderer.drawMap(
                 guiGraphics,
                 player,
-                background,
+                mapLoc,
+                bgLoc,
                 mapConfig,
                 portals,
                 WayPointManager.INSTANCE.getWaypoints(),
