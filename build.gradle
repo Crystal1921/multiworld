@@ -117,8 +117,8 @@ dependencies {
     additionalRuntimeClasspath 'io.lettuce:lettuce-core:6.2.4.RELEASE'
     additionalRuntimeClasspath 'org.yaml:snakeyaml:2.3'
 
-    jarJar ('org.sejda.imageio:webp-imageio:0.1.6')
-    additionalRuntimeClasspath 'org.sejda.imageio:webp-imageio:0.1.6'
+    jarJar (implementation 'com.madgag:animated-gif-lib:1.4')
+    additionalRuntimeClasspath 'com.madgag:animated-gif-lib:1.4'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.gui.MapRenderer;
+import me.isaiah.multiworld.gui.gif.GifAnimation;
+import me.isaiah.multiworld.gui.gif.GifManager;
+import me.isaiah.multiworld.gui.gif.GifPlayer;
 import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;
@@ -38,6 +41,7 @@ public class MapWidget extends AbstractWidget {
     private MapInstance.MapConfig mapConfig;
     @Setter
     private List<Vec2> portals;
+    private GifPlayer gifPlayer;
 
     public MapWidget(int x, int y, int width, int height, MapInstance.MapConfig mapConfig, List<Vec2> portals, MapScreen mapScreen) {
         super(x, y, width, height, Component.literal("map_open"));
@@ -48,6 +52,11 @@ public class MapWidget extends AbstractWidget {
         int posX = (mapConfig.maxX() + mapConfig.minX()) / 2;
         int posZ = (mapConfig.maxZ() + mapConfig.minZ()) / 2;
         centerOnPosition(this.mapConfig, posX, posZ);
+
+        GifAnimation mcg = GifManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "mcg"));
+        if (mcg != null) {
+            gifPlayer = new GifPlayer(mcg);
+        }
     }
 
     /**
@@ -95,6 +104,7 @@ public class MapWidget extends AbstractWidget {
         posX = (guiWidth / 2.0) - (mapDisplayWidth / 2.0) - screenDeltaX;
         posY = (guiHeight / 2.0) - (mapDisplayHeight / 2.0) - screenDeltaY;
     }
+
     /**
      * 将世界坐标转换为屏幕坐标 (用于在地图上渲染图标/航点等)
      *
@@ -257,6 +267,10 @@ public class MapWidget extends AbstractWidget {
                 null,  // use player position for center
                 null   // use player position for center
         );
+
+        if (gifPlayer != null) {
+            gifPlayer.render(MAP_PADDING, 0, getWidth(), getHeight());
+        }
     }
 
     /**
