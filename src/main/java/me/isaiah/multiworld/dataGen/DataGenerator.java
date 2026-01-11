@@ -28,7 +28,7 @@ public class DataGenerator {
                 event.includeClient(), new ModLanguage(pack, "zh_cn"));
         generator.addProvider(
                 event.includeClient(), new ModLanguage(pack, "en_us"));
-        generator.addProvider(
-                event.includeClient(), new ModMapConfig(pack));
+//        generator.addProvider(
+//                event.includeClient(), new ModMapConfig(pack));
     }
 }
