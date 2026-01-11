@@ -16,6 +16,7 @@ repositories {
     flatDir {
         dir 'libs'
     }
+    mavenCentral()
 }
 
 base {
@@ -115,6 +116,9 @@ dependencies {
     jarJar (implementation 'org.yaml:snakeyaml:2.3')
     additionalRuntimeClasspath 'io.lettuce:lettuce-core:6.2.4.RELEASE'
     additionalRuntimeClasspath 'org.yaml:snakeyaml:2.3'
+
+    jarJar ('org.sejda.imageio:webp-imageio:0.1.6')
+    additionalRuntimeClasspath 'org.sejda.imageio:webp-imageio:0.1.6'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

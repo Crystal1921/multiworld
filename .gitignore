@@ -30,3 +30,4 @@ repo
 
 src/generated/resources/.cache
 /.vscode/launch.json
+.claude
