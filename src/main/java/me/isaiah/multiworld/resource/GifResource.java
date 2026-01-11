@@ -40,6 +40,7 @@ public class GifResource extends SimplePreparableReloadListener<Map<ResourceLoca
 
     @Override
     protected void apply(Map<ResourceLocation, InputStream> inputStreamMap, ResourceManager resourceManager, ProfilerFiller profiler) {
+        // 先重新加载所有 GIF 动画数据
         inputStreamMap.forEach((resourceLocation, imageInputStream) -> {
             try {
                 GifAnimation gifAnimation = GifLoader.load(imageInputStream);
@@ -47,7 +48,8 @@ public class GifResource extends SimplePreparableReloadListener<Map<ResourceLoca
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         });
+
+        // 然后重建所有 GifPlayer 的纹理（因为 OpenGL 上下文可能已改变）
     }
 }

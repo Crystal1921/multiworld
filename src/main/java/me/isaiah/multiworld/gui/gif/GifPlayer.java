@@ -10,6 +10,7 @@ import java.util.List;
 
 public final class GifPlayer {
 
+    private final GifAnimation animation;
     private final List<Integer> textures = new ArrayList<>();
     private final List<Integer> delays = new ArrayList<>();
 
@@ -18,10 +19,38 @@ public final class GifPlayer {
     private boolean closed = false;
 
     public GifPlayer(GifAnimation animation) {
+        this.animation = animation;
+        createTextures();
+        nextFrameTime = System.currentTimeMillis();
+        // 注册到 GifManager，以便在资源重载时重建纹理
+        GifManager.getInstance().registerPlayer(this);
+    }
+
+    /**
+     * 创建所有帧的纹理
+     */
+    private void createTextures() {
         for (GifFrame frame : animation.frames) {
             textures.add(GLTextureUtil.createTexture(frame.image));
             delays.add(Math.max(frame.delayMs, 10));
         }
+    }
+
+    /**
+     * 重建纹理（窗口大小改变或资源重载后调用）
+     */
+    public void recreateTextures() {
+        // 删除旧的纹理
+        for (int texture : textures) {
+            GLTextureUtil.deleteTexture(texture);
+        }
+        textures.clear();
+        delays.clear();
+
+        // 重新创建纹理
+        createTextures();
+
+        // 保持当前帧索引
         nextFrameTime = System.currentTimeMillis();
     }
 
@@ -58,6 +87,9 @@ public final class GifPlayer {
      */
     public void close() {
         if (!closed) {
+            // 从 GifManager 取消注册
+            GifManager.getInstance().unregisterPlayer(this);
+
             for (int texture : textures) {
                 GLTextureUtil.deleteTexture(texture);
             }

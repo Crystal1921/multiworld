@@ -204,7 +204,7 @@ public class MapScreen extends Screen {
             if (player != null && mapWidget.getMapConfig().worldID().equals(player.level().dimension().location().toString())) {
                 centerOnPosition(mapWidget.getMapConfig(), player.getX(), player.getY());
             }
-        }).bounds(BUTTON_WIDTH * 2 + 150, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5,EDIT_BOX_WIDTH, BUTTON_PADDING - 10).build();
+        }).bounds(BUTTON_WIDTH * 2 + 150, instance.getWindow().getGuiScaledHeight() - BUTTON_PADDING + 5, EDIT_BOX_WIDTH, BUTTON_PADDING - 10).build();
 
         this.addRenderableWidget(mapWidget);
         this.addRenderableWidget(listSwitchButton);
