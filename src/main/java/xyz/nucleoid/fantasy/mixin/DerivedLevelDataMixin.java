@@ -3,7 +3,9 @@ package xyz.nucleoid.fantasy.mixin;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -53,20 +55,20 @@ public class DerivedLevelDataMixin {
 
     /**
      * @author Crystal1921
-     * @reason 独立存储每刻日夜流逝比例
-     */
-    @Overwrite
-    public float getDayTimePerTick() {
-        return this.fantasy$dayTimePerTick;
-    }
-
-    /**
-     * @author Crystal1921
      * @reason 独立存储日夜进度
      */
     @Overwrite
     public void setDayTimeFraction(float dayTimeFraction) {
         this.fantasy$dayTimeFraction = dayTimeFraction;
+    }
+
+    /**
+     * @author Crystal1921
+     * @reason 独立存储每刻日夜流逝比例
+     */
+    @Overwrite
+    public float getDayTimePerTick() {
+        return this.fantasy$dayTimePerTick;
     }
 
     /**
