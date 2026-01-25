@@ -1,5 +1,6 @@
 package xyz.nucleoid.fantasy.mixin;
 
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.storage.DerivedLevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WorldData;
@@ -18,12 +19,20 @@ public class DerivedLevelDataMixin {
     private float fantasy$dayTimeFraction;
     @Unique
     private float fantasy$dayTimePerTick;
+    @Unique
+    private GameRules fantasy$gameRules;
 
+    /**
+     * 服务器启动时，从持久化配置加载世界时间
+     * <p>
+     * {@link me.isaiah.multiworld.event.ServerStartEvent#onServerStart}
+     */
     @Inject(method = "<init>", at = @At("RETURN"))
     private void fantasy$initDayTime(WorldData worldData, ServerLevelData wrapped, CallbackInfo ci) {
         this.fantasy$dayTime = wrapped.getDayTime();
         this.fantasy$dayTimeFraction = wrapped.getDayTimeFraction();
         this.fantasy$dayTimePerTick = wrapped.getDayTimePerTick();
+        this.fantasy$gameRules = wrapped.getGameRules().copy();
     }
 
     /**
@@ -78,5 +87,14 @@ public class DerivedLevelDataMixin {
     @Overwrite
     public void setDayTimePerTick(float dayTimePerTick) {
         this.fantasy$dayTimePerTick = dayTimePerTick;
+    }
+
+    /**
+     * @author Crystal1921
+     * @reason 替换世界规则
+     */
+    @Overwrite
+    public GameRules getGameRules() {
+        return this.fantasy$gameRules;
     }
 }

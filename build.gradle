@@ -79,8 +79,7 @@ neoForge {
         // applies to all the run configs above
         configureEach {
 
-            jvmArguments = ['-XX:+IgnoreUnrecognizedVMOptions',
-                            '-XX:+AllowEnhancedClassRedefinition']
+            jvmArguments = ['-XX:+IgnoreUnrecognizedVMOptions']
 
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG

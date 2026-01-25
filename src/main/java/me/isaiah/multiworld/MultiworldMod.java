@@ -37,16 +37,6 @@ public class MultiworldMod {
      */
     @Getter
     public static ICreator worldCreator;
-    public static String[] COMMAND_HELP = {
-            "&4Multiworld Mod Commands:&r",
-            "&a/mw spawn&r - Teleport to current world spawn",
-            "&a/mw setspawn&r - Sets the current world spawn",
-            "&a/mw tp <id>&r - Teleport to a world",
-            "&a/mw list&r - List all worlds",
-            "&a/mw gamerule <rule> <value>&r - Change a worlds Gamerules",
-            "&a/mw create <id> <env> [-g=<generator> -s=<seed>]&r - create a new world",
-            "&a/mw difficulty <value> [world id] - Sets the difficulty of a world"
-    };
 
     public static void setICreator(ICreator ic) {
         worldCreator = ic;

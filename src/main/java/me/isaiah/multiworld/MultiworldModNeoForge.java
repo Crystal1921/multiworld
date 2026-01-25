@@ -16,7 +16,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 
 @Mod(MultiworldMod.MOD_ID)
@@ -36,11 +35,6 @@ public class MultiworldModNeoForge {
         GroupRegistry.TABS.register(modEventBus);
         ModCommandArgumentRegistry.COMMAND_ARG.register(modEventBus);
         DataAttachmentsRegistry.ATTACHMENT_TYPES.register(modEventBus);
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        MultiworldMod.onServerStarted(event.getServer());
     }
 
     @SubscribeEvent

@@ -1,5 +1,6 @@
 package me.isaiah.multiworld.event;
 
+import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.command.HomeCommand;
 import me.isaiah.multiworld.command.SpawnCommand;
 import me.isaiah.multiworld.command.WarpCommand;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class ServerStartEvent {
     @SubscribeEvent
     public static void onServerStart(ServerStartingEvent event) {
+        MultiworldMod.onServerStarted(event.getServer());
         MinecraftServer server = event.getServer();
         BorderCommand.initWorldBorder(server);
         WarpCommand.initWarp(server);
