@@ -1,12 +1,12 @@
 package me.isaiah.multiworld.gui.widget;
 
+import com.crystal.gif_loader.gif.GifAnimation;
+import com.crystal.gif_loader.gif.GifManager;
+import com.crystal.gif_loader.gif.GifPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import me.isaiah.multiworld.MultiworldMod;
 import me.isaiah.multiworld.gui.MapRenderer;
-import me.isaiah.multiworld.gui.gif.GifAnimation;
-import me.isaiah.multiworld.gui.gif.GifManager;
-import me.isaiah.multiworld.gui.gif.GifPlayer;
 import me.isaiah.multiworld.gui.screen.MapScreen;
 import me.isaiah.multiworld.map.MapInstance;
 import me.isaiah.multiworld.map.waypoint.WayPointManager;

@@ -1,6 +1,5 @@
 package me.isaiah.multiworld.event;
 
-import me.isaiah.multiworld.resource.GifResource;
 import me.isaiah.multiworld.resource.MapConfigResource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -12,6 +11,5 @@ public class ResourceEvent {
     @SubscribeEvent
     public static void onResourceEvent(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(MapConfigResource.INSTANCE);
-        event.registerReloadListener(GifResource.INSTANCE);
     }
 }
