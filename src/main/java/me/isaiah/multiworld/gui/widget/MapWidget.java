@@ -41,6 +41,7 @@ public class MapWidget extends AbstractWidget {
     private MapInstance.MapConfig mapConfig;
     @Setter
     private List<Vec2> portals;
+    @Getter
     private GifPlayer gifPlayer;
 
     public MapWidget(int x, int y, int width, int height, MapInstance.MapConfig mapConfig, List<Vec2> portals, MapScreen mapScreen) {
@@ -55,7 +56,7 @@ public class MapWidget extends AbstractWidget {
 
         GifAnimation mcg = GifManager.getInstance().getAnimation(ResourceLocation.fromNamespaceAndPath(MultiworldMod.MOD_ID, "mcg"));
         if (mcg != null) {
-            gifPlayer = new GifPlayer(mcg);
+            gifPlayer = new GifPlayer(mcg.playOnce());
         }
     }
 

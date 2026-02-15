@@ -391,6 +391,13 @@ public class MapScreen extends Screen {
         return false;
     }
 
+    public void onClose() {
+        if (this.mapWidget.getGifPlayer() != null) {
+            this.mapWidget.getGifPlayer().close();
+        }
+        super.onClose();
+    }
+
     public enum MapMode implements StringRepresentable {
         WORLD_LIST,
         PORTAL_LIST,
